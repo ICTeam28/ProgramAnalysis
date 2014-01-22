@@ -1,0 +1,52 @@
+#editor
+{
+  position: absolute;
+  width: 670px; left: 0px; top: 0px; bottom: 0px;
+}
+
+#editor textarea
+{
+  resize: none;
+}
+
+#tabs
+{
+  position: absolute;
+  left: 670px; right: 0px; top: 0px; bottom: 0px;
+}
+
+#tabs li a
+{
+  font-size: 10px;
+}
+
+#tabs > div
+{
+  margin: 2px 0px 0px 0px;
+  padding: 0px;
+  width: calc(100% - 10px);
+  height: calc(100% - 28px);
+}
+
+#imf-tabs
+{
+  position: relative;
+  width: 100%;
+  height: calc(100% - 10px);
+}
+
+#imf-tabs > div
+{
+  margin: 2px 0px 0px 0px;
+  padding: 0px;
+  width: 100%;
+  height: calc(100% - 30px);
+  overflow: auto;
+}
+
+#imf-canvas
+{
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
