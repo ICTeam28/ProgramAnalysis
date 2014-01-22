@@ -1,0 +1,26 @@
+Create the Webpages in this git repository.
+
+1.Accessing it from the Web:
+
+Your entire group project directory is accessible via the web as the URL:
+
+        http://www.doc.ic.ac.uk/project/2013/163/g13163xx/
+
+Note: we usually recommend that you put web pages in a subdirectory
+of your project directory, for example
+
+/vol/project/2013/163/g13163xx/web/
+
+in which case the above URL would become:
+
+        http://www.doc.ic.ac.uk/project/2013/163/g12163xx/web/
+
+You may also want to add a very restrictive .htaccess file to the top
+level directory to disallow web browsing of your entire group project
+directory.
+
+For more information about the DoC web server, CGI scripts etc,
+please see the CSG web guides found at:
+
+       http://www.doc.ic.ac.uk/csg/guides/web/
+
