@@ -15,6 +15,8 @@
 
         $("#error-report").text("");
         ast = mini.parse($(this).val());
+        ast = env.checkAST(ast);
+
         env.updateAST(ast);
         env.updateIMF(ast);
       }

@@ -180,11 +180,23 @@
 
   /**
    * Generates code for a statement
+   * @param {Object} Node of the Abstract Syntax tree
+   * @param {Array<ImmInstr>} List which collects information
    */
-  var generateStatement = function(node, imf)
+  var generate = function(node, imf)
   {
     switch (node['op'])
     {
+      case 'func':
+      {
+        imf.push(new ImmInstr('lbl', 'f_' + node['name']));
+        for (var i = 0; i < node['body'].length; ++i)
+        {
+          generate(node['body'][i], imf);
+        }
+
+        break;
+      }
       case 'return':
       {
         imf.push(new ImmInstr('ret', '@' + generateExpr(node['expr'], imf, 0)));
@@ -201,7 +213,7 @@
         // False branch
         for (var i = 0; i < node['false'].length; ++i)
         {
-          generateStatement(node['false'][i], imf);
+          generate(node['false'][i], imf);
         }
         imf.push(new ImmInstr('jmp', lend));
 
@@ -209,24 +221,12 @@
         imf.push(new ImmInstr('lbl', ltrue));
         for (var i = 0; i < node['true'].length; ++i)
         {
-          generateStatement(node['true'][i], imf);
+          generate(node['true'][i], imf);
         }
         imf.push(new ImmInstr('lbl', lend));
 
         break;
       }
-    }
-  };
-
-  /**
-   * Generates the intermediate form representation of a function
-   */
-  var generateFunc = function(node, imf)
-  {
-    imf.push(new ImmInstr('lbl', 'f_' + node['name']));
-    for (var i = 0; i < node['body'].length; ++i)
-    {
-      generateStatement(node['body'][i], imf);
     }
   };
 
@@ -250,7 +250,7 @@
       var imf = [];
 
       // Generate the IMF of the function
-      generateFunc(ast['funcs'][i], imf);
+      generate(ast['funcs'][i], imf);
 
       // Add the tab
       $("#imf-tabs > ul")
