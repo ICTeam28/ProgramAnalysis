@@ -29,12 +29,6 @@
   var mY = 0;
 
   /**
-   * Root of the syntax tree
-   * @type {Object}
-   */
-  var root;
-
-  /**
    * Renders the label of a node, adjusting width to the length of the text
    * and centering the text inside the box
    * @param {String} label Text to display
@@ -254,10 +248,76 @@
   };
 
   /**
+   * Check whether a node in the abstract syntax tree is correct or not
+   * @param {Object} node Node to be checked
+   * @param {Object<String, Int>} funcs Arities of defined functions
+   * @param {List<String>} vars List of defined variable names
+   */
+  var checkAST = function(node, funcs, vars)
+  {
+    switch (node['op'])
+    {
+      case 'func':
+      {
+        node['args'].map(function (arg)
+        {
+          vars.push(arg);
+        });
+
+        node['body'].map(function (nd)
+        {
+          checkAST(nd, funcs, vars);
+        });
+        return;
+      }
+      case 'return':
+      {
+        checkAST(node['expr'], funcs, vars);
+        return;
+      }
+      case 'if':
+      {
+        checkAST(node['cond'], funcs, vars);
+
+        var vt = vars.slice(0);
+        node['true'].map(function (nd)
+        {
+          checkAST(nd, funcs, vt);
+        });
+
+        var vf = vars.slice(0);
+        node['false'].map(function (nd)
+        {
+          checkAST(nd, funcs, vf);
+        });
+        return;
+      }
+      case 'bin':
+      {
+        checkAST(node['lhs'], funcs, vars);
+        checkAST(node['rhs'], funcs, vars);
+        return;
+      }
+      case 'val':
+      {
+        return;
+      }
+      case 'var':
+      {
+        if (vars.indexOf(node['name']) == -1)
+        {
+          throw new Error('Undefined variable "' + node['name'] + '"');
+        }
+        return;
+      }
+    }
+  };
+
+  /**
    * Updates the tree
    * @param {Object} ast
    */
-  env.updateAST = function(ast)
+  env.drawAST = function(ast)
   {
     var g;
 
@@ -271,18 +331,47 @@
     g = document.createElementNS(NS, "g");
     svg.appendChild(g);
 
-    drawAST(root = ast, g);
+    drawAST(ast, g);
   };
 
   /**
    * Performs type checking on the abstract syntax tree
    * @param {Object} ast Syntax tree to be checked
-   * @param ast Returns the ast
    * @throws {Error} Exception is throw when type check failed
    */
   env.checkAST = function(ast)
   {
-    return ast;
+    var arities = {};
+
+    if (ast['op'] != 'prog')
+    {
+      throw new Error('Invalid program');
+    }
+
+    for (var i = 0, func; i < ast['funcs'].length; ++i)
+    {
+      func = ast['funcs'][i];
+      if (func['op'] != 'func')
+      {
+        throw new Error('Invalid function');
+      }
+
+      arities[func.name] = func.args.length;
+      for (var j = 0, idx; j < func.args.length; ++j)
+      {
+        idx = func.args.indexOf(func.args[j]);
+        if (idx != j && idx != -1)
+        {
+          throw new Error('Duplicate argument name "' + func.args[j] +
+                          '" in "' + func.name + '"');
+        }
+      }
+    }
+
+    for (var i = 0; i < ast['funcs'].length; ++i)
+    {
+      checkAST(ast['funcs'][i], arities, []);
+    }
   };
 
   /**
