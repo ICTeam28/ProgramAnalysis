@@ -323,7 +323,7 @@
       switch (imf[i].op) {
       case 'jmp':
         for (j = 0; j < imf.length; ++j) {
-          if (imf[j].op == 'lbl' && imf[j].label == imf[i].label) {
+          if (imf[j].op === 'lbl' && imf[j].label === imf[i].label) {
             next = j;
             break;
           }
@@ -337,7 +337,7 @@
         return false;
       case 'cjmp':
         for (j = 0; j < imf.length; ++j) {
-          if (imf[j].op == 'lbl' && imf[j].label == imf[i].label) {
+          if (imf[j].op === 'lbl' && imf[j].label === imf[i].label) {
             next = j;
             break;
           }
@@ -366,7 +366,7 @@
 
     visit(0);
     for (i = 0; i < imf.length; ++i) {
-      if (live.indexOf(i) != -1) {
+      if (live.indexOf(i) !== -1) {
         imfp.push(imf[i]);
       }
     }
@@ -405,7 +405,7 @@
    * @param {Object<String, Array<ImmInstr>} imf Intermediate form
    */
   env.drawIMF = function (imf) {
-    var name, svg, i, tab;
+    var name, svg, tab;
 
     nextLabel = 0;
 

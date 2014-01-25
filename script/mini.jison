@@ -98,13 +98,19 @@ body
 
 statement
   : return
+  | while
   | ifElse
   | assignment
   ;
 
 return
-  : 'RETURN' expr ';'
+  : RETURN expr ';'
     { $$ = { 'op': 'return', 'expr': $2 }; }
+  ;
+
+while
+  : WHILE '(' expr ')' bodyOpt
+    { $$ = { 'op': 'while', 'cond': $3, 'body': $5 }; }
   ;
 
 ifElse
@@ -114,7 +120,7 @@ ifElse
 
 assignment
   : ID '=' expr ';'
-    { $$ = { 'op': 'assign', 'var': $1, 'val': $3 }; }
+    { $$ = { 'op': 'assign', 'name': $1, 'expr': $3 }; }
   ;
 
 expr

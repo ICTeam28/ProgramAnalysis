@@ -72,10 +72,13 @@
    * connecting the bar to the labels of the children
    * @param {Array<Object>} List of nodes
    * @param {SVGElement} parent SVG parent node
+   * @param {Number} off Offset from the top
    * @return {Number} Total height of the rendered elements
    */
-  var drawChildren = function (nodes, parent) {
-    var line, points = "30 30", off = 45, g, i;
+  var drawChildren = function (nodes, parent, off) {
+    var line, points = "30 30", g, i;
+
+    off = off || 45;
 
     // Take care of the children
     for (i = 0; i < nodes.length; ++i) {
@@ -126,12 +129,47 @@
 
       drawLabel('RETURN', p);
       return drawAST(node.expr, g).height;
+    case 'while':
+      // Predicate
+      drawLabel('WHILE', p);
+      g = document.createElementNS(NS, "g");
+      g.setAttribute("transform", "translate(70, 0)");
+      p.appendChild(g);
+
+      line = document.createElementNS(NS, "line");
+      line.setAttributeNS(null, "x1", "60");
+      line.setAttributeNS(null, "y1", "15");
+      line.setAttributeNS(null, "x2", "70");
+      line.setAttributeNS(null, "y2", "15");
+      p.appendChild(line);
+      cond = drawAST(node.cond, g);
+
+      // Body
+      return drawChildren(node.body, p, 25 + cond.height);
+    case 'assign':
+      // Variable Name
+      w = drawLabel(node.name, p);
+      g = document.createElementNS(NS, "g");
+      g.setAttribute("transform", "translate(" + (w + 10) + ", 0)");
+      p.appendChild(g);
+
+      line = document.createElementNS(NS, "line");
+      line.setAttributeNS(null, "x1", w);
+      line.setAttributeNS(null, "y1", "15");
+      line.setAttributeNS(null, "x2", w + 10);
+      line.setAttributeNS(null, "y2", "15");
+      p.appendChild(line);
+      expr = drawAST(node.expr, g);
+
+      // Expression
+      return drawChildren(node.expr, p, 25 + expr.height);
     case 'if':
       // Condition
       drawLabel('IF', p);
       g = document.createElementNS(NS, "g");
       g.setAttribute("transform", "translate(50, 0)");
       p.appendChild(g);
+
       line = document.createElementNS(NS, "line");
       line.setAttributeNS(null, "x1", "31");
       line.setAttributeNS(null, "y1", "15");
@@ -140,7 +178,7 @@
       p.appendChild(line);
 
       cond = drawAST(node.cond, g);
-      h = 25 + cond.height;
+      h = 30 + cond.height;
 
       // True branch
       drawLabel('TRUE', p, 30, h - 15);
@@ -151,7 +189,7 @@
       line.setAttributeNS(null, "points", "15 30 15 " + h + " 30 " + h);
       p.appendChild(line);
 
-      h += drawChildren(node['true'], g);
+      h += 10 + drawChildren(node['true'], g);
 
       // False branch
       drawLabel('FALSE', p, 30, h - 15);
@@ -264,6 +302,20 @@
       return;
     case 'return':
       checkAST(node.expr, funcs, vars);
+      return;
+    case 'while':
+      checkAST(node.cond, funcs, vars);
+
+      var vb = vars.slice(0);
+      node.body.map(function (nd) {
+        checkAST(nd, funcs, vb);
+      });
+      return;
+    case 'assign':
+      checkAST(node.expr, funcs, vars);
+      if (vars.indexOf(node.name) === -1) {
+        vars.push(node.name);
+      }
       return;
     case 'if':
       checkAST(node.cond, funcs, vars);
