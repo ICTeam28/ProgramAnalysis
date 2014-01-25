@@ -10,6 +10,7 @@
     <script type="text/javascript" src="script/ast.js"></script>
     <script type="text/javascript" src="script/imf.js"></script>
     <script type="text/javascript" src="script/cfg.js"></script>
+    <script type="text/javascript" src="script/gen-js.js"></script>
     <script type="text/javascript" src="script/editor.js"></script>
   </head>
   <body>
@@ -25,11 +26,10 @@ func testp(b)
   return 20;
 }
 
-func double(b, c)
+func main()
 {
-  return double(-b, !c);
+  return testp(0);
 }
-
       </textarea>
       <div id="error-report"> </div>
     </div>
