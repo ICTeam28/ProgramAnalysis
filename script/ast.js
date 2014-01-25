@@ -145,7 +145,7 @@
       cond = drawAST(node.cond, g);
 
       // Body
-      return drawChildren(node.body, p, 25 + cond.height);
+      return drawChildren(node.body, p, 15 + cond.height);
     case 'assign':
       // Variable Name
       w = drawLabel(node.name, p);
@@ -162,7 +162,7 @@
       expr = drawAST(node.expr, g);
 
       // Expression
-      return drawChildren(node.expr, p, 25 + expr.height);
+      return drawChildren(node.expr, p, 10 + expr.height);
     case 'if':
       // Condition
       drawLabel('IF', p);

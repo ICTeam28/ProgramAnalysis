@@ -70,6 +70,10 @@
       this.reg = arg1;
       this.label = arg2;
       break;
+    case 'njmp':
+      this.reg = arg1;
+      this.label = arg2;
+      break;
     case 'arg':
       this.reg = arg1;
       break;
@@ -102,6 +106,8 @@
       return 'jmp ' + this.label;
     case 'cjmp':
       return 'cjmp ' + this.reg + ', ' + this.label;
+    case 'njmp':
+      return 'njmp ' + this.reg + ', ' + this.label;
     case 'arg':
       return 'arg ' + this.reg;
     case 'call':
@@ -149,7 +155,7 @@
    * @param {Array<ImmInstr>} List which collects information
    */
   var generate = function (node, imf) {
-    var lend, ltrue, i;
+    var lend, ltrue, i, lcond;
 
     switch (node.op) {
     case 'func':
@@ -161,6 +167,23 @@
       break;
     case 'return':
       imf.push(new ImmInstr('ret', '@' + generateExpr(node.expr, imf, 0)));
+      break;
+    case 'while':
+      lcond = 'L' + (nextLabel++);
+      lend = 'L' + (nextLabel++);
+
+      imf.push(new ImmInstr('lbl', lcond));
+      generateExpr(node.cond, imf, 0);
+      imf.push(new ImmInstr('njmp', '@0', lend));
+
+      // Body
+      for (i = 0; i < node.body.length; ++i) {
+        generate(node.body[i], imf);
+      }
+
+      imf.push(new ImmInstr('jmp', lcond));
+      imf.push(new ImmInstr('lbl', lend));
+
       break;
     case 'if':
       lend = 'L' + (nextLabel++);
@@ -315,12 +338,26 @@
       var next, j, vn, vl;
 
       switch (imf[i].op) {
+      case 'lbl':
+        if (visit(i + 1)) {
+          live.push(i);
+          return true;
+        }
+        return false;
       case 'jmp':
         for (j = 0; j < imf.length; ++j) {
           if (imf[j].op === 'lbl' && imf[j].label === imf[i].label) {
             next = j;
             break;
           }
+        }
+
+        if (next < i) {
+          if (live.indexOf(next) !== -1) {
+            live.push(i);
+            return true;
+          }
+          return false;
         }
 
         if (visit(next)) {
