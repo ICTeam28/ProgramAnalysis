@@ -58,6 +58,10 @@
       this.dest = arg2;
       this.src = arg3;
       break;
+    case 'un':
+      this.p = arg1;
+      this.reg = arg2;
+      break;
     case 'jmp':
       this.label = arg1;
       break;
@@ -91,6 +95,8 @@
       return 'var ' + this.dest + ', ' + this.src;
     case 'bin':
       return '(' + this.p + ') ' + this.dest + ', ' + this.src;
+    case 'un':
+      return '(' + this.p + ') ' + this.reg;
     case 'jmp':
       return 'jmp ' + this.label;
     case 'cjmp':
@@ -119,9 +125,12 @@
       generateExpr(node.rhs, imf, r + 1);
       imf.push(new ImmInstr('bin', node.p, '@' + r, '@' + (r + 1)));
       return r;
+    case 'un':
+      generateExpr(node.expr, imf, r);
+      imf.push(new ImmInstr('un', node.p, '@' + r));
+      return r;
     case 'call':
-      node.args.map(function (arg)
-      {
+      node.args.map(function (arg) {
         generateExpr(arg, imf, r);
         imf.push(new ImmInstr('arg', '@' + r));
       });

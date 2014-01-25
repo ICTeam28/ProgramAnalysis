@@ -104,7 +104,7 @@
    * @return {Number} Height of the element which was rendered
    */
   var drawAST = function (node, p) {
-    var text, line, g, lhs, rhs, cond;
+    var text, line, g, lhs, rhs, cond, expr;
     var w, h, i;
 
     switch (node.op) {
@@ -195,6 +195,25 @@
         'width': lhs.width + 5 + rhs.width,
         'height': Math.max(lhs.height, rhs.height) + 50
       };
+    case 'un':
+      drawLabel(node.p, p);
+
+      g = document.createElementNS(NS, "g");
+      g.setAttribute("transform", "translate(0, 50)");
+      p.appendChild(g);
+      expr = drawAST(node.expr, g);
+
+      line = document.createElementNS(NS, "line");
+      line.setAttributeNS(null, "x1", "15");
+      line.setAttributeNS(null, "y1", "30");
+      line.setAttributeNS(null, "x2", "15");
+      line.setAttributeNS(null, "y2", "50");
+      p.appendChild(line);
+
+      return {
+        'width': expr.width,
+        'height': 50 + expr.height
+      };
     case 'call':
       for (i = 0, w = 0, h = 0; i < node.args.length; ++i) {
         g = document.createElementNS(NS, "g");
@@ -279,6 +298,9 @@
     case 'bin':
       checkAST(node.lhs, funcs, vars);
       checkAST(node.rhs, funcs, vars);
+      return;
+    case 'un':
+      checkAST(node.expr, funcs, vars);
       return;
     case 'var':
       if (vars.indexOf(node.name) === -1) {

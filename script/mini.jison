@@ -149,11 +149,11 @@ expr
   | expr '||' expr
     { $$ = { 'op': 'bin', 'p': '||', 'lhs': $1, 'rhs': $3 }; }
   | '!' expr
-    { $$ = { 'op': 'un', 'p': '!', 'arg': $2 }; }
+    { $$ = { 'op': 'un', 'p': '!', 'expr': $2 }; }
   | '-' expr %prec NEG
-    { $$ = { 'op': 'un', 'p': '-', 'arg': $2 }; }
+    { $$ = { 'op': 'un', 'p': '-', 'expr': $2 }; }
   | '~' expr
-    { $$ = { 'op': 'un', 'p': '~', 'arg': $2 }; }
+    { $$ = { 'op': 'un', 'p': '~', 'expr': $2 }; }
   | NUMBER
     { $$ = { 'op': 'num', 'val': Number(yytext) }; }
   | ID callArgsOpt
