@@ -3,35 +3,48 @@
 %%
 
 \s+                     /* skip whitespace */
-"func"                  return 'FUNC';
-"return"                return 'RETURN';
-"if"                    return 'IF';
-"else"                  return 'ELSE';
-"while"                 return 'WHILE';
+'func'                  return 'FUNC';
+'return'                return 'RETURN';
+'if'                    return 'IF';
+'else'                  return 'ELSE';
+'while'                 return 'WHILE';
 [a-zA-Z_][a-zA-Z_0-9]*  return 'ID';
 0|[1-9][0-9]*           return 'NUMBER';
-"*"                     return '*';
-"/"                     return '/';
-"-"                     return '-';
-"+"                     return '+';
-"^"                     return '^';
-"("                     return '(';
-")"                     return ')';
-"{"                     return '{';
-"}"                     return '}';
-","                     return ',';
-";"                     return ';';
-"=="                    return '==';
-"="                     return '=';
+'*'                     return '*';
+'/'                     return '/';
+'%'                     return '%';
+'-'                     return '-';
+'+'                     return '+';
+'^'                     return '^';
+'('                     return '(';
+')'                     return ')';
+'{'                     return '{';
+'}'                     return '}';
+','                     return ',';
+';'                     return ';';
+'=='                    return '==';
+'!='                    return '!=';
+'>='                    return '>=';
+'<='                    return '<=';
+'>'                     return '>';
+'<'                     return '<';
+'&&'                    return '&&';
+'||'                    return '||';
+'!'                     return '!';
+'~'                     return '~';
+'='                     return '=';
 <<EOF>>                 return 'EOF';
 .                       return 'INVALID';
 
 /lex
 
+%right '&&' '||'
+%left '==' '!='
+%left '<' '<=' '>' '>=' 
 %left '+' '-'
 %left '*' '/' '%'
-%left '=='
-%left UMINUS
+%right '^'
+%left '!' '~' NEG
 
 %start program
 %%
@@ -107,12 +120,40 @@ assignment
 expr
   : '(' expr ')'
     { $$ = $2; }
+  | expr '*' expr
+    { $$ = { 'op': 'bin', 'p': '*', 'lhs': $1, 'rhs': $3 }; }
+  | expr '/' expr
+    { $$ = { 'op': 'bin', 'p': '/', 'lhs': $1, 'rhs': $3 }; }
+  | expr '%' expr
+    { $$ = { 'op': 'bin', 'p': '%', 'lhs': $1, 'rhs': $3 }; }
+  | expr '^' expr
+    { $$ = { 'op': 'bin', 'p': '^', 'lhs': $1, 'rhs': $3 }; }
   | expr '+' expr
     { $$ = { 'op': 'bin', 'p': '+', 'lhs': $1, 'rhs': $3 }; }
   | expr '-' expr
     { $$ = { 'op': 'bin', 'p': '-', 'lhs': $1, 'rhs': $3 }; }
   | expr '==' expr
     { $$ = { 'op': 'bin', 'p': '==', 'lhs': $1, 'rhs': $3 }; }
+  | expr '!=' expr
+    { $$ = { 'op': 'bin', 'p': '!=', 'lhs': $1, 'rhs': $3 }; }
+  | expr '<' expr
+    { $$ = { 'op': 'bin', 'p': '<', 'lhs': $1, 'rhs': $3 }; }
+  | expr '<=' expr
+    { $$ = { 'op': 'bin', 'p': '<=', 'lhs': $1, 'rhs': $3 }; }
+  | expr '>' expr
+    { $$ = { 'op': 'bin', 'p': '>', 'lhs': $1, 'rhs': $3 }; }
+  | expr '>=' expr
+    { $$ = { 'op': 'bin', 'p': '>=', 'lhs': $1, 'rhs': $3 }; }
+  | expr '&&' expr
+    { $$ = { 'op': 'bin', 'p': '&&', 'lhs': $1, 'rhs': $3 }; }
+  | expr '||' expr
+    { $$ = { 'op': 'bin', 'p': '||', 'lhs': $1, 'rhs': $3 }; }
+  | '!' expr
+    { $$ = { 'op': 'un', 'p': '!', 'arg': $2 }; }
+  | '-' expr %prec NEG
+    { $$ = { 'op': 'un', 'p': '-', 'arg': $2 }; }
+  | '~' expr
+    { $$ = { 'op': 'un', 'p': '~', 'arg': $2 }; }
   | NUMBER
     { $$ = { 'op': 'num', 'val': Number(yytext) }; }
   | ID callArgsOpt
