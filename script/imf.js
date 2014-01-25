@@ -65,6 +65,13 @@
       this.reg = arg1;
       this.label = arg2;
       break;
+    case 'arg':
+      this.reg = arg1;
+      break;
+    case 'call':
+      this.reg = arg1;
+      this.func = arg2;
+      break;
     }
   };
 
@@ -88,6 +95,10 @@
       return 'jmp ' + this.label;
     case 'cjmp':
       return 'cjmp ' + this.reg + ', ' + this.label;
+    case 'arg':
+      return 'arg ' + this.reg;
+    case 'call':
+      return 'call ' + this.reg + ', ' + this.func;
     }
   };
 
@@ -107,6 +118,15 @@
       generateExpr(node.lhs, imf, r);
       generateExpr(node.rhs, imf, r + 1);
       imf.push(new ImmInstr('bin', node.p, '@' + r, '@' + (r + 1)));
+      return r;
+    case 'call':
+      node.args.map(function (arg)
+      {
+        generateExpr(arg, imf, r);
+        imf.push(new ImmInstr('arg', '@' + r));
+      });
+
+      imf.push(new ImmInstr('call', '@' + r, node.name));
       return r;
     }
 
@@ -174,7 +194,7 @@
 
     rect = document.createElementNS(NS, "rect");
     rect.setAttributeNS(null, "height", 50);
-    rect.setAttributeNS(null, "width", 150);
+    rect.setAttributeNS(null, "width", 200);
     rect.setAttributeNS(null, "x", 0);
     rect.setAttributeNS(null, "y", 0);
     g.appendChild(rect);
@@ -183,16 +203,16 @@
     text.setAttributeNS(null, "dominant-baseline", "central");
     text.setAttributeNS(null, "text-anchor", "middle");
     text.setAttributeNS(null, "font-family", "Courier New");
-    text.setAttributeNS(null, "width", 150);
+    text.setAttributeNS(null, "width", 200);
     text.setAttributeNS(null, "height", 50);
-    text.setAttributeNS(null, "x", 75);
+    text.setAttributeNS(null, "x", 100);
     text.setAttributeNS(null, "y", 25);
     text.textContent = op.toString();
     g.appendChild(text);
 
     // Every instruction except return has a successor, so we draw a line
     if (i + 1 !== ops.length && op.op !== 'ret') {
-      points = "75 50 75 100";
+      points = "100 50 100 100";
       line = document.createElementNS(NS, "polyline");
       line.setAttributeNS(null, "points", points);
       line.setAttributeNS(null, "marker-end", "url(#arrow)");
@@ -204,9 +224,9 @@
       rect.setAttributeNS(null, 'style', 'fill:green');
       for (j = 0; j < i; ++j) {
         if (ops[j].label && ops[j].label === op.label) {
-          points = "M150 " + (j * 100 + 25);
-          points += " Q 230 " + ((i + j) * 50);
-          points += ", 150 " + (i * 100);
+          points = "M200 " + (j * 100 + 25);
+          points += " Q 250 " + ((i + j) * 50);
+          points += ", 200 " + (i * 100);
 
           line = document.createElementNS(NS, "path");
           line.setAttributeNS(null, "d", points);

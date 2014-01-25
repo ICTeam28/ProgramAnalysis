@@ -214,7 +214,7 @@
       }
       return {
         'width': Math.max(drawLabel(node.name + '(..)', p), w),
-        'height': 30 + h
+        'height': 50 + h
       };
     case 'num':
     case 'var':
@@ -257,6 +257,23 @@
       var vf = vars.slice(0);
       node.false.map(function (nd) {
         checkAST(nd, funcs, vf);
+      });
+      return;
+    case 'call':
+      if (!funcs[node.name]) {
+        throw new Error('Undefined function "' + node.name + '"');
+      }
+
+      if (node.args.length < funcs[node.name]) {
+        throw new Error('Too few arguments for "' + node.name + '"');
+      }
+
+      if (node.args.length > funcs[node.name]) {
+        throw new Error('Too many arguments for "' + node.name + '"');
+      }
+
+      node.args.map(function (arg) {
+        checkAST(arg, funcs, vars);
       });
       return;
     case 'bin':

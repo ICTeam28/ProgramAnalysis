@@ -15,6 +15,11 @@
   <body>
     <div id="editor">
       <textarea cols="80" rows="25" id="input">
+func double(b, c)
+{
+  return double(b + b, c + c);
+}
+
 func testp(b)
 {
   if (b == 0) {
@@ -26,11 +31,6 @@ func testp(b)
       return testp(b - 1) + testp(b - 2);
     }
   }
-}
-
-func double(b)
-{
-  return b + b;
 }
       </textarea>
       <div id="error-report"> </div>
