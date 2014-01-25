@@ -15,30 +15,28 @@
   <body>
     <div id="editor">
       <textarea cols="80" rows="25" id="input">
-func double(b, c)
-{
-  return double(-b, !c);
-}
-
 func testp(b)
 {
   if (b == 0) {
      return 0;
   } else {
-    if (b == 1) {
-      return 1;
-    } else {
-      return testp(b - 1) + testp(b - 2);
-    }
+     return 1;
   }
+  return 20;
 }
+
+func double(b, c)
+{
+  return double(-b, !c);
+}
+
       </textarea>
       <div id="error-report"> </div>
     </div>
     <div id="tabs">
       <ul>
-        <li><a href="#tabs-2">Intermediate form</a></li>
         <li><a href="#tabs-1">Abstract Syntax Tree</a></li>
+        <li><a href="#tabs-2">Intermediate form</a></li>
         <li><a href="#tabs-3">Static Analysis</a></li>
         <li><a href="#tabs-4">x64 Assembly</a></li>
         <li><a href="#tabs-5">ARM Assembly</a></li>

@@ -38,6 +38,7 @@
    */
   var ImmInstr = function (op, arg1, arg2, arg3) {
     this.op = op;
+
     switch (this.op) {
     case 'lbl':
       this.label = arg1;
@@ -220,7 +221,7 @@
     g.appendChild(text);
 
     // Every instruction except return has a successor, so we draw a line
-    if (i + 1 !== ops.length && op.op !== 'ret') {
+    if (i + 1 !== ops.length && op.op !== 'ret' && op.op !== 'jmp') {
       points = "100 50 100 100";
       line = document.createElementNS(NS, "polyline");
       line.setAttributeNS(null, "points", points);
@@ -284,6 +285,90 @@
   };
 
   /**
+   * Draws the instructions and the links between them
+   * @param {List<ImmInstr>} imf
+   * @return {SVGSVGDocument}
+   */
+  var drawIMF = function (imf) {
+    var svg, i;
+
+    svg = document.createElementNS(NS, 'svg');
+    svg.style.height = (imf.length * 100) + "px";
+
+    drawMarker(svg);
+    for (i = 0; i < imf.length; ++i) {
+      draw(i, imf, svg);
+    }
+
+    return svg;
+  };
+
+  /**
+   * Optimises the program, removing unreachable instructions
+   * @param {List<ImmInstr>} imf intermediate code
+   * @return {List<ImmInstr>}
+   */
+  var optimise = function (imf) {
+    var live = [], i, imfp = [];
+
+    var visit = function (i) {
+      var next, j, vn, vl;
+
+      switch (imf[i].op) {
+      case 'jmp':
+        for (j = 0; j < imf.length; ++j) {
+          if (imf[j].op == 'lbl' && imf[j].label == imf[i].label) {
+            next = j;
+            break;
+          }
+        }
+
+        if (visit(next)) {
+          live.push(i);
+          return true;
+        }
+
+        return false;
+      case 'cjmp':
+        for (j = 0; j < imf.length; ++j) {
+          if (imf[j].op == 'lbl' && imf[j].label == imf[i].label) {
+            next = j;
+            break;
+          }
+        }
+
+        vn = visit(i + 1);
+        vl = visit(next);
+
+        if (vn || vl) {
+          live.push(i);
+          return true;
+        }
+
+        return false;
+      case 'ret':
+        live.push(i);
+        return true;
+      default:
+        if (visit(i + 1)) {
+          live.push(i);
+          return true;
+        }
+        return false;
+      }
+    };
+
+    visit(0);
+    for (i = 0; i < imf.length; ++i) {
+      if (live.indexOf(i) != -1) {
+        imfp.push(imf[i]);
+      }
+    }
+
+    return imfp;
+  };
+
+  /**
    * Generates the intermediate form representation of a program
    * @param {Object} ast Abstract syntax tree
    * @return {Object<String, Array<ImmInstr>} Intermediate form
@@ -296,7 +381,10 @@
       nextLabel = 0;
       code = [];
       generate(ast.funcs[i], code);
-      imf[name] = code;
+      imf[name] = {
+        'imf': code,
+        'opt': optimise(code)
+      };
     }
 
     return imf;
@@ -307,7 +395,7 @@
    * @param {Object<String, Array<ImmInstr>} imf Intermediate form
    */
   env.drawIMF = function (imf) {
-    var name, svg, i;
+    var name, svg, i, tab;
 
     nextLabel = 0;
 
@@ -318,19 +406,23 @@
 
     for (name in imf) {
       if (imf.hasOwnProperty(name)) {
-        svg = document.createElementNS(NS, 'svg');
-        drawMarker(svg);
 
-        for (i = 0; i < imf[name].length; ++i) {
-          draw(i, imf[name], svg);
-        }
+        svg = {
+          'imf': $(drawIMF(imf[name].imf)),
+          'opt': $(drawIMF(imf[name].opt)).hide()
+        };
 
-        svg.style.height = (imf[name].length * 100) + "px";
+        tab = $("<div id ='f" + name + "'></div>")
+          .append(svg.imf)
+          .append(svg.opt)
+          .append("<div class='opt'>" +
+                    "<input type='checkbox' id='o" + name + "'/>" +
+                    "<label for='o" + name + "'>Optimised</label>" +
+                  "</div>");
         tabHeaders.append('<li><a href="#f' + name + '">' + name + '</a></li>');
-        tabs.append($("<div id ='f" + name + "'></div>").append(svg));
+        tabs.append(tab);
       }
     }
-
 
     tabs.tabs();
   };
@@ -341,5 +433,14 @@
   env.initIMF = function () {
     tabs = $("#imf-tabs").tabs();
     tabHeaders = $("#imf-tabs > ul");
+
+    $(document).on('change', '#imf-tabs input', function () {
+      var svgs, idx;
+
+      idx = $(this).is(':checked') ? 1 : 0;
+      svgs = $(this).parent().siblings();
+      $(svgs[idx]).show();
+      $(svgs[1 - idx]).hide();
+    });
   };
 }(window.topics = window.topics || {}));

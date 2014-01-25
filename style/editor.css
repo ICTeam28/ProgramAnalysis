@@ -50,6 +50,11 @@ body
   stroke-width: 2;
 }
 
+#ast-svg rect:hover
+{
+  fill: #eeeeee;
+}
+
 #ast-svg line, #ast-svg polyline
 {
   fill: none;
@@ -92,6 +97,12 @@ body
   fill: #cccccc;
   stroke: #000000;
   stroke-width: 2;
+}
+
+#imf-tabs .opt
+{
+  top: 0; left: 0;
+  position: absolute;
 }
 
 #imf-tabs line, rect, #imf-tabs polyline, #imf-tabs path:not(.arrow)
