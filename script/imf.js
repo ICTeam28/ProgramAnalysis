@@ -75,7 +75,8 @@
       this.label = arg2;
       break;
     case 'arg':
-      this.reg = arg1;
+      this.arg = arg1;
+      this.reg = arg2;
       break;
     case 'call':
       this.reg = arg1;
@@ -109,7 +110,7 @@
     case 'njmp':
       return 'njmp ' + this.reg + ', ' + this.label;
     case 'arg':
-      return 'arg ' + this.reg;
+      return 'arg ' + this.arg + ',' + this.reg;
     case 'call':
       return 'call ' + this.reg + ', ' + this.func;
     }
@@ -117,9 +118,14 @@
 
   /**
    * Generates code for an expression
+   * @param {Array<ImmInstr>} imf List which collects information
+   * @param {Number} r Index of the register where the result is stored
+   * @param {Object<String, List<String>} fs Function arguments
    * @return Index of the register where the result is stored
    */
-  var generateExpr = function (node, imf, r) {
+  var generateExpr = function (node, imf, r, fs) {
+    var i;
+
     switch (node.op) {
     case 'num':
       imf.push(new ImmInstr('const', '@' + r, node.val));
@@ -128,19 +134,19 @@
       imf.push(new ImmInstr('var', '@' + r, node.name));
       return r;
     case 'bin':
-      generateExpr(node.lhs, imf, r);
-      generateExpr(node.rhs, imf, r + 1);
+      generateExpr(node.lhs, imf, r, fs);
+      generateExpr(node.rhs, imf, r + 1, fs);
       imf.push(new ImmInstr('bin', node.p, '@' + r, '@' + (r + 1)));
       return r;
     case 'un':
-      generateExpr(node.expr, imf, r);
+      generateExpr(node.expr, imf, r, fs);
       imf.push(new ImmInstr('un', node.p, '@' + r));
       return r;
     case 'call':
-      node.args.map(function (arg) {
-        generateExpr(arg, imf, r);
-        imf.push(new ImmInstr('arg', '@' + r));
-      });
+      for (i = 0; i < node.args.length; ++i) {
+        generateExpr(node.args[i], imf, r, fs);
+        imf.push(new ImmInstr('arg', fs[node.name][i], '@' + r));
+      }
 
       imf.push(new ImmInstr('call', '@' + r, node.name));
       return r;
@@ -152,21 +158,26 @@
   /**
    * Generates code for a statement
    * @param {Object} Node of the Abstract Syntax tree
-   * @param {Array<ImmInstr>} List which collects information
+   * @param {Array<ImmInstr>} imf List which collects information
+   * @param {Object<String, List<String>} fs Function arguments
    */
+<<<<<<< HEAD
   var generate = function (node, imf) {
     var lend, ltrue, i, lcond;
+=======
+  var generate = function (node, imf, fs) {
+    var lend, ltrue, i;
+>>>>>>> e94a7d67749417bd28ea8bb207ab22bfffac7af4
 
     switch (node.op) {
     case 'func':
       imf.push(new ImmInstr('lbl', 'f_' + node.name));
       for (i = 0; i < node.body.length; ++i) {
-        generate(node.body[i], imf);
+        generate(node.body[i], imf, fs);
       }
-
       break;
     case 'return':
-      imf.push(new ImmInstr('ret', '@' + generateExpr(node.expr, imf, 0)));
+      imf.push(new ImmInstr('ret', '@' + generateExpr(node.expr, imf, 0, fs)));
       break;
     case 'while':
       lcond = 'L' + (nextLabel++);
@@ -189,19 +200,19 @@
       lend = 'L' + (nextLabel++);
       ltrue = 'L' + (nextLabel++);
 
-      generateExpr(node.cond, imf, 0);
+      generateExpr(node.cond, imf, 0, fs);
       imf.push(new ImmInstr('cjmp', '@0', ltrue));
 
       // False branch
       for (i = 0; i < node.false.length; ++i) {
-        generate(node.false[i], imf);
+        generate(node.false[i], imf, fs);
       }
       imf.push(new ImmInstr('jmp', lend));
 
       // True branch
       imf.push(new ImmInstr('lbl', ltrue));
       for (i = 0; i < node['true'].length; ++i) {
-        generate(node['true'][i], imf);
+        generate(node['true'][i], imf, fs);
       }
       imf.push(new ImmInstr('lbl', lend));
 
@@ -411,13 +422,17 @@
    * @return {Object<String, Array<ImmInstr>} Intermediate form
    */
   env.genIMF = function (ast) {
-    var i = 0, name, imf = {}, code = [];
+    var i = 0, name, imf = {}, code = [], fs = {};
+
+    for (i = 0; i < ast.funcs.length; ++i) {
+      fs[ast.funcs[i].name] = ast.funcs[i].args;
+    }
 
     for (i = 0; i < ast.funcs.length; ++i) {
       name = ast.funcs[i].name;
       nextLabel = 0;
       code = [];
-      generate(ast.funcs[i], code);
+      generate(ast.funcs[i], code, fs);
       imf[name] = {
         'imf': code,
         'opt': optimise(code)

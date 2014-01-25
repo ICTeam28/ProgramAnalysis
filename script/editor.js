@@ -6,12 +6,19 @@
 (function (env) {
   "use strict";
   /**
+   * Initialise the console
+   */
+  env.initConsole = function () {
+
+  };
+
+  /**
    * Initialises the editor
    */
   env.initEditor = function () {
     $("#input").on('keyup', function () {
       try {
-        var ast, imf;
+        var ast, imf, js;
 
         $("#error-report").text("");
         ast = mini.parse($(this).val());
@@ -20,6 +27,8 @@
 
         env.drawAST(ast);
         env.drawIMF(imf);
+        js = env.genJS(imf);
+        js();
       } catch (e) {
         $("#error-report").text(e + " " + e.stack);
       }
@@ -32,6 +41,7 @@
   $(function () {
     $("#tabs").tabs();
 
+    env.initConsole();
     env.initEditor();
     env.initAST();
     env.initIMF();
