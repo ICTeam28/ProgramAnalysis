@@ -50,7 +50,7 @@
       this.dest = arg1;
       this.src = arg2;
       break;
-    case 'var':
+    case 'ldr':
       this.dest = arg1;
       this.src = arg2;
       break;
@@ -101,8 +101,8 @@
       return 'ret ' + this.reg;
     case 'const':
       return 'const ' + this.dest + ', $' + this.src;
-    case 'var':
-      return 'var ' + this.dest + ', ' + this.src;
+    case 'ldr':
+      return 'ldr ' + this.dest + ', ' + this.src;
     case 'bin':
       return '(' + this.p + ') ' + this.dest + ', ' + this.src;
     case 'un':
@@ -137,7 +137,7 @@
       imf.push(new ImmInstr('const', '@' + r, node.val));
       return r;
     case 'var':
-      imf.push(new ImmInstr('var', '@' + r, node.name));
+      imf.push(new ImmInstr('ldr', '@' + r, node.name));
       return r;
     case 'bin':
       generateExpr(node.lhs, imf, r, fs);
@@ -271,11 +271,17 @@
     switch (op.op) {
     case 'lbl':
       rect.setAttributeNS(null, 'style', 'fill:green');
-      for (j = 0; j < i; ++j) {
-        if (ops[j].label && ops[j].label === op.label) {
-          points = "M200 " + (j * 100 + 25);
-          points += " Q 250 " + ((i + j) * 50);
-          points += ", 200 " + (i * 100);
+      for (j = 0; j < ops.length; ++j) {
+        if (ops[j].label && ops[j].op != 'lbl' && ops[j].label === op.label) {
+          if (j < i) {
+            points = "M200 " + (j * 100 + 25);
+            points += " Q 250 " + ((i + j) * 50);
+            points += ", 200 " + (i * 100);
+          } else {
+            points = "M200 " + (j * 100 + 25);
+            points += " Q 250 " + ((i + j) * 50);
+            points += ", 200 " + (i * 100 + 50);
+          }
 
           line = document.createElementNS(NS, "path");
           line.setAttributeNS(null, "d", points);
@@ -344,77 +350,78 @@
 
   /**
    * Optimises the program, removing unreachable instructions
+   * Performs a depth first search starting from the root node and then
+   * checks whether the reachable instructions lead to an operation which
+   * has side effects
    * @param {List<ImmInstr>} imf intermediate code
    * @return {List<ImmInstr>}
    */
   var optimise = function (imf) {
-    var live = [], i, imfp = [];
+    var live = [], i, j, imfp = [], graph = [], viz = {}, rviz = [];
 
-    var visit = function (i) {
-      var next, j, vn, vl;
-
+    for (i = 0; i < imf.length; ++i) {
       switch (imf[i].op) {
-      case 'lbl':
-        if (visit(i + 1)) {
-          live.push(i);
-          return true;
-        }
-        return false;
-      case 'jmp':
-        for (j = 0; j < imf.length; ++j) {
-          if (imf[j].op === 'lbl' && imf[j].label === imf[i].label) {
-            next = j;
-            break;
-          }
-        }
-
-        if (next < i) {
-          if (live.indexOf(next) !== -1) {
-            live.push(i);
-            return true;
-          }
-          return false;
-        }
-
-        if (visit(next)) {
-          live.push(i);
-          return true;
-        }
-
-        return false;
-      case 'cjmp':
-        for (j = 0; j < imf.length; ++j) {
-          if (imf[j].op === 'lbl' && imf[j].label === imf[i].label) {
-            next = j;
-            break;
-          }
-        }
-
-        vn = visit(i + 1);
-        vl = visit(next);
-
-        if (vn || vl) {
-          live.push(i);
-          return true;
-        }
-
-        return false;
       case 'ret':
-        live.push(i);
-        return true;
+        graph[i] = [];
+        break;
+      case 'jmp':
+        graph[i] = [];
+        for (j = 0; j < imf.length; ++j) {
+          if (imf[j].label == imf[i].label) {
+            graph[i].push(j);
+          }
+        }
+        break;
+      case 'cjmp': case 'njmp':
+        graph[i] = [i + 1];
+        for (j = 0; j < imf.length; ++j) {
+          if (imf[j].label == imf[i].label) {
+            graph[i].push(j);
+          }
+        }
+        break;
       default:
-        if (visit(i + 1)) {
-          live.push(i);
+        graph[i] = [i + 1];
+        break;
+      }
+    }
+
+    var hasSideEffects = function(i) {
+      var j;
+
+      if (viz[i]) {
+        return false;
+      }
+
+      viz[i] = true;
+      for (j = 0; j < graph[i].length; ++j) {
+        if (hasSideEffects(graph[i][j])) {
           return true;
         }
-        return false;
+      }
+
+      return imf[i].op == 'ret';
+    };
+
+    var dfs = function(i) {
+      var j;
+
+      if (viz[i]) {
+        return;
+      }
+
+      viz[i] = true;
+      rviz.push(i);
+      for (j = 0; j < graph[i].length; ++j) {
+        dfs(graph[i][j]);
       }
     };
 
-    visit(0);
-    for (i = 0; i < imf.length; ++i) {
-      if (live.indexOf(i) !== -1) {
-        imfp.push(imf[i]);
+    dfs(0);
+    for (i = 0; i < rviz.length; ++i) {
+      viz = {};
+      if (hasSideEffects(rviz[i])) {
+        imfp.push(imf[rviz[i]]);
       }
     }
 

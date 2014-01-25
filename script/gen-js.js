@@ -19,8 +19,10 @@
       return "return r[" + op.reg.slice(1) + "];";
     case 'const':
       return "r[" + op.dest.slice(1) + "]=" + op.src + ";";
-    case 'var':
+    case 'ldr':
       return "r[" + op.dest.slice(1) + "]=v." + op.src + ";";
+    case 'str':
+      return "v." + op.dest + "=r[" + op.src.slice(1) + "];";
     case 'bin':
       dest = "r[" + op.dest.slice(1) + "]";
       switch (op.p) {
@@ -39,14 +41,17 @@
       dest = "r[" + op.reg.slice(1) + "]";
       return dest + "=" + op.p + dest + ";";
     case 'jmp':
-      break;
+      return "return l." + op.label + "();";
     case 'cjmp':
       src = "r[" + op.reg.slice(1) + "]";
-      return "if(" + src + "){return label." + op.label + "();}";
+      return "if(" + src + "){return l." + op.label + "();}";
+    case 'njmp':
+      src = "r[" + op.reg.slice(1) + "]";
+      return "if(!" + src + "){return l." + op.label + "();}";
     case 'arg':
       return "ca." + op.arg + "=r[" + op.reg.slice(1) + "];";
     case 'call':
-      src = "f.f_" + op.func + "(ca, {}, f);"
+      src = "f.f_" + op.func + "(ca, {}, f)"
       return "r[" + op.reg.slice(1) + "]="+src+";ca={};";
     }
   };
@@ -60,7 +65,7 @@
     for (i = 0; i < imf.length; ++i) {
       if (imf[i].op === 'lbl') {
         if (label !== undefined) {
-          labels[label] = ops;
+          labels[label] = ops + "return l." + imf[i].label + "();";
         }
         ops = "";
         label = imf[i].label;
@@ -70,14 +75,15 @@
     }
 
     labels[label] = ops;
-    source = "var label={},ca={};";
+    source = "var l={},ca={};";
     for (i in labels) {
       if (labels.hasOwnProperty(i)) {
-        source += "label." + i + "=function(){" + labels[i] + "};";
+        source += "l." + i + "=function(){" + labels[i] + "};";
       }
     }
 
-    source += "return label." + imf[0].label + "();";
+    source += "return l." + imf[0].label + "();";
+    console.log(source);
     return new Function("v", "r", "f", source);
   };
 
@@ -99,7 +105,7 @@
       if (!code.f_main) {
         throw new Error("'main' not found");
       }
-      code.f_main({}, {}, code);
+      console.log(code.f_main({}, {}, code));
     };
   };
 }(window.topics = window.topics || {}));
