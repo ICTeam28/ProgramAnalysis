@@ -23,7 +23,7 @@ func testp(b)
     if (b == 1) {
       return 1;
     } else {
-      return b + 50;
+      return testp(b - 1) + testp(b - 2);
     }
   }
 }
@@ -37,8 +37,8 @@ func double(b)
     </div>
     <div id="tabs">
       <ul>
-        <li><a href="#tabs-1">Abstract Syntax Tree</a></li>
         <li><a href="#tabs-2">Intermediate form</a></li>
+        <li><a href="#tabs-1">Abstract Syntax Tree</a></li>
         <li><a href="#tabs-3">Static Analysis</a></li>
         <li><a href="#tabs-4">x64 Assembly</a></li>
         <li><a href="#tabs-5">ARM Assembly</a></li>
