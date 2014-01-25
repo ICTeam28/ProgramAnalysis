@@ -82,6 +82,10 @@
       this.reg = arg1;
       this.func = arg2;
       break;
+    case 'str':
+      this.dest = arg1;
+      this.src = arg2;
+      break;
     }
   };
 
@@ -113,6 +117,8 @@
       return 'arg ' + this.arg + ',' + this.reg;
     case 'call':
       return 'call ' + this.reg + ', ' + this.func;
+    case 'str':
+      return 'str ' + this.dest + ', ' + this.src;
     }
   };
 
@@ -161,13 +167,8 @@
    * @param {Array<ImmInstr>} imf List which collects information
    * @param {Object<String, List<String>} fs Function arguments
    */
-<<<<<<< HEAD
-  var generate = function (node, imf) {
-    var lend, ltrue, i, lcond;
-=======
   var generate = function (node, imf, fs) {
-    var lend, ltrue, i;
->>>>>>> e94a7d67749417bd28ea8bb207ab22bfffac7af4
+    var lend, ltrue, i, lcond;
 
     switch (node.op) {
     case 'func':
@@ -184,17 +185,21 @@
       lend = 'L' + (nextLabel++);
 
       imf.push(new ImmInstr('lbl', lcond));
-      generateExpr(node.cond, imf, 0);
+      generateExpr(node.cond, imf, 0, fs);
       imf.push(new ImmInstr('njmp', '@0', lend));
 
       // Body
       for (i = 0; i < node.body.length; ++i) {
-        generate(node.body[i], imf);
+        generate(node.body[i], imf, fs);
       }
 
       imf.push(new ImmInstr('jmp', lcond));
       imf.push(new ImmInstr('lbl', lend));
 
+      break;
+    case 'assign':
+      generateExpr(node.expr, imf, 0, fs);
+      imf.push(new ImmInstr('str', node.name, '@0'));
       break;
     case 'if':
       lend = 'L' + (nextLabel++);
