@@ -30,7 +30,7 @@
    * @param {String} op Instruction opcode
    * @constructor
    */
-  var ImmInstr = function (op, arg1, arg2, arg3) {
+  var ImmInstr = function (op, arg1, arg2) {
     this.op = op;
     this.next = [];
 
@@ -39,42 +39,25 @@
       this.label = arg1;
       break;
     case 'ret':
-      this.reg = arg1;
-      break;
-    case 'const':
-      this.dest = arg1;
-      this.src = arg2;
-      break;
-    case 'ldr':
-      this.dest = arg1;
-      this.src = arg2;
-      break;
-    case 'bin':
-      this.p = arg1;
-      this.dest = arg2;
-      this.src = arg3;
-      break;
-    case 'un':
-      this.p = arg1;
-      this.reg = arg2;
+      this.expr = arg1;
       break;
     case 'jmp':
       this.label = arg1;
       break;
     case 'cjmp':
-      this.reg = arg1;
+      this.expr = arg1;
       this.label = arg2;
       break;
     case 'njmp':
-      this.reg = arg1;
+      this.expr = arg1;
       this.label = arg2;
       break;
     case 'arg':
       this.arg = arg1;
-      this.reg = arg2;
+      this.expr = arg2;
       break;
     case 'call':
-      this.reg = arg1;
+      this.expr = arg1;
       this.func = arg2;
       break;
     case 'str':
@@ -89,134 +72,39 @@
    * @this {ImmInstr}
    */
   ImmInstr.prototype.toString = function () {
+    /**
+     * Converts an expression into a string
+     * @param {Object} node
+     * @return {String}
+     */
+    var exprString = function (node) {
+      switch (node.op) {
+      case 'num':
+        return node.val;
+      case 'var':
+        return node.name;
+      case 'bin':
+        return '(' + exprString(node.lhs) + node.p + exprString(node.rhs) + ')';
+      case 'un':
+        return '(' + node.p + exprString(node.expr) + ')';
+      case 'call':
+        return node.name + '(' + node.args.map(exprString).join(',') + ')';
+      }
+    };
+
     switch (this.op) {
     case 'lbl':
       return this.label + ':';
     case 'ret':
-      return 'ret ' + this.reg;
-    case 'const':
-      return 'const ' + this.dest + ', $' + this.src;
-    case 'ldr':
-      return 'ldr ' + this.dest + ', ' + this.src;
-    case 'bin':
-      return '(' + this.p + ') ' + this.dest + ', ' + this.src;
-    case 'un':
-      return '(' + this.p + ') ' + this.reg;
+      return 'ret ' + exprString(this.expr);
     case 'jmp':
       return 'jmp ' + this.label;
     case 'cjmp':
-      return 'cjmp ' + this.reg + ', ' + this.label;
+      return 'cjmp ' + this.label + ',' + exprString(this.expr);
     case 'njmp':
-      return 'njmp ' + this.reg + ', ' + this.label;
-    case 'arg':
-      return 'arg ' + this.arg + ',' + this.reg;
-    case 'call':
-      return 'call ' + this.reg + ', ' + this.func;
+      return 'njmp ' + this.label + ',' + exprString(this.expr);
     case 'str':
-      return 'str ' + this.dest + ', ' + this.src;
-    }
-  };
-
-  /**
-   * Generates code for an expression
-   * @param {Array<ImmInstr>} imf List which collects information
-   * @param {Number} r Index of the register where the result is stored
-   * @param {Object<String, List<String>} fs Function arguments
-   * @return Index of the register where the result is stored
-   */
-  var generateExpr = function (node, imf, r, fs) {
-    var i;
-
-    switch (node.op) {
-    case 'num':
-      imf.push(new ImmInstr('const', '@' + r, node.val));
-      return r;
-    case 'var':
-      imf.push(new ImmInstr('ldr', '@' + r, node.name));
-      return r;
-    case 'bin':
-      generateExpr(node.lhs, imf, r, fs);
-      generateExpr(node.rhs, imf, r + 1, fs);
-      imf.push(new ImmInstr('bin', node.p, '@' + r, '@' + (r + 1)));
-      return r;
-    case 'un':
-      generateExpr(node.expr, imf, r, fs);
-      imf.push(new ImmInstr('un', node.p, '@' + r));
-      return r;
-    case 'call':
-      for (i = 0; i < node.args.length; ++i) {
-        generateExpr(node.args[i], imf, r, fs);
-        imf.push(new ImmInstr('arg', fs[node.name][i], '@' + r));
-      }
-
-      imf.push(new ImmInstr('call', '@' + r, node.name));
-      return r;
-    }
-
-    return 0;
-  };
-
-  /**
-   * Generates code for a statement
-   * @param {Object} Node of the Abstract Syntax tree
-   * @param {Array<ImmInstr>} imf List which collects information
-   * @param {Object<String, List<String>} fs Function arguments
-   */
-  var generate = function (node, imf, fs) {
-    var lend, ltrue, i, lcond;
-
-    switch (node.op) {
-    case 'func':
-      imf.push(new ImmInstr('lbl', 'f_' + node.name));
-      for (i = 0; i < node.body.length; ++i) {
-        generate(node.body[i], imf, fs);
-      }
-      break;
-    case 'return':
-      imf.push(new ImmInstr('ret', '@' + generateExpr(node.expr, imf, 0, fs)));
-      break;
-    case 'while':
-      lcond = 'L' + (nextLabel++);
-      lend = 'L' + (nextLabel++);
-
-      imf.push(new ImmInstr('lbl', lcond));
-      generateExpr(node.cond, imf, 0, fs);
-      imf.push(new ImmInstr('njmp', '@0', lend));
-
-      // Body
-      for (i = 0; i < node.body.length; ++i) {
-        generate(node.body[i], imf, fs);
-      }
-
-      imf.push(new ImmInstr('jmp', lcond));
-      imf.push(new ImmInstr('lbl', lend));
-
-      break;
-    case 'assign':
-      generateExpr(node.expr, imf, 0, fs);
-      imf.push(new ImmInstr('str', node.name, '@0'));
-      break;
-    case 'if':
-      lend = 'L' + (nextLabel++);
-      ltrue = 'L' + (nextLabel++);
-
-      generateExpr(node.cond, imf, 0, fs);
-      imf.push(new ImmInstr('cjmp', '@0', ltrue));
-
-      // False branch
-      for (i = 0; i < node.false.length; ++i) {
-        generate(node.false[i], imf, fs);
-      }
-      imf.push(new ImmInstr('jmp', lend));
-
-      // True branch
-      imf.push(new ImmInstr('lbl', ltrue));
-      for (i = 0; i < node['true'].length; ++i) {
-        generate(node['true'][i], imf, fs);
-      }
-      imf.push(new ImmInstr('lbl', lend));
-
-      break;
+      return 'str ' + this.dest + ',' + exprString(this.src);
     }
   };
 
@@ -227,9 +115,10 @@
    * @param {SVGSVGElement} p Parent SVG Node
    */
   var draw = function (i, ops, p) {
-    var g, rect, line, text, op, points, j, y;
+    var g, rect, line, text, op, points, j, y, str;
 
     op = ops[i];
+    str = op.toString();
     y = i * 100;
 
     g = document.createElementNS(NS, "g");
@@ -251,7 +140,7 @@
     text.setAttributeNS(null, "height", 50);
     text.setAttributeNS(null, "x", 100);
     text.setAttributeNS(null, "y", 25);
-    text.textContent = op.toString();
+    text.textContent = (str.length > 16) ? (str.substr(0, 13) + "...") : str;
     g.appendChild(text);
 
     // Draw line to the direct successor (if applicable)
@@ -294,7 +183,6 @@
       rect.setAttributeNS(null, 'style', 'fill:#00cc00');
       break;
     case 'ret':
-      text.textContent = 'ret ' + op.reg;
       rect.setAttributeNS(null, 'style', 'fill:blue');
       break;
     }
@@ -458,12 +346,152 @@
   };
 
   /**
+   * Reaching definitions analysis
+   * @param {Object<Number, ImmInstr>} imf
+   */
+  var reachable = function (imf) {
+    var i, j, gen = {}, kill = {}, name, change;
+    var entry = {}, exit = {}, entryp = {}, exitp = {};
+
+    for (i in imf) {
+      if (imf.hasOwnProperty(i)) {
+        gen[i] = [];
+        kill[i] = [];
+
+        name = null;
+        switch (imf[i].op) {
+        case 'str':
+        case 'bin':
+        case 'ldr':
+        case 'const':
+          name = imf[i].dest;
+          break;
+        case 'un':
+          name = imf[i].reg;
+          break;
+        }
+
+        if (name) {
+          gen[i].push({ 'name': name, 'idx': parseInt(i, 10) });
+          for (j in imf) {
+            if (imf.hasOwnProperty(j)) {
+              switch (imf[j].op) {
+              case 'str':
+              case 'bin':
+              case 'ldr':
+              case 'const':
+                if (imf[j].dest === name) {
+                  kill[i].push({
+                    'name': imf[j].dest,
+                    'idx': parseInt(j, 10)
+                  });
+                }
+                break;
+              case 'un':
+                if (imf[j].dest === name) {
+                  kill[i].push({
+                    'name': imf[j].reg,
+                    'idx': parseInt(j, 10)
+                  });
+                }
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    do {
+      entryp = {};
+      exitp = {};
+      for (i in imf) {
+        if (imf.hasOwnProperty(i)) {
+          for (j in imf) {
+            if (imf.hasOwnProperty(j) && imf[i].next.indexOf(i) !== -1) {
+              entryp[i] = entry[i].append(exit[j]);
+            }
+          }
+        }
+      }
+
+      for (i in imf) {
+        if (imf.hasOwnProperty(i)) {
+          //exitp[i] =
+        }
+      }
+    } while (false);
+  };
+
+  /**
+   * Generates code for a statement
+   * @param {Object} Node of the Abstract Syntax tree
+   * @param {Array<ImmInstr>} imf List which collects information
+   * @param {Object<String, List<String>} fs Function arguments
+   */
+  var generate = function (node, imf, fs) {
+    var lend, ltrue, i, lcond;
+
+    switch (node.op) {
+    case 'func':
+      imf.push(new ImmInstr('lbl', 'f_' + node.name));
+      for (i = 0; i < node.body.length; ++i) {
+        generate(node.body[i], imf, fs);
+      }
+      imf.push(new ImmInstr('ret', { 'op': 'num', 'val': 0 }));
+      break;
+    case 'return':
+      imf.push(new ImmInstr('ret', node.expr));
+      break;
+    case 'while':
+      lcond = 'L' + (nextLabel++);
+      lend = 'L' + (nextLabel++);
+
+      imf.push(new ImmInstr('lbl', lcond));
+      imf.push(new ImmInstr('njmp', node.cond, lend));
+
+      // Body
+      for (i = 0; i < node.body.length; ++i) {
+        generate(node.body[i], imf, fs);
+      }
+
+      imf.push(new ImmInstr('jmp', lcond));
+      imf.push(new ImmInstr('lbl', lend));
+
+      break;
+    case 'assign':
+      imf.push(new ImmInstr('str', node.name, node.expr));
+      break;
+    case 'if':
+      lend = 'L' + (nextLabel++);
+      ltrue = 'L' + (nextLabel++);
+
+      imf.push(new ImmInstr('cjmp', node.cond, ltrue));
+
+      // False branch
+      for (i = 0; i < node.false.length; ++i) {
+        generate(node.false[i], imf, fs);
+      }
+      imf.push(new ImmInstr('jmp', lend));
+
+      // True branch
+      imf.push(new ImmInstr('lbl', ltrue));
+      for (i = 0; i < node['true'].length; ++i) {
+        generate(node['true'][i], imf, fs);
+      }
+      imf.push(new ImmInstr('lbl', lend));
+
+      break;
+    }
+  };
+
+  /**
    * Generates the intermediate form representation of a program
    * @param {Object} ast Abstract syntax tree
    * @return {Object<String, Array<ImmInstr>} Intermediate form
    */
   env.genIMF = function (ast) {
-    var i = 0, imf = {}, code = [], fs = {};
+    var i = 0, imf = {}, code = [], pruned, reached, fs = {};
 
     for (i = 0; i < ast.funcs.length; ++i) {
       fs[ast.funcs[i].name] = ast.funcs[i].args;
@@ -474,11 +502,12 @@
       code = [];
 
       generate(ast.funcs[i], code, fs);
-      code = buildGraph(code);
+      code = prune(buildGraph(code));
+      reached = reachable(pruned);
 
       imf[ast.funcs[i].name] = {
         'Intemediate Form': code,
-        'Optimized': prune(code)
+        'Reachable Definitions': reached
       };
     }
 

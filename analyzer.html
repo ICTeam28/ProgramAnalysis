@@ -10,24 +10,24 @@
     <script type="text/javascript" src="script/ast.js"></script>
     <script type="text/javascript" src="script/imf.js"></script>
     <script type="text/javascript" src="script/cfg.js"></script>
-    <script type="text/javascript" src="script/gen-js.js"></script>
     <script type="text/javascript" src="script/editor.js"></script>
   </head>
   <body>
     <div id="editor">
       <textarea cols="80" rows="25" id="input">
-func testp(b)
+func testp()
 {
-  if (b < 5) {
-    return b - 1;
-  } else {
-    return b + 1;
+  x = 5;
+  y = 1;
+  while (x > 1) {
+     x = x * y;
+     y = y - 1;
   }
 }
 
 func main()
 {
-  return testp(0);
+  return testp();
 }
       </textarea>
       <div id="error-report"> </div>

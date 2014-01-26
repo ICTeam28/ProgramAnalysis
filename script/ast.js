@@ -331,7 +331,7 @@
       });
       return;
     case 'call':
-      if (!funcs[node.name]) {
+      if (funcs[node.name] === undefined) {
         throw new Error('Undefined function "' + node.name + '"');
       }
 
