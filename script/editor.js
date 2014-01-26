@@ -27,8 +27,6 @@
 
         env.drawAST(ast);
         env.drawIMF(imf);
-        js = env.genJS(imf);
-        js();
       } catch (e) {
         $("#error-report").text(e + " " + e.stack);
       }

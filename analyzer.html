@@ -18,10 +18,11 @@
       <textarea cols="80" rows="25" id="input">
 func testp(b)
 {
-  while (b < 10) {
-    b = b + 1;
+  if (b < 5) {
+    return b - 1;
+  } else {
+    return b + 1;
   }
-  return 20;
 }
 
 func main()

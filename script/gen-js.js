@@ -83,7 +83,6 @@
     }
 
     source += "return l." + imf[0].label + "();";
-    console.log(source);
     return new Function("v", "r", "f", source);
   };
 
@@ -105,7 +104,7 @@
       if (!code.f_main) {
         throw new Error("'main' not found");
       }
-      console.log(code.f_main({}, {}, code));
+      code.f_main({}, {}, code);
     };
   };
 }(window.topics = window.topics || {}));

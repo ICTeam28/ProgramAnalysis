@@ -80,7 +80,39 @@ body
 {
   position: absolute;
   top: 40px; left: 0; right: 0; bottom: 0;
-  padding: 0; margin: 0;
+  padding: 30px 0 0 0;
+  margin: 0
+}
+
+#imf-tabs .header
+{
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 40px;
+}
+
+#imf-tabs .header > .prev
+{
+  position: absolute;
+  left: 0px;
+}
+
+#imf-tabs .header > .next
+{
+  position: absolute;
+  right: 0px;
+}
+
+#imf-tabs .header > span
+{
+  position: absolute;
+  top: 0px; left: 40px; right: 40px; bottom: 0px;
+  text-align: center;
+}
+
+#imf-tabs .content
+{
+  position: absolute;
+  top: 40px; left: 0; right: 0; bottom: 0;
   overflow: auto;
 }
 
@@ -97,12 +129,6 @@ body
   fill: #cccccc;
   stroke: #000000;
   stroke-width: 2;
-}
-
-#imf-tabs .opt
-{
-  top: 0; left: 0;
-  position: absolute;
 }
 
 #imf-tabs line, rect, #imf-tabs polyline, #imf-tabs path:not(.arrow)

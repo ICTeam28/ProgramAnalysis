@@ -20,12 +20,6 @@
   var tabs = null;
 
   /**
-   * Tab header list
-   * @type {?HTMLUlElement}
-   */
-  var tabHeaders = null;
-
-  /**
    * Index of the next available label
    * @type {Number}
    */
@@ -38,6 +32,7 @@
    */
   var ImmInstr = function (op, arg1, arg2, arg3) {
     this.op = op;
+    this.next = [];
 
     switch (this.op) {
     case 'lbl':
@@ -259,8 +254,8 @@
     text.textContent = op.toString();
     g.appendChild(text);
 
-    // Every instruction except return has a successor, so we draw a line
-    if (i + 1 !== ops.length && op.op !== 'ret' && op.op !== 'jmp') {
+    // Draw line to the direct successor (if applicable)
+    if (op.next.indexOf(i + 1) !== -1 && ops[i + 1]) {
       points = "100 50 100 100";
       line = document.createElementNS(NS, "polyline");
       line.setAttributeNS(null, "points", points);
@@ -268,27 +263,29 @@
       g.appendChild(line);
     }
 
+    // Draw a curved line on the right to successors
+    for (j = 0; j < op.next.length; ++j) {
+      if (op.next[j] !== i + 1) {
+        if (op.next[j] < i) {
+          points = "M200 " + (i * 100 + 25);
+          points += " Q 250 " + ((i + op.next[j]) * 50);
+          points += ", 200 " + (op.next[j] * 100 + 50);
+        } else {
+          points = "M200 " + (i * 100 + 25);
+          points += " Q 250 " + ((i + op.next[j]) * 50);
+          points += ", 200 " + (op.next[j] * 100);
+        }
+
+        line = document.createElementNS(NS, "path");
+        line.setAttributeNS(null, "d", points);
+        line.setAttributeNS(null, "marker-end", "url(#arrow)");
+        p.appendChild(line);
+      }
+    }
+
     switch (op.op) {
     case 'lbl':
       rect.setAttributeNS(null, 'style', 'fill:green');
-      for (j = 0; j < ops.length; ++j) {
-        if (ops[j].label && ops[j].op != 'lbl' && ops[j].label === op.label) {
-          if (j < i) {
-            points = "M200 " + (j * 100 + 25);
-            points += " Q 250 " + ((i + j) * 50);
-            points += ", 200 " + (i * 100);
-          } else {
-            points = "M200 " + (j * 100 + 25);
-            points += " Q 250 " + ((i + j) * 50);
-            points += ", 200 " + (i * 100 + 50);
-          }
-
-          line = document.createElementNS(NS, "path");
-          line.setAttributeNS(null, "d", points);
-          line.setAttributeNS(null, "marker-end", "url(#arrow)");
-          p.appendChild(line);
-        }
-      }
       break;
     case 'jmp':
       rect.setAttributeNS(null, 'style', 'fill:#00cc00');
@@ -335,93 +332,125 @@
    * @return {SVGSVGDocument}
    */
   var drawIMF = function (imf) {
-    var svg, i;
+    var svg, i, h = 0;
 
     svg = document.createElementNS(NS, 'svg');
-    svg.style.height = (imf.length * 100) + "px";
 
     drawMarker(svg);
-    for (i = 0; i < imf.length; ++i) {
-      draw(i, imf, svg);
+    for (i in imf) {
+      if (imf.hasOwnProperty(i)) {
+        draw(parseInt(i, 10), imf, svg);
+        h += 100;
+      }
     }
 
+    svg.style.height = h + "px";
     return svg;
   };
 
   /**
-   * Optimises the program, removing unreachable instructions
-   * Performs a depth first search starting from the root node and then
-   * checks whether the reachable instructions lead to an operation which
-   * has side effects
-   * @param {List<ImmInstr>} imf intermediate code
-   * @return {List<ImmInstr>}
+   * Builds the control flow graph
+   * @param {List<ImmInstr>} imf
+   * @return {Object<Number, ImmInstr>} graph
    */
-  var optimise = function (imf) {
-    var live = [], i, j, imfp = [], graph = [], viz = {}, rviz = [];
+  var buildGraph = function (imf) {
+    var graph = {}, i, j, next;
 
     for (i = 0; i < imf.length; ++i) {
+      graph[i] = imf[i];
+
+      // Search for jump targets
+      if (imf[i].op !== 'lbl' && imf[i].label) {
+        for (j = 0; j < imf.length; ++j) {
+          if (imf[j].op === 'lbl' && imf[j].label === imf[i].label) {
+            next = j;
+            break;
+          }
+        }
+      }
+
       switch (imf[i].op) {
-      case 'ret':
-        graph[i] = [];
-        break;
       case 'jmp':
-        graph[i] = [];
-        for (j = 0; j < imf.length; ++j) {
-          if (imf[j].label == imf[i].label) {
-            graph[i].push(j);
-          }
-        }
+        // Jumps transfer control to the target label
+        graph[i].next = [next];
         break;
-      case 'cjmp': case 'njmp':
-        graph[i] = [i + 1];
-        for (j = 0; j < imf.length; ++j) {
-          if (imf[j].label == imf[i].label) {
-            graph[i].push(j);
-          }
-        }
+      case 'cjmp':
+      case 'njmp':
+        // Conditional jumps go to the label or the next instruction
+        graph[i].next = [i + 1, next];
+        break;
+      case 'ret':
+        // Return goes nowhere, but it has side effects
+        graph[i].next = [];
         break;
       default:
-        graph[i] = [i + 1];
+        // Normal instructions lead to the next instruction in the queue
+        graph[i].next = [i + 1];
         break;
       }
     }
 
-    var hasSideEffects = function(i) {
-      var j;
+    return graph;
+  };
 
-      if (viz[i]) {
+  /**
+   * Removes all the instructions which are not on a path between the root label
+   * (start of the program) and an instruction which has side effects (return)
+   * @param {Object<Number, ImmInstr>} imf Intermediate code
+   * @return {Object<Number, ImmInstr>}
+   */
+  var prune = function (imf) {
+    var reachable = [], visited = [], loop = {}, imfp = {}, i, j, idx;
+
+    // Identifies all the nodes which are reachable from the root node
+    (function visit(i) {
+      if (reachable.indexOf(i) !== -1) {
+        return;
+      }
+      reachable.push(i);
+      imf[i].next.map(visit);
+    }(0));
+
+    // Checks whether an op has side effects or leads to another op which
+    // has side effects
+    var hasSideEffects = function (i) {
+      var k;
+
+      if (loop[i]) {
         return false;
       }
 
-      viz[i] = true;
-      for (j = 0; j < graph[i].length; ++j) {
-        if (hasSideEffects(graph[i][j])) {
+      loop[i] = true;
+      if (imf[i].op === 'ret') {
+        return true;
+      }
+
+      for (k = 0; k < imf[i].next.length; ++k) {
+        if (hasSideEffects(imf[i].next[k])) {
           return true;
         }
       }
 
-      return imf[i].op == 'ret';
+      return false;
     };
 
-    var dfs = function(i) {
-      var j;
-
-      if (viz[i]) {
-        return;
+    // Eliminates ops with no side effects
+    for (i = 0; i < reachable.length; ++i) {
+      loop = {};
+      if (hasSideEffects(reachable[i])) {
+        visited.push(reachable[i]);
       }
+    }
 
-      viz[i] = true;
-      rviz.push(i);
-      for (j = 0; j < graph[i].length; ++j) {
-        dfs(graph[i][j]);
-      }
-    };
-
-    dfs(0);
-    for (i = 0; i < rviz.length; ++i) {
-      viz = {};
-      if (hasSideEffects(rviz[i])) {
-        imfp.push(imf[rviz[i]]);
+    // Relabels the graph
+    for (i = 0; i < visited.length; ++i) {
+      imfp[i] = $.extend(true, {}, imf[visited[i]]);
+      imfp[i].next = [];
+      for (j = 0; j < imf[visited[i]].next.length; ++j) {
+        idx = visited.indexOf(imf[visited[i]].next[j]);
+        if (idx >= 0) {
+          imfp[i].next.push(idx);
+        }
       }
     }
 
@@ -434,20 +463,22 @@
    * @return {Object<String, Array<ImmInstr>} Intermediate form
    */
   env.genIMF = function (ast) {
-    var i = 0, name, imf = {}, code = [], fs = {};
+    var i = 0, imf = {}, code = [], fs = {};
 
     for (i = 0; i < ast.funcs.length; ++i) {
       fs[ast.funcs[i].name] = ast.funcs[i].args;
     }
 
     for (i = 0; i < ast.funcs.length; ++i) {
-      name = ast.funcs[i].name;
       nextLabel = 0;
       code = [];
+
       generate(ast.funcs[i], code, fs);
-      imf[name] = {
-        'imf': code,
-        'opt': optimise(code)
+      code = buildGraph(code);
+
+      imf[ast.funcs[i].name] = {
+        'Intemediate Form': code,
+        'Optimized': prune(code)
       };
     }
 
@@ -455,36 +486,42 @@
   };
 
   /**
-   * Converts the abstract syntax tree into immediate form
+   * Sets up the IMF diagrams for each function
    * @param {Object<String, Array<ImmInstr>} imf Intermediate form
    */
   env.drawIMF = function (imf) {
-    var name, svg, tab;
+    var name, content, i, first;
 
-    nextLabel = 0;
-
-    // Reset the tab views
     $(">div", tabs).remove();
     $(">ul li", tabs).remove();
     tabs.tabs("destroy");
 
     for (name in imf) {
       if (imf.hasOwnProperty(name)) {
+        content = $("<div class='content'/>");
 
-        svg = {
-          'imf': $(drawIMF(imf[name].imf)),
-          'opt': $(drawIMF(imf[name].opt)).hide()
-        };
+        first = false;
+        for (i in imf[name]) {
+          if (imf[name].hasOwnProperty(i)) {
+            $(drawIMF(imf[name][i]))
+              .attr('data-name', i)
+              .css('display', first ? 'none' : 'block')
+              .appendTo(content);
+            first = first || i;
+          }
+        }
 
-        tab = $("<div id ='f" + name + "'></div>")
-          .append(svg.imf)
-          .append(svg.opt)
-          .append("<div class='opt'>" +
-                    "<input type='checkbox' id='o" + name + "'/>" +
-                    "<label for='o" + name + "'>Optimised</label>" +
-                  "</div>");
-        tabHeaders.append('<li><a href="#f' + name + '">' + name + '</a></li>');
-        tabs.append(tab);
+        $('<div id ="f' + name + '"></div>')
+          .append('<div class="header">' +
+                    '<input type="button" class="prev" value="<"/>' +
+                    '<span>' + first + '</span>' +
+                    '<input type="button" class="next" value=">"/>' +
+                  '</div>')
+          .append(content)
+          .appendTo(tabs);
+
+        $('<li><a href="#f' + name + '">' + name + '</a></li>')
+          .appendTo("#imf-tabs > ul");
       }
     }
 
@@ -496,15 +533,26 @@
    */
   env.initIMF = function () {
     tabs = $("#imf-tabs").tabs();
-    tabHeaders = $("#imf-tabs > ul");
 
-    $(document).on('change', '#imf-tabs input', function () {
-      var svgs, idx;
+    var slide = function (slides, dir) {
+      var i, title, children;
 
-      idx = $(this).is(':checked') ? 1 : 0;
-      svgs = $(this).parent().siblings();
-      $(svgs[idx]).show();
-      $(svgs[1 - idx]).hide();
-    });
+      children = $(slides).parent().next().children();
+      for (i = 0; i < children.length; ++i) {
+        if (children[i].style.display === 'block') {
+          break;
+        }
+      }
+
+      i = (i + dir + children.length) % children.length;
+      children.css('display', 'none');
+      children[i].style.display = 'block';
+      title = $(slides).siblings('span').first();
+      title.text(children[i].getAttribute('data-name'));
+    };
+
+    $(document)
+      .on('click', '#imf-tabs .next', function () { slide(this, +1); })
+      .on('click', '#imf-tabs .prev', function () { slide(this, -1); });
   };
 }(window.topics = window.topics || {}));
