@@ -62,7 +62,7 @@
       break;
     case 'str':
       this.dest = arg1;
-      this.src = arg2;
+      this.expr = arg2;
       break;
     }
   };
@@ -104,7 +104,7 @@
     case 'njmp':
       return 'njmp ' + this.label + ',' + exprString(this.expr);
     case 'str':
-      return 'str ' + this.dest + ',' + exprString(this.src);
+      return 'str ' + this.dest + ',' + exprString(this.expr);
     }
   };
 
@@ -510,6 +510,54 @@
   };
 
   /**
+   * Live variable analysis
+   * @param {Object<Number, ImmInstr>} imf
+   */
+  var alive = function (imf) {
+    var i, kill = {}, gen = {};
+
+    var traverse = function (node) {
+      switch (node.op) {
+      case 'var':
+        if (gen[i].indexOf(node.name) === -1) {
+          gen[i].push(node.name);
+        }
+        break;
+      case 'bin':
+        traverse(node.lhs);
+        traverse(node.rhs);
+        break;
+      case 'un':
+        traverse(node.expr);
+        break;
+      case 'call':
+        node.args.map(traverse);
+        break;
+      }
+    };
+
+    // Computes killLV and genLV for every instruction
+    for (i in imf) {
+      if (imf.hasOwnProperty(i)) {
+        gen[i] = [];
+        kill[i] = [];
+
+        if (imf[i].op === 'str') {
+          kill[i].push(imf[i].dest);
+        }
+
+        if (imf[i].expr) {
+          traverse(imf[i].expr);
+        }
+      }
+    }
+
+    console.log(kill);
+    console.log(gen);
+    console.log(iterate(imf, gen, kill));
+  };
+
+  /**
    * Generates code for a statement
    * @param {Object} Node of the Abstract Syntax tree
    * @param {Array<ImmInstr>} imf List which collects information
@@ -577,7 +625,7 @@
    * @return {Object<String, Array<ImmInstr>} Intermediate form
    */
   env.genIMF = function (ast) {
-    var i = 0, imf = {}, code = [], reached, fs = {};
+    var i = 0, imf = {}, code = [], reached, live, fs = {};
 
     for (i = 0; i < ast.funcs.length; ++i) {
       fs[ast.funcs[i].name] = ast.funcs[i].args;
@@ -590,6 +638,7 @@
       generate(ast.funcs[i], code, fs);
       code = prune(buildGraph(code));
       reached = reachable(code);
+      live = alive(code);
 
       imf[ast.funcs[i].name] = {
         'Intemediate Form': code,
