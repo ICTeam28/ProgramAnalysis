@@ -346,59 +346,106 @@
   };
 
   /**
-   * Reaching definitions analysis
-   * @param {Object<Number, ImmInstr>} imf
+   * Chaotic iteration used to solve the system of equations
+   * @param {List<ImmInstr>} imf
+   * @param {List<Object>} gen
+   * @param {List<Object>} kill
+   * @return {Object<String, List<Object>} entry and exit
    */
-  var reachable = function (imf) {
-    var i, j, gen = {}, kill = {}, name, change;
+  var iterate = function (imf, gen, kill) {
+    /**
+     * Unites two sets
+     * @param {List<a>} a
+     * @param {List<b>} b
+     * @return a U b
+     */
+    var union = function (a, b) {
+      var ap = [], k;
+      for (k = 0; k < a.length; ++k) {
+        ap.push(a[k]);
+      }
+
+      for (k = 0; k < b.length; ++k) {
+        if (a.indexOf(b[k]) === -1) {
+          ap.push(b[k]);
+        }
+      }
+
+      return ap;
+    };
+
+    /**
+     * Computes the difference of two sets
+     * @param {List<a>} a
+     * @param {List<b>} b
+     * return a - b
+     */
+    var difference = function (a, b) {
+      var ap = [], k;
+      for (k = 0; k < a.length; ++k) {
+        if (b.indexOf(a[k]) === -1) {
+          ap.push(a[k]);
+        }
+      }
+      return ap;
+    };
+
+    /**
+     * Checks whether two sets are equal
+     * @param {List<a>} a
+     * @param {List<b>} b
+     * return a == b
+     */
+    var compare = function (a, b) {
+      var k;
+
+      // Returns true if two sets are equivalent
+      var compareSets = function (a, b) {
+        var p;
+        if (a.length !== b.length) {
+          return false;
+        }
+
+        for (p = 0; p < a.length; ++p) {
+          if (a.indexOf(b[p]) === -1) {
+            return false;
+          }
+          if (b.indexOf(a[p]) === -1) {
+            return false;
+          }
+        }
+
+        return true;
+      };
+
+      // Checks whether a has all the keys of b and vice-versa
+      // If all keys are equivalent, checks whether all values
+      // are equivalent
+      for (k in a) {
+        if (a.hasOwnProperty(k)) {
+          if (!b[k] || !compareSets(b[k], a[k])) {
+            return false;
+          }
+        }
+      }
+
+      for (k in b) {
+        if (b.hasOwnProperty(k)) {
+          if (!a[k] || !compareSets(b[k], a[k])) {
+            return false;
+          }
+        }
+      }
+      return true;
+    };
+
     var entry = {}, exit = {}, entryp = {}, exitp = {};
+    var i, j, change;
 
     for (i in imf) {
       if (imf.hasOwnProperty(i)) {
-        gen[i] = [];
-        kill[i] = [];
-
-        name = null;
-        switch (imf[i].op) {
-        case 'str':
-        case 'bin':
-        case 'ldr':
-        case 'const':
-          name = imf[i].dest;
-          break;
-        case 'un':
-          name = imf[i].reg;
-          break;
-        }
-
-        if (name) {
-          gen[i].push({ 'name': name, 'idx': parseInt(i, 10) });
-          for (j in imf) {
-            if (imf.hasOwnProperty(j)) {
-              switch (imf[j].op) {
-              case 'str':
-              case 'bin':
-              case 'ldr':
-              case 'const':
-                if (imf[j].dest === name) {
-                  kill[i].push({
-                    'name': imf[j].dest,
-                    'idx': parseInt(j, 10)
-                  });
-                }
-                break;
-              case 'un':
-                if (imf[j].dest === name) {
-                  kill[i].push({
-                    'name': imf[j].reg,
-                    'idx': parseInt(j, 10)
-                  });
-                }
-                break;
-              }
-            }
-          }
-        }
+        entry[i] = [];
+        exit[i] = [];
       }
     }
 
@@ -407,9 +454,12 @@
       exitp = {};
       for (i in imf) {
         if (imf.hasOwnProperty(i)) {
+          entryp[i] = [];
           for (j in imf) {
-            if (imf.hasOwnProperty(j) && imf[i].next.indexOf(i) !== -1) {
-              entryp[i] = entry[i].append(exit[j]);
+            if (imf.hasOwnProperty(j)) {
+              if (imf[j].next.indexOf(parseInt(i, 10)) !== -1) {
+                entryp[i] = union(entryp[i], exit[j]);
+              }
             }
           }
         }
@@ -417,10 +467,46 @@
 
       for (i in imf) {
         if (imf.hasOwnProperty(i)) {
-          //exitp[i] =
+          exitp[i] = union(difference(entryp[i], kill[i]), gen[i]);
         }
       }
-    } while (false);
+
+      change = !compare(entry, entryp) || !compare(exit, exitp);
+      entry = entryp;
+      exit = exitp;
+    } while (change);
+
+    return { 'entry': entryp, 'exit': exitp };
+  };
+
+  /**
+   * Reaching definitions analysis
+   * @param {Object<Number, ImmInstr>} imf
+   */
+  var reachable = function (imf) {
+    var i, j, gen = {}, kill = {};
+
+    // Build the kill and gen functions for every instruction
+    for (i in imf) {
+      if (imf.hasOwnProperty(i)) {
+        gen[i] = [];
+        kill[i] = [];
+
+        if (imf[i].op === 'str') {
+          gen[i].push(parseInt(i, 10));
+
+          for (j in imf) {
+            if (imf.hasOwnProperty(j) && imf[j].op === 'str') {
+              if (imf[j].dest === imf[i].dest) {
+                kill[i].push(parseInt(j, 10));
+              }
+            }
+          }
+        }
+      }
+    }
+
+    console.log(iterate(imf, gen, kill));
   };
 
   /**
@@ -491,7 +577,7 @@
    * @return {Object<String, Array<ImmInstr>} Intermediate form
    */
   env.genIMF = function (ast) {
-    var i = 0, imf = {}, code = [], pruned, reached, fs = {};
+    var i = 0, imf = {}, code = [], reached, fs = {};
 
     for (i = 0; i < ast.funcs.length; ++i) {
       fs[ast.funcs[i].name] = ast.funcs[i].args;
@@ -503,7 +589,7 @@
 
       generate(ast.funcs[i], code, fs);
       code = prune(buildGraph(code));
-      reached = reachable(pruned);
+      reached = reachable(code);
 
       imf[ast.funcs[i].name] = {
         'Intemediate Form': code,
