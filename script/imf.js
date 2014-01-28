@@ -14,6 +14,17 @@
   var NS = "http://www.w3.org/2000/svg";
 
   /**
+   * Colours used for the interference graph
+   * @type {List<String>}
+   */
+  var COLOURS = [
+    "#ff0000", "#00ff00", "#0000ff",
+    "#ffff00", "#00ffff", "#ff00ff",
+    "#cc0000", "#00cc00", "#0000cc",
+    "#cccc00", "#00cccc", "#cc00cc",
+  ];
+
+  /**
    * Tab which hold the code for every function
    * @type {?HTMLDivElement}
    */
@@ -218,7 +229,7 @@
       points = "100 50 100 100";
       line = document.createElementNS(NS, "polyline");
       line.setAttributeNS(null, "points", points);
-      line.setAttributeNS(null, "marker-end", "url(#arrow)");
+      line.setAttributeNS(null, "marker-end", "url(#arrowEnd)");
       g.appendChild(line);
     }
 
@@ -237,7 +248,7 @@
 
         line = document.createElementNS(NS, "path");
         line.setAttributeNS(null, "d", points);
-        line.setAttributeNS(null, "marker-end", "url(#arrow)");
+        line.setAttributeNS(null, "marker-end", "url(#arrowEnd)");
         p.appendChild(line);
       }
     }
@@ -262,25 +273,46 @@
    * Adds an arrow marker to the document
    * @param {SVGSVGElement} svg
    */
-  var drawMarker = function (svg) {
-    var defs, marker, path;
+  var drawMarker = function (svg, s) {
+    var defs, marker, path, points;
+
+    s = s || 10;
 
     defs = document.createElementNS(NS, "defs");
     svg.appendChild(defs);
 
+    // End marker
+    points = "M 0 0 L " + s + " " + (s / 2) + " L 0 " + s + " z";
     marker = document.createElementNS(NS, "marker");
-    marker.setAttributeNS(null, "id", "arrow");
+    marker.setAttributeNS(null, "id", "arrowEnd");
     marker.setAttributeNS(null, "orient", "auto");
-    marker.setAttributeNS(null, "markerWidth", "6");
-    marker.setAttributeNS(null, "markerHeight", "6");
-    marker.setAttributeNS(null, "viewBox", "0 0 10 10");
-    marker.setAttributeNS(null, "refX", "10");
-    marker.setAttributeNS(null, "refY", "5");
+    marker.setAttributeNS(null, "markerWidth", s / 2 + 1);
+    marker.setAttributeNS(null, "markerHeight", s / 2 + 1);
+    marker.setAttributeNS(null, "viewBox", "0 0 " + s + " " + s);
+    marker.setAttributeNS(null, "refX", s);
+    marker.setAttributeNS(null, "refY", s / 2);
     defs.appendChild(marker);
 
     path = document.createElementNS(NS, "path");
     path.setAttributeNS(null, "class", "arrow");
-    path.setAttributeNS(null, "d", "M 0 0 L 10 5 L 0 10 z");
+    path.setAttributeNS(null, "d", points);
+    marker.appendChild(path);
+
+    // Start marker
+    points = "M 0 " + (s / 2) + " L " + s + " 0 L " + s + " " + s + " z";
+    marker = document.createElementNS(NS, "marker");
+    marker.setAttributeNS(null, "id", "arrowStart");
+    marker.setAttributeNS(null, "orient", "auto");
+    marker.setAttributeNS(null, "markerWidth", s / 2 + 1);
+    marker.setAttributeNS(null, "markerHeight", s / 2 + 1);
+    marker.setAttributeNS(null, "viewBox", "0 0 " + s + " " + s);
+    marker.setAttributeNS(null, "refX", 0);
+    marker.setAttributeNS(null, "refY", s / 2);
+    defs.appendChild(marker);
+
+    path = document.createElementNS(NS, "path");
+    path.setAttributeNS(null, "class", "arrow");
+    path.setAttributeNS(null, "d", points);
     marker.appendChild(path);
   };
 
@@ -293,6 +325,7 @@
     var svg, i, h = 0;
 
     svg = document.createElementNS(NS, 'svg');
+    svg.setAttributeNS(null, 'class', 'imf');
 
     drawMarker(svg);
     for (i in imf) {
@@ -303,6 +336,93 @@
     }
 
     svg.style.height = h + "px";
+    return svg;
+  };
+
+  /**
+   * Draws the interference graph
+   */
+  var drawIGraph = function (igraph) {
+    var svg, i, j, index = {};
+
+    svg = document.createElementNS(NS, 'svg');
+    svg.setAttributeNS(null, 'class', 'igraph');
+    svg.setAttributeNS(null, 'preserveAspectRatio', 'xMidYMin meet');
+    svg.setAttributeNS(null, 'viewBox', '0 0 1000 1000');
+    drawMarker(svg, 20);
+
+    var count = 0;
+    for (i in igraph.graph) {
+      if (igraph.graph.hasOwnProperty(i)) {
+        index[i] = count++;
+      }
+    }
+
+    var idx = 0, idxp, x, y, angle, anglep, ad, points, mdl;
+    var g, text, circle, line;
+    for (i in igraph.graph) {
+      if (igraph.graph.hasOwnProperty(i)) {
+        angle = (idx / count) * 2 * Math.PI - Math.PI / 2;
+        for (j = 0; j < igraph.graph[i].length; ++j) {
+          if (igraph.graph[i][j] > i) {
+            continue;
+          }
+
+          idxp = index[igraph.graph[i][j]];
+          anglep = (idxp / count) * 2 * Math.PI - Math.PI / 2;
+
+          if (Math.abs(idxp - idx) == 1) {
+            mdl = (angle + anglep) / 2;
+            ad = 0.11 * (idx - idxp);
+            points = "M";
+            points += Math.floor(500 + Math.cos(angle - ad) * 450) + " ";
+            points += Math.floor(500 + Math.sin(angle - ad) * 450) + " ";
+            points += "Q ";
+            points += Math.floor(500 + Math.cos(mdl) * 450) + " ";
+            points += Math.floor(500 + Math.sin(mdl) * 450) + " ";
+            points += Math.floor(500 + Math.cos(anglep + ad) * 450) + " ";
+            points += Math.floor(500 + Math.sin(anglep + ad) * 450);
+          } else {
+            points = "M";
+            points += Math.floor(500 + Math.cos(angle) * 400) + " ";
+            points += Math.floor(500 + Math.sin(angle) * 400) + " ";
+            points += "Q 500 500, ";
+            points += Math.floor(500 + Math.cos(anglep) * 400) + " ";
+            points += Math.floor(500 + Math.sin(anglep) * 400);
+          }
+
+          line = document.createElementNS(NS, "path");
+          line.setAttributeNS(null, "d", points);
+          line.setAttributeNS(null, "marker-end", "url(#arrowEnd)");
+          line.setAttributeNS(null, "marker-start", "url(#arrowStart)");
+          svg.appendChild(line);
+        }
+
+        x = Math.floor(500 + Math.cos(angle) * 450);
+        y = Math.floor(500 + Math.sin(angle) * 450);
+
+        g = document.createElementNS(NS, "g");
+        g.setAttributeNS(null, "transform", "translate(" + x + "," + y + ")");
+        svg.appendChild(g);
+
+        circle = document.createElementNS(NS, 'circle');
+        circle.setAttributeNS(null, 'cx', 0);
+        circle.setAttributeNS(null, 'cy', 0);
+        circle.setAttributeNS(null, 'r', 50);
+        circle.setAttributeNS(null, 'fill', COLOURS[igraph.colour[i]]);
+        g.appendChild(circle);
+
+        text = document.createElementNS(NS, 'text');
+        text.setAttributeNS(null, "x", 0);
+        text.setAttributeNS(null, "y", 0);
+        text.textContent = i;
+        g.appendChild(text);
+
+
+        ++idx;
+      }
+    }
+
     return svg;
   };
 
@@ -358,7 +478,7 @@
    * @return {Object<Number, ImmInstr>}
    */
   var prune = function (imf) {
-    var reachable = [], visited = [], loop = {}, imfp = {}, i, j, idx;
+    var reachable = [], visited = [], loop = {}, imfp = {}, i, j, k, idx;
 
     // Identifies all the nodes which are reachable from the root node
     (function visit(i) {
@@ -374,7 +494,7 @@
     // Checks whether an op has side effects or leads to another op which
     // has side effects
     var hasSideEffects = function (i) {
-      var k;
+      var p;
 
       if (loop[i]) {
         return false;
@@ -385,8 +505,8 @@
         return true;
       }
 
-      for (k = 0; k < imf[i].next.length; ++k) {
-        if (hasSideEffects(imf[i].next[k])) {
+      for (p = 0; p < imf[i].next.length; ++p) {
+        if (hasSideEffects(imf[i].next[p])) {
           return true;
         }
       }
@@ -403,6 +523,7 @@
     }
 
     // Relabels the graph
+    var rdIn, rdOut;
     for (i = 0; i < visited.length; ++i) {
       imfp[i] = $.extend(true, {}, imf[visited[i]]);
       imfp[i].next = [];
@@ -411,6 +532,24 @@
         if (idx >= 0) {
           imfp[i].next.push(idx);
         }
+      }
+
+      if (imfp[i].rd) {
+        rdIn = [];
+        for (j = 0; j < imfp[i].rd.in.length; ++j) {
+          if ((k = visited.indexOf(imfp[i].rd.in[j])) !== -1) {
+            rdIn.push(k);
+          }
+        }
+        imfp[i].rd.in = rdIn;
+
+        rdOut = [];
+        for (j = 0; j < imfp[i].rd.out.length; ++j) {
+          if ((k = visited.indexOf(imfp[i].rd.out[j])) !== -1) {
+            rdOut.push(k);
+          }
+        }
+        imfp[i].rd.out = rdOut;
       }
     }
 
@@ -437,6 +576,7 @@
       }
     }
 
+    // Fix links
     var ret = {}, rdIn, rdOut;
     for (i = 0; i < keys.length; ++i) {
       ret[i] = imf[keys[i]];
@@ -649,8 +789,84 @@
   };
 
   /**
+   * Builds the interference graph & uses a graph colouring algorithm to
+   * assign temporaries
+   * @param {Object<Number, ImmInstr>} imf
+   * @return {Pair<Object, Object>} graph
+   */
+  var interferenceGraph = function (imf) {
+    var graph = {}, verts = [], vert, i, j, k, x, y;
+
+    // Fetch all the different variable names
+    for (i in imf) {
+      if (imf.hasOwnProperty(i)) {
+        for (j = 0; j < imf[i].lv.out.length; ++j) {
+          vert = imf[i].lv.out[j];
+          if (!graph[vert]) {
+            graph[vert] = [];
+            verts.push(vert);
+          }
+        }
+      }
+    }
+
+    // Add edges to the graph between nodes which are live
+    // at a point of the program
+    for (i in imf) {
+      if (imf.hasOwnProperty(i)) {
+        for (j = 0; j < imf[i].lv.out.length; ++j) {
+          for (k = 0; k < imf[i].lv.out.length; ++k) {
+            x = imf[i].lv.out[j];
+            y = imf[i].lv.out[k];
+            if (x !== y) {
+              if (graph[x].indexOf(y) === -1) {
+                graph[x].push(y);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Minimal graph colouring - Welsh-Powell algorithm
+    // Sort vertices in descending order by their degree
+    verts = verts.sort(function (a, b) {
+      return graph[b].length - graph[a].length;
+    });
+
+    // On each pass, assign a new colour to as many vertices as possible
+    var toColor = verts.length, nextColor = 0, colour = {}, good;
+    while (toColor > 0) {
+      for (i = 0; i < verts.length; ++i) {
+        // If the vertex hasn't been coloured yet
+        if (!colour.hasOwnProperty(verts[i])) {
+          good = true;
+          // Check if it is linked to other nodes with the same colour
+          for (j = 0; j < graph[verts[i]].length; ++j) {
+            if (colour[graph[verts[i]][j]] === nextColor) {
+              good = false;
+              break;
+            }
+          }
+          // If no conflicts exist, assign the new colour
+          if (good) {
+            colour[verts[i]] = nextColor;
+            toColor--;
+          }
+        }
+      }
+      ++nextColor;
+    }
+
+    return {
+      'graph': graph,
+      'colour': colour
+    };
+  };
+
+  /**
    * Available expression analysis
-   * @param {Object<Number, Imm instruction>} imf
+   * @param {Object<Number, ImmInstr>} imf
    */
   var availableExp = function (imf) {
     var i, j, k, l, kill = {}, gen = {}, allGen = [], name, subs = [];
@@ -802,7 +1018,7 @@
    * @return {Object<String, Array<ImmInstr>} Intermediate form
    */
   env.genIMF = function (ast) {
-    var i = 0, imf = {}, code = [], live, fs = {};
+    var i = 0, imf = {}, code = [], live, igraph, fs = {};
 
     for (i = 0; i < ast.funcs.length; ++i) {
       fs[ast.funcs[i].name] = ast.funcs[i].args;
@@ -818,10 +1034,12 @@
       liveVariables(code);
       availableExp(code);
       live = removeDeadVars(code);
+      igraph = interferenceGraph(live);
 
       imf[ast.funcs[i].name] = {
-        'Unoptimized code': code,
-        'Dead variables removed': live
+        'Unoptimized Code': drawIMF(code),
+        'Dead Variable Removal': drawIMF(live),
+        'Interference Graph': drawIGraph(igraph)
       };
     }
 
@@ -846,7 +1064,7 @@
         first = false;
         for (i in imf[name]) {
           if (imf[name].hasOwnProperty(i)) {
-            $(drawIMF(imf[name][i]))
+            $(imf[name][i])
               .attr('data-name', i)
               .css('display', first ? 'none' : 'block')
               .appendTo(content);
