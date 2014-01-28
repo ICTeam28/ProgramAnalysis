@@ -358,7 +358,7 @@
       }
     }
 
-    var idx = 0, idxp, x, y, angle, anglep, ad, points, mdl;
+    var idx = 0, idxp, x, y, angle, anglep, ad, points, mdl, diff;
     var g, text, circle, line;
     for (i in igraph.graph) {
       if (igraph.graph.hasOwnProperty(i)) {
@@ -370,10 +370,16 @@
 
           idxp = index[igraph.graph[i][j]];
           anglep = (idxp / count) * 2 * Math.PI - Math.PI / 2;
+          diff = idx - idxp;
 
-          if (Math.abs(idxp - idx) == 1) {
+          if (Math.abs(diff) == 1 || diff === count - 1) {
             mdl = (angle + anglep) / 2;
-            ad = 0.11 * (idx - idxp);
+            ad = 0.11 * (idx - idxp) / Math.abs(diff);
+            if (diff === count - 1) {
+              mdl += Math.PI;
+              ad = -ad;
+            }
+
             points = "M";
             points += Math.floor(500 + Math.cos(angle - ad) * 450) + " ";
             points += Math.floor(500 + Math.sin(angle - ad) * 450) + " ";
@@ -848,6 +854,7 @@
               break;
             }
           }
+
           // If no conflicts exist, assign the new colour
           if (good) {
             colour[verts[i]] = nextColor;
