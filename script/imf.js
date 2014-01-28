@@ -669,12 +669,46 @@
                 imfp[i].dest = newName;
               }
             }
-
           }
         }
       }
     }
+
     return imfp;
+  };
+
+  /**
+   * Removes redundant instructions from the renamed imf
+   * @param {Object<Number, ImmInstr>} imf
+   * @return {Object<Number, ImmInstr>} imfp
+   */
+  var optimiseRenamed = function (imf) {
+    var imfp = $.extend(true, {}, imf);
+    var i, j, k, next;
+
+    for (i in imfp) {
+      if (imfp[i].hasOwnProperty) {
+        if (imfp[i].op === 'str') {
+          name = imfp[i].dest;
+          if (imfp[i].expr.op === 'var' && imfp[i].expr.name === name) {
+            if (imfp[i].next.length === 1) {
+              next = imfp[i].next[0];
+              for (j in imfp) {
+                if (imfp.hasOwnProperty(j)) {
+                  for (k = 0; k < imfp[j].next.length; ++k) {
+                    if (imfp[j].next[k] === parseInt(i, 10)) {
+                      imfp[j].next[k] = next;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return prune(imfp);
   };
 
   /**
@@ -1105,7 +1139,10 @@
       live = removeDeadVars(code);
       igraph = interferenceGraph(live);
       renamed = renameVariables(live, igraph.colour);
-      console.log(igraph.colour);
+      renamed = optimiseRenamed(renamed);
+      // TODO: Merge consecutive labels
+      // TODO: Remove jumps to consecutive instructions
+
       imf[ast.funcs[i].name] = {
         'Unoptimized Code': drawIMF(code),
         'Dead Variable Removal': drawIMF(live),
