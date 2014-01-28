@@ -616,6 +616,14 @@
   };
 
   /**
+   * Renames variables based on the graph colouring
+   */
+  var renameVariables = function (imf, colours) {
+    var imfp = $.extend(true, {}, imf);
+
+  };
+
+  /**
    * Reaching definitions analysis
    * @param {Object<Number, ImmInstr>} imf
    */
@@ -1025,7 +1033,7 @@
    * @return {Object<String, Array<ImmInstr>} Intermediate form
    */
   env.genIMF = function (ast) {
-    var i = 0, imf = {}, code = [], live, igraph, fs = {};
+    var i = 0, imf = {}, code = [], live, igraph, fs = {}, renamed;
 
     for (i = 0; i < ast.funcs.length; ++i) {
       fs[ast.funcs[i].name] = ast.funcs[i].args;
@@ -1042,11 +1050,13 @@
       availableExp(code);
       live = removeDeadVars(code);
       igraph = interferenceGraph(live);
+      renamed = renameVariables(live, igraph.colour);
 
       imf[ast.funcs[i].name] = {
         'Unoptimized Code': drawIMF(code),
         'Dead Variable Removal': drawIMF(live),
-        'Interference Graph': drawIGraph(igraph)
+        'Interference Graph': drawIGraph(igraph),
+        'Renamed variables': drawIMF(renamed)
       };
     }
 
