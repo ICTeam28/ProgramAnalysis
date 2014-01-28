@@ -372,7 +372,7 @@
           anglep = (idxp / count) * 2 * Math.PI - Math.PI / 2;
           diff = idx - idxp;
 
-          if (Math.abs(diff) == 1 || diff === count - 1) {
+          if (Math.abs(diff) === 1 || diff === count - 1) {
             mdl = (angle + anglep) / 2;
             ad = 0.11 * (idx - idxp) / Math.abs(diff);
             if (diff === count - 1) {
@@ -617,10 +617,64 @@
 
   /**
    * Renames variables based on the graph colouring
+   * @param {Object<Number, ImmInstr>} imf
+   * @param {Object} colours
+   * @return {Object<Number, ImmInstr>} imfp
    */
   var renameVariables = function (imf, colours) {
     var imfp = $.extend(true, {}, imf);
+    var i, j, replace, newName;
 
+    /**
+     * Assigns newName to all the variables within the expression whose 
+     * name matches replace
+     * @param {Object} node
+     */
+    var renameExp = function (node) {
+      switch (node.op) {
+      case 'var':
+        if (node.name === replace) {
+          node.name = newName;
+        }
+        break;
+      case 'bin':
+        renameExp(node.lhs);
+        renameExp(node.rhs);
+        break;
+      case 'un':
+        renameExp(node.expr);
+        break;
+      case 'call':
+        node.args.map(renameExp);
+        break;
+      case 'num':
+        break;
+      }
+    };
+
+    for (i in imfp) {
+      if (imfp[i].hasOwnProperty) {
+        for (j in colours) {
+          if (colours[j].hasOwnProperty) {
+
+            newName = 'a' + (colours[j]);
+            replace = j;
+
+            if (imfp[i].expr) {
+              renameExp(imfp[i].expr);
+            }
+
+            if (imfp[i].op === 'str') {
+              if (imfp[i].dest === j) {
+                imfp[i].dest = newName;
+              }
+            }
+
+          }
+        }
+      }
+    }
+    return imfp;
   };
 
   /**
@@ -1051,7 +1105,7 @@
       live = removeDeadVars(code);
       igraph = interferenceGraph(live);
       renamed = renameVariables(live, igraph.colour);
-
+      console.log(igraph.colour);
       imf[ast.funcs[i].name] = {
         'Unoptimized Code': drawIMF(code),
         'Dead Variable Removal': drawIMF(live),
