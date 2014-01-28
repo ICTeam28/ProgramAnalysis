@@ -506,7 +506,7 @@
       }
     }
 
-    console.log(iterate(imf, gen, kill));
+    //console.log(iterate(imf, gen, kill));
   };
 
   /**
@@ -552,9 +552,97 @@
       }
     }
 
-    console.log(kill);
-    console.log(gen);
-    console.log(iterate(imf, gen, kill));
+    //console.log(kill);
+    //console.log(gen);
+    //console.log(iterate(imf, gen, kill));
+  };
+
+  /**
+   * Available expression analysis
+   * @param {Object<Number, Imm instruction>} imf
+   */
+  var availableExp = function (imf) {
+    var i, j, k, l, kill = {}, gen = {}, allGen = [], name, subs = [];
+
+    /**
+     * Returns true if name appears in the expression
+     * @param {Object} node
+     */
+    var appears = function (node) {
+      switch (node.op) {
+      case 'var':
+        if (node.name === name) {
+          return true;
+        }
+        return false;
+      case 'bin':
+        return appears(node.lhs) || appears(node.rhs);
+      case 'un':
+        return appears(node.expr);
+      case 'call':
+        return node.args.map(appears);
+      case 'num':
+        return false;
+      }
+    };
+
+    /**
+     * Stores all subexpressions of the given expression in subs array
+     * @param {Object} node
+     */
+    var getSub = function (node) {
+      switch (node.op) {
+      case 'var':
+        subs.push(node.name);
+        break;
+      case 'bin':
+        getSub(node.lhs);
+        getSub(node.rhs);
+        break;
+      case 'un':
+        getSub(node.epxr);
+        break;
+      case 'call':
+        node.args.map(getSub);
+        break;
+      case 'num':
+        break;
+      }
+    };
+
+    // Computes killAE and genAE for every instruction
+    for (i in imf) {
+      if (imf.hasOwnProperty(i)) {
+        gen[i] = [];
+        kill[i] = [];
+
+        if (imf[i].expr) {
+          allGen.push(imf[i].expr);
+          gen[i].push(imf[i].expr);
+        }
+
+        if (imf[i].op === 'str') {
+          allGen.push(imf[i].dest);
+          name = imf[i].dest;
+          for (j = 0; j < allGen.length; j++) {
+            if (appears(allGen[j])) {
+              subs = [];
+              getSub(allGen[j]);
+              for (k = 0; k < subs.length; k++) {
+                for (l = 0; l < allGen.length; l++) {
+                  name = subs[k];
+                  if (appears(allGen[l]) && kill[i].indexOf(allGen[l]) === -1) {
+                    kill[i].push(allGen[l]);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    //console.log(kill);
+    //console.log(gen);
   };
 
   /**
@@ -639,6 +727,7 @@
       code = prune(buildGraph(code));
       reached = reachable(code);
       live = alive(code);
+      availableExp(code);
 
       imf[ast.funcs[i].name] = {
         'Intemediate Form': code,

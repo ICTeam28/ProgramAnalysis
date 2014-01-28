@@ -17,16 +17,14 @@
       <textarea cols="80" rows="25" id="input">
 func testp()
 {
-  z = 0;
-  x = 2;
-  y = 4;
-  x = 1;
-  if (y > x) {
-    z = y;  
-  } else {
-    z = y * y;
+  a = 0;
+  b = 0;
+  x = a + b;
+  y = a * b;
+  while (y > a + b) {
+    a = a + 1;
+    x = a + b;
   }
-  x = z;
 }
 
 func main()
