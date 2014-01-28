@@ -1,80 +1,100 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE html>
 <html>
-   <head>
-   <link href='http://fonts.googleapis.com/css?family=Droid+Sans+Mono' rel='stylesheet' type='text/css'>
-   <style type="text/css">
-   #input {
-      background-color:#cfcfcf;
-      font-family: 'Droid Sans Mono', sans-serif;
-      color:#3f3f3f;
-   }
-   .textAreaWithLines {
-   }
-   .textAreaWithLines textarea,.textAreaWithLines div{
-      border:0px;
-      line-height:120%;
-      font-size:12px;
-   }
-   .lineObj {
-      background-color:#b0b0b0;
-      font-family: 'Droid Sans Mono', sans-serif;
-      color:#3f3f3f;
-   }
-   </style>
-   
-   <script type="text/javascript">
-   var lineObjOffsetTop = 2;
-   
-   function createTextAreaWithLines(id)
-   {
-      var el = document.createElement('div');
-      var ta = document.getElementById(id);
-      ta.parentNode.insertBefore(el,ta);
-      el.appendChild(ta);
-      
-      el.className='textAreaWithLines';
-      el.style.width = (ta.offsetWidth + 30) + 'px';
-      ta.style.position = 'absolute';
-      ta.style.left = '30px';
-      el.style.height = (ta.offsetHeight + 2) + 'px';
-      el.style.overflow='hidden';
-      el.style.position = 'relative';
-      el.style.width = (ta.offsetWidth + 30) + 'px';
-      var lineObj = document.createElement('div');
-      lineObj.style.position = 'absolute';
-      lineObj.style.top = lineObjOffsetTop + 'px';
-      lineObj.style.left = '0px';
-      lineObj.style.width = '27px';
-      el.insertBefore(lineObj,ta);
-      lineObj.style.textAlign = 'right';
-      lineObj.className='lineObj';
-      var string = '';
-      for(var no=1;no<200;no++){
-         if(string.length>0)string = string + '<br>';
-         string = string + no;
-      }
-      
-      ta.onkeydown = function() { positionLineObj(lineObj,ta); };
-      ta.onmousedown = function() { positionLineObj(lineObj,ta); };
-      ta.onscroll = function() { positionLineObj(lineObj,ta); };
-      ta.onblur = function() { positionLineObj(lineObj,ta); };
-      ta.onfocus = function() { positionLineObj(lineObj,ta); };
-      ta.onmouseover = function() { positionLineObj(lineObj,ta); };
-      lineObj.innerHTML = string;
-      
-   }
-   
-   function positionLineObj(obj,ta)
-   {
-      obj.style.top = (ta.scrollTop * -1 + lineObjOffsetTop) + 'px';      
-   }
-   
-   </script>
-   
-   </head>   
-   <body>
-   <form>
-   <textarea cols="80" rows="25" id="input">
+    <head>
+    <link href='http://fonts.googleapis.com/css?family=Droid+Sans+Mono' rel='stylesheet' type='text/css'>
+    <script type='text/javascript' src="script/behave.js"></script>
+    <!-- Shame CSS doesn't support inheritance :( -->
+    <style type="text/css">
+    #input {
+        background-color:#cfcfcf;
+        resize: none;
+
+        font-family: 'Droid Sans Mono', sans-serif;
+        font-size:12px;
+        color:#3f3f3f;
+    }
+
+    .textAreaWithLines {
+        background-color:#b0b0b0;
+
+        font-family: 'Droid Sans Mono', sans-serif;
+        font-size:12px;
+        color:#3f3f3f;
+    }
+
+    .textAreaWithLines textarea, .textAreaWithLines div {
+        border:0px;
+    }
+
+    .lineObj {
+    }
+    </style>
+    
+    <script type="text/javascript">   
+    var lineNoOffsetTop = 4;
+
+    function setupEditor(id) {
+        // Set up text area for code editing
+        // Using: https://github.com/jakiestfu/Behave.js
+        var ta = document.getElementById(id);
+        var editor = new Behave({
+            textarea: ta,
+            replaceTab: true,
+            softTabs: true,
+            tabSize: 4,
+            autoOpen: true,
+            overwrite: true,
+            autoStrip: true,
+            autoIndent: true
+        });
+
+        var el = document.createElement('div');
+        ta.parentNode.insertBefore(el,ta);
+        el.appendChild(ta);
+        
+        el.className='textAreaWithLines';
+        el.style.width = (ta.offsetWidth + 30) + 'px';
+        ta.style.position = 'absolute';
+        ta.style.left = '30px';
+        el.style.height = (ta.offsetHeight + 2) + 'px';
+        el.style.overflow='hidden';
+        el.style.position = 'relative';
+        el.style.width = (ta.offsetWidth + 30) + 'px';
+
+        var lineObj = document.createElement('div');
+        lineObj.style.position = 'absolute';
+        lineObj.style.top = lineNoOffsetTop + 'px';
+        lineObj.style.left = '0px';
+        lineObj.style.width = '30px';
+        el.insertBefore(lineObj,ta);
+        lineObj.style.textAlign = 'right';
+        lineObj.className='lineObj';
+        var string = '';
+        for (var no = 1; no < 200; no++) {
+            if (string.length > 0)
+                string = string + '<br>';
+            string = string + no;
+        }
+        
+        // Update line numbers on various events
+        ta.onkeydown = function() { updateLineNumbers(lineObj, ta); };
+        ta.onmousedown = function() { updateLineNumbers(lineObj, ta); };
+        ta.onscroll = function() { updateLineNumbers(lineObj, ta); };
+        ta.onblur = function() { updateLineNumbers(lineObj, ta); };
+        ta.onfocus = function() { updateLineNumbers(lineObj, ta); };
+        ta.onmouseover = function() { updateLineNumbers(lineObj, ta); };
+        lineObj.innerHTML = string;
+    }
+    
+    function updateLineNumbers(obj, ta) {
+        obj.style.top = (ta.scrollTop * -1 + lineNoOffsetTop) + 'px';      
+    }
+    </script>
+    
+    </head>   
+    <body>
+    <form>
+    <textarea cols="80" rows="25" id="input">
 func testp() {
     z = 0;
     x = 2;
@@ -91,11 +111,10 @@ func testp() {
 
 func main() {
     return testp();
-}
-   </textarea>
-   </form>
-   <script type="text/javascript">
-   createTextAreaWithLines('input');
-   </script>
-   </body>
+}</textarea>
+    </form>
+    <script type="text/javascript">
+    setupEditor('input');
+    </script>
+    </body>
 </html>
