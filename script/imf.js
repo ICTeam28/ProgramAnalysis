@@ -26,6 +26,74 @@
   var nextLabel = 0;
 
   /**
+   * Set operations required by chaotic iteration
+   */
+  var set = {
+    /**
+     * Union of two setss
+     * @param {List<a>} a
+     * @param {List<b>} b
+     * @return a U b
+     */
+    union: function (a, b) {
+      var ap = [], k;
+      for (k = 0; k < a.length; ++k) {
+        ap.push(a[k]);
+      }
+
+      for (k = 0; k < b.length; ++k) {
+        if (a.indexOf(b[k]) === -1) {
+          ap.push(b[k]);
+        }
+      }
+
+      return ap;
+    },
+
+    /**
+     * Computes the difference of two sets
+     * @param {List<a>} a
+     * @param {List<b>} b
+     * return a - b
+     */
+    difference: function (a, b) {
+      var ap = [], k;
+      for (k = 0; k < a.length; ++k) {
+        if (b.indexOf(a[k]) === -1) {
+          ap.push(a[k]);
+        }
+      }
+
+      return ap;
+    },
+
+    /**
+     * Checks whether two sets are equal
+     * @param {List<a>} a
+     * @param {List<b>} b
+     * return a == b
+     */
+    compare: function (a, b) {
+      var p;
+
+      if (a.length !== b.length) {
+        return false;
+      }
+
+      for (p = 0; p < a.length; ++p) {
+        if (a.indexOf(b[p]) === -1) {
+          return false;
+        }
+        if (b.indexOf(a[p]) === -1) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+  };
+
+  /**
    * Intermediate form instruction
    * @param {String} op Instruction opcode
    * @constructor
@@ -33,6 +101,8 @@
   var ImmInstr = function (op, arg1, arg2) {
     this.op = op;
     this.next = [];
+    this.rd = { 'in': [], 'out': [] };
+    this.lv = { 'in': [], 'out': [] };
 
     switch (this.op) {
     case 'lbl':
@@ -299,6 +369,8 @@
       imf[i].next.map(visit);
     }(0));
 
+    reachable.sort(function (a, b) { return a - b; });
+
     // Checks whether an op has side effects or leads to another op which
     // has side effects
     var hasSideEffects = function (i) {
@@ -346,151 +418,71 @@
   };
 
   /**
-   * Chaotic iteration used to solve the system of equations
-   * @param {List<ImmInstr>} imf
-   * @param {List<Object>} gen
-   * @param {List<Object>} kill
-   * @return {Object<String, List<Object>} entry and exit
+   * Removes assignments to variables whose value is not used later
+   * Nodes that link to removed operations are linked to the following
+   * instruction instead
+   * @param {Object<Number, ImmInstr>} imfp
    */
-  var iterate = function (imf, gen, kill) {
-    /**
-     * Unites two sets
-     * @param {List<a>} a
-     * @param {List<b>} b
-     * @return a U b
-     */
-    var union = function (a, b) {
-      var ap = [], k;
-      for (k = 0; k < a.length; ++k) {
-        ap.push(a[k]);
-      }
+  var removeDeadVars = function (imfp) {
+    var i, j, k, keys = [], imf;
 
-      for (k = 0; k < b.length; ++k) {
-        if (a.indexOf(b[k]) === -1) {
-          ap.push(b[k]);
-        }
-      }
-
-      return ap;
-    };
-
-    /**
-     * Computes the difference of two sets
-     * @param {List<a>} a
-     * @param {List<b>} b
-     * return a - b
-     */
-    var difference = function (a, b) {
-      var ap = [], k;
-      for (k = 0; k < a.length; ++k) {
-        if (b.indexOf(a[k]) === -1) {
-          ap.push(a[k]);
-        }
-      }
-      return ap;
-    };
-
-    /**
-     * Checks whether two sets are equal
-     * @param {List<a>} a
-     * @param {List<b>} b
-     * return a == b
-     */
-    var compare = function (a, b) {
-      var k;
-
-      // Returns true if two sets are equivalent
-      var compareSets = function (a, b) {
-        var p;
-        if (a.length !== b.length) {
-          return false;
-        }
-
-        for (p = 0; p < a.length; ++p) {
-          if (a.indexOf(b[p]) === -1) {
-            return false;
-          }
-          if (b.indexOf(a[p]) === -1) {
-            return false;
-          }
-        }
-
-        return true;
-      };
-
-      // Checks whether a has all the keys of b and vice-versa
-      // If all keys are equivalent, checks whether all values
-      // are equivalent
-      for (k in a) {
-        if (a.hasOwnProperty(k)) {
-          if (!b[k] || !compareSets(b[k], a[k])) {
-            return false;
-          }
-        }
-      }
-
-      for (k in b) {
-        if (b.hasOwnProperty(k)) {
-          if (!a[k] || !compareSets(b[k], a[k])) {
-            return false;
-          }
-        }
-      }
-      return true;
-    };
-
-    var entry = {}, exit = {}, entryp = {}, exitp = {};
-    var i, j, change;
-
+    imf = $.extend(true, {}, imfp);
     for (i in imf) {
       if (imf.hasOwnProperty(i)) {
-        entry[i] = [];
-        exit[i] = [];
+        if (imf[i].op === 'str' && imf[i].lv.out.indexOf(imf[i].dest) === -1) {
+          delete imf[i];
+        } else {
+          keys.push(parseInt(i, 10));
+        }
       }
     }
 
-    do {
-      entryp = {};
-      exitp = {};
-      for (i in imf) {
-        if (imf.hasOwnProperty(i)) {
-          entryp[i] = [];
-          for (j in imf) {
-            if (imf.hasOwnProperty(j)) {
-              if (imf[j].next.indexOf(parseInt(i, 10)) !== -1) {
-                entryp[i] = union(entryp[i], exit[j]);
-              }
-            }
+    var ret = {}, rdIn, rdOut;
+    for (i = 0; i < keys.length; ++i) {
+      ret[i] = imf[keys[i]];
+      for (j = 0; j < ret[i].next.length; ++j) {
+        for (k = 0; k < keys.length; ++k) {
+          if (keys[k] >= ret[i].next[j]) {
+            ret[i].next[j] = k;
+            break;
           }
         }
       }
 
-      for (i in imf) {
-        if (imf.hasOwnProperty(i)) {
-          exitp[i] = union(difference(entryp[i], kill[i]), gen[i]);
+      rdIn = [];
+      for (j = 0; j < ret[i].rd.in.length; ++j) {
+        if ((k = keys.indexOf(ret[i].rd.in[j])) !== -1) {
+          rdIn.push(k);
         }
       }
+      ret[i].rd.in = rdIn;
 
-      change = !compare(entry, entryp) || !compare(exit, exitp);
-      entry = entryp;
-      exit = exitp;
-    } while (change);
+      rdOut = [];
+      for (j = 0; j < ret[i].rd.out.length; ++j) {
+        if ((k = keys.indexOf(ret[i].rd.out[j])) !== -1) {
+          rdOut.push(k);
+        }
+      }
+      ret[i].rd.out = rdOut;
+    }
 
-    return { 'entry': entryp, 'exit': exitp };
+    return ret;
   };
 
   /**
    * Reaching definitions analysis
    * @param {Object<Number, ImmInstr>} imf
    */
-  var reachable = function (imf) {
-    var i, j, gen = {}, kill = {};
+  var reachingDefs = function (imf) {
+    var i, j, gen = {}, kill = {}, enter = {}, exit = {};
 
     // Build the kill and gen functions for every instruction
     for (i in imf) {
       if (imf.hasOwnProperty(i)) {
         gen[i] = [];
         kill[i] = [];
+        enter[i] = [];
+        exit[i] = [];
 
         if (imf[i].op === 'str') {
           gen[i].push(parseInt(i, 10));
@@ -506,21 +498,72 @@
       }
     }
 
-    console.log(iterate(imf, gen, kill));
+    // Chaotic iteration
+    var enterp = {}, exitp = {};
+    var change;
+
+    do {
+      enterp = {};
+      exitp = {};
+      for (i in imf) {
+        if (imf.hasOwnProperty(i)) {
+          enterp[i] = [];
+          for (j in imf) {
+            if (imf.hasOwnProperty(j)) {
+              if (imf[j].next.indexOf(parseInt(i, 10)) !== -1) {
+                enterp[i] = set.union(enterp[i], exit[j]);
+              }
+            }
+          }
+        }
+      }
+
+      for (i in imf) {
+        if (imf.hasOwnProperty(i)) {
+          exitp[i] = set.union(set.difference(enterp[i], kill[i]), gen[i]);
+        }
+      }
+
+      change = false;
+      for (i in imf) {
+        if (imf.hasOwnProperty(i)) {
+          if (!set.compare(enter[i], enterp[i])) {
+            change = true;
+            break;
+          }
+
+          if (!set.compare(exit[i], exitp[i])) {
+            change = true;
+            break;
+          }
+        }
+      }
+
+      enter = enterp;
+      exit = exitp;
+    } while (change);
+
+    // Save the results
+    for (i in imf) {
+      if (imf.hasOwnProperty(i)) {
+        imf[i].rd.in = enter[i];
+        imf[i].rd.out = exit[i];
+      }
+    }
   };
 
   /**
    * Live variable analysis
    * @param {Object<Number, ImmInstr>} imf
    */
-  var alive = function (imf) {
-    var i, kill = {}, gen = {};
+  var liveVariables = function (imf) {
+    var i, j, writes = {}, reads = {}, enter = {}, exit = {};
 
     var traverse = function (node) {
       switch (node.op) {
       case 'var':
-        if (gen[i].indexOf(node.name) === -1) {
-          gen[i].push(node.name);
+        if (reads[i].indexOf(node.name) === -1) {
+          reads[i].push(node.name);
         }
         break;
       case 'bin':
@@ -539,11 +582,13 @@
     // Computes killLV and genLV for every instruction
     for (i in imf) {
       if (imf.hasOwnProperty(i)) {
-        gen[i] = [];
-        kill[i] = [];
+        reads[i] = [];
+        writes[i] = [];
+        enter[i] = [];
+        exit[i] = [];
 
         if (imf[i].op === 'str') {
-          kill[i].push(imf[i].dest);
+          writes[i].push(imf[i].dest);
         }
 
         if (imf[i].expr) {
@@ -552,9 +597,55 @@
       }
     }
 
-    console.log(kill);
-    console.log(gen);
-    console.log(iterate(imf, gen, kill));
+    // Chaotic iteration
+    var enterp = {}, exitp = {};
+    var change;
+
+    do {
+      enterp = {};
+      exitp = {};
+
+      for (i in imf) {
+        if (imf.hasOwnProperty(i)) {
+          exitp[i] = [];
+          for (j = 0; j < imf[i].next.length; ++j) {
+            exitp[i] = set.union(exitp[i], enter[imf[i].next[j]]);
+          }
+        }
+      }
+
+      for (i in imf) {
+        if (imf.hasOwnProperty(i)) {
+          enterp[i] = set.union(set.difference(exit[i], writes[i]), reads[i]);
+        }
+      }
+
+      change = false;
+      for (i in imf) {
+        if (imf.hasOwnProperty(i)) {
+          if (!set.compare(enter[i], enterp[i])) {
+            change = true;
+            break;
+          }
+
+          if (!set.compare(exit[i], exitp[i])) {
+            change = true;
+            break;
+          }
+        }
+      }
+
+      enter = enterp;
+      exit = exitp;
+    } while (change);
+
+    // Save the results
+    for (i in imf) {
+      if (imf.hasOwnProperty(i)) {
+        imf[i].lv.in = enter[i];
+        imf[i].lv.out = exit[i];
+      }
+    }
   };
 
   /**
@@ -625,7 +716,7 @@
    * @return {Object<String, Array<ImmInstr>} Intermediate form
    */
   env.genIMF = function (ast) {
-    var i = 0, imf = {}, code = [], reached, live, fs = {};
+    var i = 0, imf = {}, code = [], live, fs = {};
 
     for (i = 0; i < ast.funcs.length; ++i) {
       fs[ast.funcs[i].name] = ast.funcs[i].args;
@@ -637,12 +728,13 @@
 
       generate(ast.funcs[i], code, fs);
       code = prune(buildGraph(code));
-      reached = reachable(code);
-      live = alive(code);
+      reachingDefs(code);
+      liveVariables(code);
+      live = removeDeadVars(code);
 
       imf[ast.funcs[i].name] = {
-        'Intemediate Form': code,
-        'Reachable Definitions': reached
+        'Unoptimized code': code,
+        'Dead variables removed': live
       };
     }
 
