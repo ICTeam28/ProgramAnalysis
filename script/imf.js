@@ -583,7 +583,7 @@
     }
 
     // Fix links
-    var ret = {}, rdIn, rdOut;
+    var ret = {};
     for (i = 0; i < keys.length; ++i) {
       ret[i] = imf[keys[i]];
       for (j = 0; j < ret[i].next.length; ++j) {
@@ -594,26 +594,10 @@
           }
         }
       }
-
-      rdIn = [];
-      for (j = 0; j < ret[i].rd.in.length; ++j) {
-        if ((k = keys.indexOf(ret[i].rd.in[j])) !== -1) {
-          rdIn.push(k);
-        }
-      }
-      ret[i].rd.in = rdIn;
-
-      rdOut = [];
-      for (j = 0; j < ret[i].rd.out.length; ++j) {
-        if ((k = keys.indexOf(ret[i].rd.out[j])) !== -1) {
-          rdOut.push(k);
-        }
-      }
-      ret[i].rd.out = rdOut;
     }
 
-    return ret;
-  };
+    return prune(ret);
+  }
 
   /**
    * Renames variables based on the graph colouring
@@ -626,7 +610,7 @@
     var i, j, replace, newName;
 
     /**
-     * Assigns newName to all the variables within the expression whose 
+     * Assigns newName to all the variables within the expression whose
      * name matches replace
      * @param {Object} node
      */
