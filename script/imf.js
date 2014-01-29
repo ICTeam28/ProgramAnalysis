@@ -689,8 +689,7 @@
     for (i in imfp) {
       if (imfp[i].hasOwnProperty) {
         if (imfp[i].op === 'str') {
-          name = imfp[i].dest;
-          if (imfp[i].expr.op === 'var' && imfp[i].expr.name === name) {
+          if (imfp[i].expr.op === 'var' && imfp[i].expr.name === imfp[i].dest) {
             if (imfp[i].next.length === 1) {
               next = imfp[i].next[0];
               for (j in imfp) {
@@ -698,6 +697,43 @@
                   for (k = 0; k < imfp[j].next.length; ++k) {
                     if (imfp[j].next[k] === parseInt(i, 10)) {
                       imfp[j].next[k] = next;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return prune(imfp);
+  };
+
+  /**
+   * Merges consequitive labels
+   * @param {Object<Number, ImmInstr>} imf
+   * @return {Object<Number, ImmInstr>} imfp
+   */
+  var mergeLabels = function (imf) {
+    var imfp = $.extend(true, {}, imf);
+    var i, j, k, l, next;
+
+    for (i in imfp) {
+      if (imfp[i].hasOwnProperty) {
+        if (imfp[i].op === 'lbl') {
+          if (imfp[i].next.length === 1) {
+            next = imfp[i].next[0];
+            for (j in imfp) {
+              if (imfp[j].hasOwnProperty) {
+                if (imfp[j].op === 'lbl' && next === parseInt(j, 10)) {
+                  for (k in imfp) {
+                    if (imfp[k].hasOwnProperty) {
+                      for (l = 0; l < imfp[k].next.length; ++l) {
+                        if (imfp[k].next[l] === parseInt(i, 10)) {
+                          imfp[k].next[l] = next;
+                        }
+                      }
                     }
                   }
                 }
@@ -1140,8 +1176,7 @@
       igraph = interferenceGraph(live);
       renamed = renameVariables(live, igraph.colour);
       renamed = optimiseRenamed(renamed);
-      // TODO: Merge consecutive labels
-      // TODO: Remove jumps to consecutive instructions
+      renamed = mergeLabels(renamed);
 
       imf[ast.funcs[i].name] = {
         'Unoptimized Code': drawIMF(code),
