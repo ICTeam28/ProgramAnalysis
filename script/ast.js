@@ -368,7 +368,7 @@
    * Updates the tree
    * @param {Object} ast
    */
-  env.drawAST = function (ast) {
+  env.drawAST = function (ast, svg) {
     var g, i;
 
     // Delete the old drawing
@@ -416,37 +416,5 @@
     }
   };
 
-  /**
-   * Initialises the AST viewer
-   */
-  env.initAST = function () {
-    svg = $("#ast-svg").get(0);
-
-    $(svg)
-      .on('selectstart', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      })
-      .on('mousedown', function (e) {
-        var mx = e.pageX, my = e.pageY;
-        var ox = mX, oy = mY;
-        var root = svg.firstChild;
-
-        $(this)
-          .css('cursor', 'move')
-          .on('mousemove.drag', function (e) {
-            mX = ox - mx + e.pageX;
-            mY = oy - my + e.pageY;
-            root.setAttribute("transform", "translate(" + mX + "," + mY + ")");
-          });
-      });
-    $(window)
-      .on('mouseup', function () {
-        $(svg)
-          .off('mousemove.drag')
-          .css('cursor', 'auto');
-      });
-  };
 }(window.topics = window.topics || {}));
 

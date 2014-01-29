@@ -1178,8 +1178,9 @@
    * @param {Object<String, Array<ImmInstr>} imf Intermediate form
    */
   env.drawIMF = function (imf) {
-    var name, content, i, first;
+    var name, content, i, first, tabs;
 
+    tabs = $("#imf-tabs").tabs();
     $(">div", tabs).remove();
     $(">ul li", tabs).remove();
     tabs.tabs("destroy");
@@ -1214,33 +1215,5 @@
     }
 
     tabs.tabs();
-  };
-
-  /**
-   * Initialises the intermediate form viewer
-   */
-  env.initIMF = function () {
-    tabs = $("#imf-tabs").tabs();
-
-    var slide = function (slides, dir) {
-      var i, title, children;
-
-      children = $(slides).parent().next().children();
-      for (i = 0; i < children.length; ++i) {
-        if (children[i].style.display === 'block') {
-          break;
-        }
-      }
-
-      i = (i + dir + children.length) % children.length;
-      children.css('display', 'none');
-      children[i].style.display = 'block';
-      title = $(slides).siblings('span').first();
-      title.text(children[i].getAttribute('data-name'));
-    };
-
-    $(document)
-      .on('click', '#imf-tabs .next', function () { slide(this, +1); })
-      .on('click', '#imf-tabs .prev', function () { slide(this, -1); });
   };
 }(window.topics = window.topics || {}));
