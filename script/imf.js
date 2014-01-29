@@ -637,9 +637,9 @@
     };
 
     for (i in imfp) {
-      if (imfp[i].hasOwnProperty(i)) {
+      if (imfp.hasOwnProperty(i)) {
         for (j in colours) {
-          if (colours[j].hasOwnProperty(j)) {
+          if (colours.hasOwnProperty(j)) {
 
             newName = 'a' + (colours[j]);
             replace = j;
@@ -671,7 +671,7 @@
     var i, j, k, next;
 
     for (i in imfp) {
-      if (imfp[i].hasOwnProperty) {
+      if (imfp.hasOwnProperty(i)) {
         if (imfp[i].op === 'str') {
           if (imfp[i].expr.op === 'var' && imfp[i].expr.name === imfp[i].dest) {
             if (imfp[i].next.length === 1) {
@@ -704,15 +704,15 @@
     var i, j, k, l, next;
 
     for (i in imfp) {
-      if (imfp[i].hasOwnProperty) {
+      if (imfp.hasOwnProperty(i)) {
         if (imfp[i].op === 'lbl') {
           if (imfp[i].next.length === 1) {
             next = imfp[i].next[0];
             for (j in imfp) {
-              if (imfp[j].hasOwnProperty) {
+              if (imfp.hasOwnProperty(j)) {
                 if (imfp[j].op === 'lbl' && next === parseInt(j, 10)) {
                   for (k in imfp) {
-                    if (imfp[k].hasOwnProperty) {
+                    if (imfp.hasOwnProperty(k)) {
                       for (l = 0; l < imfp[k].next.length; ++l) {
                         if (imfp[k].next[l] === parseInt(i, 10)) {
                           imfp[k].next[l] = next;
