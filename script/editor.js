@@ -1,10 +1,18 @@
 /*jslint browser:true, ass:true */
-/*global mini */
+/*global mini, Behave */
 /**
  * @fileOverview User Interface
  */
 (function (env) {
   "use strict";
+
+  /**
+   * Reports a new warning
+   */
+  env.warning = function (text) {
+    $('<div>' + text + '</div>')
+      .appendTo("#warn-list");
+  };
 
   /**
    * Initialise the console
@@ -20,12 +28,60 @@
    * Initialises the editor
    */
   var initEditor = function () {
-    $("#input").on('keyup', function () {
+    var lineNoOffsetTop = 4;
+
+    var ta = document.getElementById('input');
+    var editor = new Behave({
+        textarea: ta,
+        replaceTab: true,
+        softTabs: true,
+        tabSize: 4,
+        autoOpen: true,
+        overwrite: true,
+        autoStrip: true,
+        autoIndent: true
+    });
+
+    var el = document.createElement('div');
+    ta.parentNode.insertBefore(el,ta);
+    el.appendChild(ta);
+
+    $(el)
+      .attr('class', 'textAreaWithLines')
+      .css('width', (ta.offsetWidth + 30) + 'px')
+      .css('height', (ta.offsetHeight + 2) + 'px')
+      .css('overflow', 'hidden')
+      .css('position', 'relative');
+
+    var lineObj = document.createElement('div');
+    lineObj.style.position = 'absolute';
+    lineObj.style.top = lineNoOffsetTop + 'px';
+    lineObj.style.left = '0px';
+    lineObj.style.width = '30px';
+    el.insertBefore(lineObj,ta);
+    lineObj.style.textAlign = 'right';
+    lineObj.className='lineObj';
+
+    var string = '';
+    for (var no = 1; no < 200; no++) {
+        if (string.length > 0)
+            string = string + '<br>';
+        string = string + no;
+    }
+
+    // Update line numbers on various events
+    lineObj.innerHTML = string;
+
+    var update = function () {
+      lineObj.style.top = (ta.scrollTop * -1 + lineNoOffsetTop) + 'px';
+
+      // Parse & display everything
       try {
         var ast, imf;
 
-        $("#error-report").text("");
-        ast = mini.parse($(this).val());
+        $("#error-report").html('');
+        $("#warn-list").html('');
+        ast = mini.parse($(ta).val());
         env.checkAST(ast);
         imf = env.genIMF(ast);
 
@@ -34,7 +90,10 @@
       } catch (e) {
         $("#error-report").text(e + " " + e.stack);
       }
-    });
+    };
+
+    update();
+    BehaveHooks.add([ 'keydown', 'keyup', 'mousedown', 'scroll' ], update);
   };
 
   /**

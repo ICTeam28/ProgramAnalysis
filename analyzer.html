@@ -2,20 +2,22 @@
 <html>
   <head>
     <title> Editor </title>
-    <link rel="stylesheet" type="text/css" href="style/editor.css"/>
-    <link rel="stylesheet" type="text/css" href="style/jquery-ui.css"/>
-    <script type="text/javascript" src="script/jquery.js"></script>
-    <script type="text/javascript" src="script/jquery-ui.js"></script>
-    <script type="text/javascript" src="script/mini.js"></script>
-    <script type="text/javascript" src="script/ast.js"></script>
-    <script type="text/javascript" src="script/imf.js"></script>
-    <script type="text/javascript" src="script/dataflow.js"></script>
-    <script type="text/javascript" src="script/optimizer.js"></script>
-    <script type="text/javascript" src="script/editor.js"></script>
+    <link rel='stylesheet' type='text/css' href='style/editor.css'/>
+    <link rel='stylesheet' type='text/css' href='style/jquery-ui.css'/>
+    <link rel='stylesheet' type='text/css' href='http://fonts.googleapis.com/css?family=Droid+Sans+Mono' />
+    <script type='text/javascript' src='script/behave.js'></script>
+    <script type='text/javascript' src='script/jquery.js'></script>
+    <script type='text/javascript' src='script/jquery-ui.js'></script>
+    <script type='text/javascript' src='script/mini.js'></script>
+    <script type='text/javascript' src='script/ast.js'></script>
+    <script type='text/javascript' src='script/imf.js'></script>
+    <script type='text/javascript' src='script/dataflow.js'></script>
+    <script type='text/javascript' src='script/optimizer.js'></script>
+    <script type='text/javascript' src='script/editor.js'></script>
   </head>
   <body>
     <div id="editor">
-      <textarea cols="50" rows="25" id="input">
+      <textarea cols="53" rows="25" id="input">
 func testp()
 {
   z = 0;
@@ -56,7 +58,8 @@ func main()
         </div>
       </div>
       <div id="tabs-3">
-        Static Analysis
+        <div id="warn-list">
+        </div>
       </div>
       <div id="tabs-4">
         x64 Assembly

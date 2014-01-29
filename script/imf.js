@@ -16,6 +16,7 @@
   /**
    * Colours used for the interference graph
    * @type {List<String>}
+   * @const
    */
   var COLOURS = [
     "#ff0000", "#00ff00", "#0000ff",
@@ -23,6 +24,30 @@
     "#cc0000", "#00cc00", "#0000cc",
     "#cccc00", "#00cccc", "#cc00cc",
   ];
+
+  /**
+   * Priority of operators
+   * @type {Object<String, Number>}
+   * @const
+   */
+  var PRIORITY = {
+    '&&': 0,
+    '||': 0,
+    '==': 1,
+    '!=': 1,
+    '<' : 1,
+    '<=': 1,
+    '>' : 1,
+    '>=': 1,
+    '+' : 2,
+    '-':  2,
+    '*' : 3,
+    '/' : 3,
+    '%':  3,
+    '^':  4,
+    '!' : 5,
+    '~':  5
+  };
 
   /**
    * Tab which hold the code for every function
@@ -149,43 +174,59 @@
   };
 
   /**
+   * Converts an expression into a string
+   * @param {Object} node
+   * @return {String}
+   */
+  var exprToString = function (node) {
+    var str;
+
+    switch (node.op) {
+    case 'num':
+      return node.val;
+    case 'var':
+      return node.name;
+    case 'bin':
+      str = '';
+      if (node.lhs.op == 'bin' && PRIORITY[node.lhs.p] < PRIORITY[node.p]) {
+        str += '(' + exprToString(node.lhs) + ')';
+      } else {
+        str += exprToString(node.lhs);
+      }
+
+      str += node.p;
+
+      if (node.rhs.op == 'bin' && PRIORITY[node.rhs.p] < PRIORITY[node.p]) {
+        str += '(' + exprToString(node.rhs) + ')';
+      } else {
+        str += exprToString(node.rhs);
+      }
+      return str;
+    case 'un':
+      return '(' + node.p + exprToString(node.expr) + ')';
+    case 'call':
+      return node.name + '(' + node.args.map(exprToString).join(',') + ')';
+    }
+  };
+
+  /**
    * Converts an instruction to a string
    * @this {ImmInstr}
    */
   ImmInstr.prototype.toString = function () {
-    /**
-     * Converts an expression into a string
-     * @param {Object} node
-     * @return {String}
-     */
-    var exprString = function (node) {
-      switch (node.op) {
-      case 'num':
-        return node.val;
-      case 'var':
-        return node.name;
-      case 'bin':
-        return '(' + exprString(node.lhs) + node.p + exprString(node.rhs) + ')';
-      case 'un':
-        return '(' + node.p + exprString(node.expr) + ')';
-      case 'call':
-        return node.name + '(' + node.args.map(exprString).join(',') + ')';
-      }
-    };
-
     switch (this.op) {
     case 'lbl':
       return this.label + ':';
     case 'ret':
-      return 'ret ' + exprString(this.expr);
+      return 'ret ' + exprToString(this.expr);
     case 'jmp':
       return 'jmp ' + this.label;
     case 'cjmp':
-      return 'cjmp ' + this.label + ',' + exprString(this.expr);
+      return 'cjmp ' + this.label + ',' + exprToString(this.expr);
     case 'njmp':
-      return 'njmp ' + this.label + ',' + exprString(this.expr);
+      return 'njmp ' + this.label + ',' + exprToString(this.expr);
     case 'str':
-      return 'str ' + this.dest + ',' + exprString(this.expr);
+      return 'str ' + this.dest + ',' + exprToString(this.expr);
     }
   };
 

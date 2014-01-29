@@ -9,6 +9,23 @@ body
   width: 425px; left: 0px; top: 0px; bottom: 0px;
 }
 
+#input
+{
+  position: absolute;
+  left: 30px;
+  right: 0px;
+  background-color:#cfcfcf;
+  resize: none;
+  font-family: 'Droid Sans Mono', sans-serif;
+  font-size:12px;
+  color:#3f3f3f;
+}
+
+#input:focus
+{
+  outline: 0px none transparent;
+}
+
 #editor textarea
 {
   resize: none;
@@ -32,6 +49,21 @@ body
   padding: 0px;
   width: 100%;
   height: calc(100% - 28px);
+}
+
+.textAreaWithLines {
+    background-color:#b0b0b0;
+
+    font-family: 'Droid Sans Mono', sans-serif;
+    font-size:12px;
+    color:#3f3f3f;
+}
+
+.textAreaWithLines textarea, .textAreaWithLines div {
+    border:0px;
+}
+
+.lineObj {
 }
 
 /*******************************************************************************
