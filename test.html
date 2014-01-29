@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <title>Test Suite</title>
   <link rel="stylesheet" href="style/qunit.css">
+  <script type="text/javascript" src="script/qunit.js"></script>
+  <script type="text/javascript" src="script/jquery.js"></script>
   <script type="text/javascript" src="script/mini.js"></script>
   <script type="text/javascript" src="script/ast.js"></script>
   <script type="text/javascript" src="script/imf.js"></script>
@@ -13,7 +15,6 @@
 <body>
   <div id="qunit"></div>
   <div id="qunit-fixture"></div>
-  <script src="script/qunit.js"></script>
   <script type="text/javascript">
     module("parser");
     test("return 0", function() {
@@ -62,6 +63,54 @@
                     'op': 'var',
                     'name': 'b'
                   }
+                }
+              }
+            ]
+          }
+        ]
+      }
+      deepEqual(ast, mini.parse(source));
+    });
+
+    test("Assignment test", function() {
+      var source = 'func main(){a=0;b=a;c=b;return c;}';
+      var ast = {
+        'op': 'prog',
+        'funcs': [
+          {
+            'op': 'func',
+            'args': [],
+            'name': 'main',
+            'body': [
+              {
+                'op': 'assign',
+                'name': 'a',
+                'expr': {
+                  'op': 'num',
+                  'val': 0
+                }
+              },
+              {
+                'op': 'assign',
+                'name': 'b',
+                'expr': {
+                  'op': 'var',
+                  'name': 'a'
+                }
+              },
+              {
+                'op': 'assign',
+                'name': 'c',
+                'expr': {
+                  'op': 'var',
+                  'name': 'b'
+                }
+              },
+              {
+                'op': 'return',
+                'expr': {
+                  'op': 'var',
+                  'name': 'c'
                 }
               }
             ]

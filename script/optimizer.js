@@ -232,15 +232,15 @@
     var i, j, k, l, next;
 
     for (i in imfp) {
-      if (imfp[i].hasOwnProperty) {
+      if (imfp.hasOwnProperty(i)) {
         if (imfp[i].op === 'lbl') {
           if (imfp[i].next.length === 1) {
             next = imfp[i].next[0];
             for (j in imfp) {
-              if (imfp[j].hasOwnProperty) {
+              if (imfp.hasOwnProperty(j)) {
                 if (imfp[j].op === 'lbl' && next === parseInt(j, 10)) {
                   for (k in imfp) {
-                    if (imfp[k].hasOwnProperty) {
+                    if (imfp.hasOwnProperty(k)) {
                       for (l = 0; l < imfp[k].next.length; ++l) {
                         if (imfp[k].next[l] === parseInt(i, 10)) {
                           imfp[k].next[l] = next;
@@ -259,6 +259,37 @@
     return env.prune(imfp);
   };
 
+  /**
+   * Removes redundant jumps
+   * @param {Object<Number, ImmInstr>} imf
+   * @return {Object<Number, ImmInstr>} imfp
+   */
+  env.removeJumps = function (imf) {
+    var imfp = $.extend(true, {}, imf);
+    var i, j, k, next;
+
+    for (i in imfp) {
+      if (imfp.hasOwnProperty(i)) {
+        if (imfp[i].op === 'jmp') {
+          if (imfp[i].next.length === 1) {
+            next = imfp[i].next[0];
+            for (j in imfp) {
+              if (imfp.hasOwnProperty(j)) {
+                for (k = 0; k < imfp[j].next.length; ++k) {
+                  if (imfp[j].next[k] === parseInt(i, 10)) {
+                    imfp[j].next[k] = next;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return env.prune(imfp);
+  };
+  
   /**
    * Removes branches whose condition can be determined
    * @param {List<ImmInstr>} imf
