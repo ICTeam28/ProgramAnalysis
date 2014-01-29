@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Test Suite</title>
+  <link rel="stylesheet" href="style/qunit.css">
+  <script type="text/javascript" src="script/mini.js"></script>
+  <script type="text/javascript" src="script/ast.js"></script>
+  <script type="text/javascript" src="script/imf.js"></script>
+  <script type="text/javascript" src="script/dataflow.js"></script>
+  <script type="text/javascript" src="script/optimizer.js"></script>
+</head>
+<body>
+  <div id="qunit"></div>
+  <div id="qunit-fixture"></div>
+  <script src="script/qunit.js"></script>
+  <script type="text/javascript">
+    module("parser");
+    test("return 0", function() {
+      var source = 'func main() { return 0; }';
+      var ast = {
+        'op': 'prog',
+        'funcs': [
+          {
+            'op': 'func',
+            'args': [],
+            'name': 'main',
+            'body': [
+              {
+                'op': 'return',
+                'expr': {
+                  'op': 'num',
+                  'val': 0
+                }
+              }
+            ]
+          }
+        ]
+      }
+      deepEqual(ast, mini.parse(source));
+    });
+    test("a+b", function() {
+      var source = 'func main(a, b) { return a+b; }';
+      var ast = {
+        'op': 'prog',
+        'funcs': [
+          {
+            'op': 'func',
+            'args': [ 'a', 'b' ],
+            'name': 'main',
+            'body': [
+              {
+                'op': 'return',
+                'expr': {
+                  'op': 'bin',
+                  'p': '+',
+                  'lhs': {
+                    'op': 'var',
+                    'name': 'a'
+                  },
+                  'rhs': {
+                    'op': 'var',
+                    'name': 'b'
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+      deepEqual(ast, mini.parse(source));
+    });
+  </script>
+</body>
+</html>
