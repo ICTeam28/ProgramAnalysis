@@ -597,7 +597,7 @@
     }
 
     return prune(ret);
-  }
+  };
 
   /**
    * Renames variables based on the graph colouring
@@ -637,9 +637,9 @@
     };
 
     for (i in imfp) {
-      if (imfp[i].hasOwnProperty) {
+      if (imfp[i].hasOwnProperty(i)) {
         for (j in colours) {
-          if (colours[j].hasOwnProperty) {
+          if (colours[j].hasOwnProperty(j)) {
 
             newName = 'a' + (colours[j]);
             replace = j;
