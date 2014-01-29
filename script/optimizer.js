@@ -258,4 +258,187 @@
 
     return env.prune(imfp);
   };
+
+  /**
+   * Removes branches whose condition can be determined
+   * @param {List<ImmInstr>} imf
+   * @erturn {List<ImmInstr>}
+   */
+  env.reduceBranches = function (imf) {
+    var imfp = $.extend(true, {}, imf), i, j, k, next;
+
+    for (i in imfp) {
+      if (imfp.hasOwnProperty(i)) {
+        switch (imfp[i].op) {
+        case 'cjmp':
+          if (imfp[i].expr.op === 'num') {
+            // If condition is true, jump to target
+            if (imfp[i].expr.val !== 0) {
+              for (j = 0; j < imfp[i].next.length; ++j) {
+                if (imfp[i].next[j] !== parseInt(i, 10) + 1) {
+                  next = imfp[i].next[j];
+                }
+              }
+            } else {
+              next = parseInt(i, 10) + 1;
+            }
+
+            delete imfp[i].expr;
+            imfp[i].op = 'jmp';
+            imfp[i].label = imfp[next].label;
+            imfp[i].next = [next];
+          }
+          break;
+        case 'jmp':
+          if (imfp[i].next[0] === parseInt(i, 10) + 1) {
+            for (j in imfp) {
+              for (k = 0; k < imfp[j].next.length; ++k) {
+                if (imfp[j].next[k] === parseInt(i, 10)) {
+                  imfp[j].next[k] = imfp[i].next[0];
+                }
+              }
+            }
+          }
+          break;
+        }
+      }
+    }
+
+    return env.mergeLabels(env.prune(imfp));
+  };
+
+  /**
+   * Constant folding
+   * Keeps track of variables which are constant and reduces expressions
+   * which operate on constant values
+   */
+  env.foldConstants = function (imf) {
+    var changed;
+
+    // Tries to evaluate the expression with a given state
+    var replace = function (node, state) {
+      var lhs, rhs, expr;
+      switch (node.op) {
+      case 'var':
+        if (state.hasOwnProperty(node.name) && state[node.name] !== false) {
+          changed = true;
+          return {
+            'op': 'num',
+            'val': state[node.name]
+          };
+        }
+        return node;
+      case 'bin':
+        lhs = replace(node.lhs, state);
+        rhs = replace(node.rhs, state);
+        return {
+          'op': 'bin',
+          'p': node.p,
+          'lhs': lhs,
+          'rhs': rhs
+        };
+      case 'un':
+        expr = replace(node.expr, state);
+        if (expr.op === 'num') {
+          return {
+            'op': 'num',
+            'val': expr.unop(node.p, expr.val)
+          };
+        }
+
+        return {
+          'op': 'un',
+          'p': node.p,
+          'expr': expr
+        };
+      default:
+        return node;
+      }
+    };
+
+    // Combines information from two different states
+    var unify = function (a, b) {
+      var i, k, u = {};
+
+      for (i in a) {
+        if (a.hasOwnProperty(i)) {
+          if (!b.hasOwnProperty(i) || b[i] === a[i]) {
+            u[i] = a[i];
+          } else {
+            u[i] = false;
+          }
+        }
+      }
+
+      for (i in b) {
+        if (b.hasOwnProperty(i)) {
+          if (!a.hasOwnProperty(i) || b[i] === a[i]) {
+            u[i] = b[i];
+          } else {
+            u[i] = false;
+          }
+        }
+      }
+
+      return u;
+    };
+
+    // Replaces constants in basic blocks
+    var reduceExpr = function (imf) {
+      var imfp = $.extend(true, {}, imf), i, j, k;
+
+      var state, states = {}, back;
+      for (i in imfp) {
+        if (imfp.hasOwnProperty(i)) {
+          // Intersect incoming states
+          back = false;
+          state = {};
+          for (j in imfp) {
+            if (imfp.hasOwnProperty(j) && i != j) {
+              for (k = 0; k < imfp[j].next.length; ++k) {
+                if (imfp[j].next[k] === parseInt(i, 10)) {
+                  if (parseInt(j, 10) > parseInt(i, 10)) {
+                    back = true;
+                    break;
+                  } else {
+                    state = unify(state, states[j]);
+                  }
+                }
+              }
+
+              if (back) {
+                break;
+              }
+            }
+          }
+
+          state = back ? {} : state;
+
+          if (imfp[i].expr) {
+            imfp[i].expr = env.pruneAST(replace(imfp[i].expr, state));
+          }
+
+          if (imfp[i].cond) {
+            imfp[i].cond = env.pruneAST(replace(imfp[i].cond, state));
+          }
+
+          // If a new constant is found, add it to the state
+          if (imf[i].op === 'str' && imfp[i].expr.op === 'num') {
+            state[imfp[i].dest] = imfp[i].expr.val;
+          }
+
+          states[i] = state;
+        }
+      }
+
+      return imfp;
+    };
+
+    do {
+      changed = false;
+      imf = env.reduceBranches(env.mergeLabels(reduceExpr(imf)));2
+    } while (changed);
+
+    return imf;
+  };
 }(window.topics = window.topics || {}));

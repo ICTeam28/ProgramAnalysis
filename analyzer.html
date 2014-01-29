@@ -4,7 +4,7 @@
     <title> Editor </title>
     <link rel='stylesheet' type='text/css' href='style/editor.css'/>
     <link rel='stylesheet' type='text/css' href='style/jquery-ui.css'/>
-    <link rel='stylesheet' type='text/css' href='http://fonts.googleapis.com/css?family=Droid+Sans+Mono' />
+    <!--<link rel='stylesheet' type='text/css' href='http://fonts.googleapis.com/css?family=Droid+Sans+Mono' />-->
     <script type='text/javascript' src='script/behave.js'></script>
     <script type='text/javascript' src='script/jquery.js'></script>
     <script type='text/javascript' src='script/jquery-ui.js'></script>
@@ -18,25 +18,24 @@
   <body>
     <div id="editor">
       <textarea cols="53" rows="25" id="input">
-func testp()
+func testp(x)
 {
+  x = ~~~x;
   z = 0;
-  x = 2;
   y = 4;
-  x = 1;
   q = 3;
-  if (y > x) {
+  if (y > x + 0) {
     z = y;
   } else {
     z = y * y;
   }
   x = z;
-  return x;
+  return x + 2 + 3 + 4 + y + 6 + 5 + z + y + x;
 }
 
 func main()
 {
-  return testp();
+  return testp(1);
 }
       </textarea>
       <div id="error-report"> </div>

@@ -295,7 +295,7 @@
         getSub(node.rhs);
         break;
       case 'un':
-        getSub(node.epxr);
+        getSub(node.expr);
         break;
       case 'call':
         node.args.map(getSub);

@@ -1182,7 +1182,7 @@
    * @return {Object<String, Array<ImmInstr>} Intermediate form
    */
   env.genIMF = function (ast) {
-    var i = 0, imf = {}, code = [], live, igraph, fs = {}, renamed;
+    var i = 0, imf = {}, code = [], live, igraph, fs = {}, renamed, folded;
 
     for (i = 0; i < ast.funcs.length; ++i) {
       fs[ast.funcs[i].name] = ast.funcs[i].args;
@@ -1194,10 +1194,11 @@
 
       generate(ast.funcs[i], code, fs);
       code = env.prune(buildGraph(code));
-      env.reachingDefs(code);
-      env.liveVariables(code);
-      env.availableExp(code);
-      live = env.removeDeadVars(code);
+      folded = env.prune(env.foldConstants(code));
+      env.reachingDefs(folded);
+      env.liveVariables(folded);
+      env.availableExp(folded);
+      live = env.removeDeadVars(folded);
       igraph = env.interferenceGraph(live);
       renamed = env.renameVariables(live, igraph.colour);
       renamed = env.optimiseRenamed(renamed);
@@ -1205,6 +1206,7 @@
 
       imf[ast.funcs[i].name] = {
         'Unoptimized Code': drawIMF(code),
+        'Constant folding': drawIMF(folded),
         'Dead Variable Removal': drawIMF(live),
         'Interference Graph': drawIGraph(igraph),
         'Renamed variables': drawIMF(renamed)

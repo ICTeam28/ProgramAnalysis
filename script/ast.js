@@ -14,22 +14,99 @@
   var NS = "http://www.w3.org/2000/svg";
 
   /**
-   * Root node of the SVG document
-   * @type {SVGSVGElement}
+   * Executes a binary operation on the ast
    */
-  var svg;
+  env.binop = function (op, lhs, rhs) {
+    switch (op) {
+    case '==':
+      return lhs === rhs ? 1 : 0;
+    case '!=':
+      return lhs !== rhs ? 1 : 0;
+    case '<=':
+      return lhs <= rhs ? 1 : 0;
+    case '>=':
+      return lhs >= rhs ? 1 : 0;
+    case '<':
+      return lhs < rhs ? 1 : 0;
+    case '>':
+      return lhs > rhs ? 1 : 0;
+    case '&&':
+      return lhs && rhs ? 1 : 0;
+    case '||':
+      return lhs || rhs ? 1 : 0;
+    case '+':
+      return lhs + rhs;
+    case '-':
+      return lhs - rhs;
+    case '*':
+      return lhs * rhs;
+    case '/':
+      return Math.floor(lhs / rhs);
+    case '%':
+      return Math.floor(lhs % rhs);
+    case '^':
+      return Math.pow(lhs, rhs);
+    }
+  };
 
   /**
-   * X offset (origin)
-   * @type {Number}
+   * Executes an unary operation
    */
-  var mX = 0;
+  env.unop = function (op, val) {
+    switch (op) {
+    case '-':
+      return -val;
+    case '!':
+      return val ? 0 : 1;
+    case '~':
+      return ~val;
+    }
+  };
 
   /**
-   * Y offset (origin)
-   * @type {Number}
+   * Computes the number of nodes in a tree
+   * @return Node count
    */
-  var mY = 0;
+  var nodeCount = function (ast) {
+    var count = 0;
+
+    function all(body) {
+      var i;
+      for (i = 0; i < body.length; ++i) {
+        count += nodeCount(body[i]);
+      }
+    }
+
+    switch (ast.op) {
+    case 'prog':
+      all(ast.funcs);
+      break;
+    case 'func':
+      all(ast.body);
+      break;
+    case 'return':
+      count = nodeCount(ast.expr);
+      break;
+    case 'while':
+      count = nodeCount(ast.cond);
+      break;
+    case 'assign':
+      count = nodeCount(ast.expr);
+      break;
+    case 'if':
+      count = nodeCount(ast.cond);
+      all(ast.true);
+      all(ast.false);
+      break;
+    case 'call':
+      all(call.args);
+      break;
+    case 'bin':
+      count = nodeCount(ast.lhs) + nodeCount(ast.rhs);
+      break;
+    }
+    return count + 1;
+  };
 
   /**
    * Renders the label of a node, adjusting width to the length of the text
@@ -107,7 +184,7 @@
    * @return {Number} Height of the element which was rendered
    */
   var drawAST = function (node, p) {
-    var text, line, g, lhs, rhs, cond, expr;
+    var text, line, g, lhs, rhs, cond, tmp, expr;
     var w, h, i;
 
     switch (node.op) {
@@ -205,15 +282,23 @@
     case 'bin':
       drawLabel(node.p, p);
 
+      if (nodeCount(node.lhs) > nodeCount(node.rhs)) {
+        lhs = node.rhs;
+        rhs = node.lhs;
+      } else {
+        lhs = node.lhs;
+        rhs = node.rhs;
+      }
+
       g = document.createElementNS(NS, "g");
       g.setAttribute("transform", "translate(0, 50)");
       p.appendChild(g);
-      lhs = drawAST(node.lhs, g);
+      lhs = drawAST(lhs, g);
 
       g = document.createElementNS(NS, "g");
       g.setAttribute("transform", "translate(" + (5 + lhs.width) + ", 50)");
       p.appendChild(g);
-      rhs = drawAST(node.rhs, g);
+      rhs = drawAST(rhs, g);
 
       line = document.createElementNS(NS, "line");
       line.setAttributeNS(null, "x1", "15");
@@ -229,10 +314,29 @@
       line.setAttributeNS(null, "y2", "50");
       p.appendChild(line);
 
-      return {
-        'width': lhs.width + 5 + rhs.width,
-        'height': Math.max(lhs.height, rhs.height) + 50
-      };
+      w = lhs.width + rhs.width + 15;
+      h = Math.max(lhs.height, rhs.height) + 50;
+
+      if (node.oexpr) {
+        g = document.createElementNS(NS, "g");
+        g.setAttribute("class", "old");
+        g.setAttribute("transform", "translate(" + w + ", 0)");
+        p.appendChild(g);
+
+        line = document.createElementNS(NS, "line");
+        line.setAttributeNS(null, "class", "oldLine");
+        line.setAttributeNS(null, "x1", "30");
+        line.setAttributeNS(null, "y1", "15");
+        line.setAttributeNS(null, "x2", w);
+        line.setAttributeNS(null, "y2", "15");
+        p.appendChild(line);
+
+        lhs = drawAST(node.oexpr, g, true);
+        w += lhs.width;
+        h = Math.max(h, lhs.height);
+      }
+
+      return { 'width': w, 'height': h };
     case 'un':
       drawLabel(node.p, p);
 
@@ -274,6 +378,27 @@
         'height': 50 + h
       };
     case 'num':
+      if (node.oexpr) {
+        g = document.createElementNS(NS, "g");
+        g.setAttribute("class", "old");
+        g.setAttribute("transform", "translate(60, 0)");
+        p.appendChild(g);
+
+        line = document.createElementNS(NS, "line");
+        line.setAttributeNS(null, "class", "oldLine");
+        line.setAttributeNS(null, "x1", "30");
+        line.setAttributeNS(null, "y1", "15");
+        line.setAttributeNS(null, "x2", "60");
+        line.setAttributeNS(null, "y2", "15");
+        p.appendChild(line);
+
+        lhs = drawAST(node.oexpr, g, true);
+
+        return {
+          'width': 60 + drawLabel(node.val, p) + lhs.width,
+          'height': lhs.height
+        };
+      }
     case 'var':
       text = node[node.op === 'num' ? 'val' : 'name'];
       return {
@@ -359,7 +484,7 @@
         throw new Error('Undefined variable "' + node.name + '"');
       }
       return;
-    case 'val':
+    case 'num':
       return;
     }
   };
@@ -416,5 +541,152 @@
     }
   };
 
+  /**
+   * Simplifies the abstract syntax tree, but keeps the old expressions
+   * as a subtree
+   * @param {Object} ast Input tree
+   * @param {Boolean} rootExpr True if the expr node is the root of the expr
+   * @return {Object} AST with constant expressions removed
+   */
+  env.pruneAST = function (ast, rootExpr) {
+    // Lifts the child into the parent, execution the operation on constants
+    var lift = function (a) {
+      if (['+', '==', '*'].indexOf(a.p) === -1) {
+        return false;
+      }
+      // Descends down the tree and finds another node which takes a constant
+      // and an expression
+      function descend(node, val) {
+        var branch;
+
+        if (node.op !== 'bin' || a.p !== node.p) {
+          return;
+        }
+
+        if (node.lhs.op === 'num') {
+          return {
+            'op': 'bin',
+            'p': node.p,
+            'rhs': node.rhs,
+            'lhs': {
+              'op': 'num',
+              'val': env.binop(node.p, node.lhs.val, val)
+            }
+          }
+        }
+
+        if (node.rhs.op === 'num') {
+          return {
+            'op': 'bin',
+            'p': node.p,
+            'lhs': node.lhs,
+            'rhs': {
+              'op': 'num',
+              'val': env.binop(node.p, node.rhs.val, val)
+            }
+          }
+        }
+
+        if (branch = descend(node.lhs, val)) {
+          return {
+            'op': 'bin',
+            'p': node.p,
+            'lhs': branch,
+            'rhs': node.rhs
+          };
+        }
+
+        if (branch = descend(node.rhs, val)) {
+          return {
+            'op': 'bin',
+            'p': node.p,
+            'lhs': node.lhs,
+            'rhs': branch
+          };
+        }
+
+        return false;
+      }
+
+      if (a.rhs.op === 'num') {
+        return descend($.extend(true, {}, a.lhs), a.rhs.val);
+      }
+
+      if (a.lhs.op === 'num') {
+        return descend($.extend(true, {}, a.rhs), a.lhs.val);
+      }
+
+      return false;
+    };
+
+    var expr, lhs, rhs, val, lhso, rhso;
+    switch (ast.op) {
+    case 'prog':
+      ast.funcs = ast.funcs.map(env.pruneAST);
+      return ast;
+    case 'func':
+      ast.body = ast.body.map(env.pruneAST);
+      return ast;
+    case 'return':
+      ast.expr = env.pruneAST(ast.expr);
+      return ast;
+    case 'while':
+      ast.cond = env.pruneAST(ast.cond);
+      ast.body = ast.body.map(env.pruneAST);
+      return ast;
+    case 'assign':
+      ast.expr = env.pruneAST(ast.expr);
+      return ast;
+    case 'if':
+      ast.cond = env.pruneAST(ast.cond);
+      ast.true = ast.true.map(env.pruneAST);
+      ast.false = ast.false.map(env.pruneAST);
+      return ast;
+    case 'call':
+      ast.args = ast.args.map(env.pruneAST);
+      return ast;
+    case 'bin':
+      lhso = $.extend(true, {}, ast.lhs);
+      rhso = $.extend(true, {}, ast.rhs);
+      lhs = env.pruneAST(ast.lhs);
+      rhs = env.pruneAST(ast.rhs);
+      if (lhs.op === 'num' && rhs.op === 'num') {
+        val = env.binop(ast.p, lhs.val, rhs.val);
+        return {
+          'op': 'num',
+          'val': val,
+          'oexpr': ast
+        };
+      }
+
+      ast.lhs = lhs;
+      ast.rhs = rhs;
+      if (val = lift(ast)) {
+        val.oexpr = {
+          'op': 'bin',
+          'p': ast.p,
+          'rhs': rhso,
+          'lhs': lhso
+        };
+
+        return val;
+      }
+      return ast;
+    case 'un':
+      expr = env.pruneAST(ast.expr);
+      if (expr.op === 'num') {
+        return {
+          'op': 'num',
+          'val': env.unop(ast.p, expr.val),
+          'oexpr': ast
+        };
+      }
+
+      ast.expr = expr;
+      return ast;
+    default:
+      return ast;
+    }
+  };
 }(window.topics = window.topics || {}));
 
