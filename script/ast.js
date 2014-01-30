@@ -378,6 +378,9 @@
         'height': 50 + h
       };
     case 'num':
+    case 'var':
+      text = node[node.op === 'num' ? 'val' : 'name'];
+
       if (node.oexpr) {
         g = document.createElementNS(NS, "g");
         g.setAttribute("class", "old");
@@ -395,12 +398,11 @@
         lhs = drawAST(node.oexpr, g, true);
 
         return {
-          'width': 60 + drawLabel(node.val, p) + lhs.width,
+          'width': 60 + drawLabel(text, p) + lhs.width,
           'height': lhs.height
         };
       }
-    case 'var':
-      text = node[node.op === 'num' ? 'val' : 'name'];
+
       return {
         'width': drawLabel(text, p),
         'height': 30
@@ -545,10 +547,9 @@
    * Simplifies the abstract syntax tree, but keeps the old expressions
    * as a subtree
    * @param {Object} ast Input tree
-   * @param {Boolean} rootExpr True if the expr node is the root of the expr
    * @return {Object} AST with constant expressions removed
    */
-  env.pruneAST = function (ast, rootExpr) {
+  env.pruneAST = function (ast) {
     // Lifts the child into the parent, execution the operation on constants
     var lift = function (a) {
       if (['+', '==', '*'].indexOf(a.p) === -1) {
@@ -657,7 +658,27 @@
           'val': val,
           'oexpr': ast
         };
+      } else if (ast.p === '*') {
+        if (lhs.val === 0 || rhs.val === 0) {
+          return {
+            'op': 'num',
+            'val': 0,
+            'oexpr': ast
+          }
+        } else if (lhs.val === 1 || rhs.val === 1) {
+          val = $.extend(true, {}, lhs.val === 1 ? rhs : lhs);
+          val.oexpr = { 'op': 'bin', 'p': ast.p, 'rhs': rhso, 'lhs': lhso };
+          return val;
+        }
+      } else if (ast.p === '+') {
+        if (lhs.val === 0 || rhs.val === 0) {
+          val = $.extend(true, {}, lhs.val === 0 ? rhs : lhs);
+          val.oexpr = { 'op': 'bin', 'p': ast.p, 'rhs': rhso, 'lhs': lhso };
+          return val;
+        }
       }
+
+      // TODO: Implement identity elements for '-' and '/'
 
       ast.lhs = lhs;
       ast.rhs = rhs;
@@ -680,6 +701,10 @@
           'val': env.unop(ast.p, expr.val),
           'oexpr': ast
         };
+      } else if (expr.op === 'un' && expr.p === ast.p) {
+        val = $.extend(true, {}, expr.expr);
+        val.oexpr = ast;
+        return val;
       }
 
       ast.expr = expr;

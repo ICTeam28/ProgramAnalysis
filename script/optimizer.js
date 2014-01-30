@@ -289,7 +289,7 @@
 
     return env.prune(imfp);
   };
-  
+
   /**
    * Removes branches whose condition can be determined
    * @param {List<ImmInstr>} imf
