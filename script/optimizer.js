@@ -14,6 +14,8 @@
   env.prune = function (imf) {
     var reachable = [], visited = [], loop = {}, imfp = {}, i, j, k, idx;
 
+    imf = env.removeLabels(env.removeJumps(env.mergeLabels(imf)));
+
     // Identifies all the nodes which are reachable from the root node
     (function visit(i) {
       if (reachable.indexOf(i) !== -1) {
@@ -87,7 +89,7 @@
       }
     }
 
-    return env.removeLabels(env.removeJumps(env.mergeLabels(imfp)));
+    return imfp;
   };
 
   /**
