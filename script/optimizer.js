@@ -271,8 +271,8 @@
     for (i in imfp) {
       if (imfp.hasOwnProperty(i)) {
         if (imfp[i].op === 'jmp') {
-          if (imfp[i].next.length === 1) {
-            next = imfp[i].next[0];
+          next = imfp[i].next[0];
+          if (next == parseInt(i) + 1) {
             for (j in imfp) {
               if (imfp.hasOwnProperty(j)) {
                 for (k = 0; k < imfp[j].next.length; ++k) {
