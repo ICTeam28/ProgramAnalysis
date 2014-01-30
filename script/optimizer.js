@@ -291,6 +291,59 @@
   };
 
   /**
+   * Removes labels which have 1 incoming non-jmp edge
+   * @param {Object<Number, ImmInstr>} imf
+   * @return {Object<Number, ImmInstr>} imfp
+   */
+  env.removeLabels = function (imf) {
+    var imfp = $.extend(true, {}, imf);
+    var i, j, k, l, m, next, inDegree;
+
+    /**
+     * Computes inDegree of a given node
+     * @param {Number} node
+     */
+    var getInDegree = function (node) {
+      for (l in imfp) {
+        if (imfp.hasOwnProperty(l)) {
+          for (m = 0; m < imfp[l].next.length; m++) {
+            if (imfp[l].next[m] === node) {
+              inDegree = inDegree + 1;
+            }
+          }
+        }
+      }
+    };
+
+    for (i in imfp) {
+      if (imfp.hasOwnProperty(i)) {
+        if (imfp[i].op === 'lbl') {
+          if (imfp[i].next.length === 1) {
+            next = imfp[i].next[0];
+            for (j in imfp) {
+              if (imfp.hasOwnProperty(j)) {
+                for (k = 0; k < imfp[j].next.length; ++k) {
+                  if (imfp[j].next[k] === parseInt(i, 10) && 
+                      parseInt(j, 10) === (parseInt(i, 10) - 1)) {
+                    inDegree = 0;
+                    getInDegree(parseInt(i, 10));
+                    if (inDegree === 1) {
+                      imfp[j].next[k] = next;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return env.prune(imfp);
+  };
+  
+
+  /**
    * Removes branches whose condition can be determined
    * @param {List<ImmInstr>} imf
    * @erturn {List<ImmInstr>}
@@ -338,6 +391,7 @@
     return env.mergeLabels(env.prune(imfp));
   };
 
+
   /**
    * Constant folding
    * Keeps track of variables which are constant and reduces expressions
@@ -373,7 +427,7 @@
         if (expr.op === 'num') {
           return {
             'op': 'num',
-            'val': expr.unop(node.p, expr.val)
+            'val': env.unop(node.p, expr.val)
           };
         }
 
