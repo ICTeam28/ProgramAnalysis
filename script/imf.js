@@ -539,9 +539,6 @@
       igraph = env.interferenceGraph(live);
       renamed = env.renameVariables(live, igraph.colour);
       renamed = env.optimiseRenamed(renamed);
-      renamed = env.mergeLabels(renamed);
-      renamed = env.removeJumps(renamed);
-      renamed = env.removeLabels(renamed);
 
       imf[ast.funcs[i].name] = {
         'Unoptimized Code': drawIMF(code),

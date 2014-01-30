@@ -87,7 +87,7 @@
       }
     }
 
-    return imfp;
+    return env.removeLabels(env.removeJumps(env.mergeLabels(imfp)));
   };
 
   /**
@@ -256,7 +256,7 @@
       }
     }
 
-    return env.prune(imfp);
+    return imfp;
   };
 
   /**
@@ -287,7 +287,7 @@
       }
     }
 
-    return env.prune(imfp);
+    return imfp;
   };
 
   /**
@@ -323,7 +323,7 @@
             for (j in imfp) {
               if (imfp.hasOwnProperty(j)) {
                 for (k = 0; k < imfp[j].next.length; ++k) {
-                  if (imfp[j].next[k] === parseInt(i, 10) && 
+                  if (imfp[j].next[k] === parseInt(i, 10) &&
                       parseInt(j, 10) === (parseInt(i, 10) - 1)) {
                     inDegree = 0;
                     getInDegree(parseInt(i, 10));
@@ -339,9 +339,9 @@
       }
     }
 
-    return env.prune(imfp);
+    return imfp;
   };
-  
+
 
   /**
    * Removes branches whose condition can be determined
@@ -390,7 +390,6 @@
 
     return env.mergeLabels(env.prune(imfp));
   };
-
 
   /**
    * Constant folding
