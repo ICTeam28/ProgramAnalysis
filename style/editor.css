@@ -8,7 +8,7 @@ body
 
 #editor
 {
-  background-color:#465e77;
+  background-color:#486f97;
   padding: 10px;
   width: 410px;
   height: 100%;
@@ -25,7 +25,7 @@ body
 
 #editor textarea
 {
-    background-color:#cfcfcf;
+    background-color:#e0e0e0;
     resize: none;
     border: 0;
     margin: 0;
@@ -40,7 +40,7 @@ body
 #tabs
 {
   position: absolute;
-  left: 425px; right: 0px; top: 0px; bottom: 0px;
+  left: 440px; right: 10px; top: 10px; bottom: 10px;
 }
 
 #tabs li a
@@ -59,7 +59,7 @@ body
 
 .textAreaWithLines
 {
-    background-color:#b0b0b0;
+    background-color:#c0c0c0;
 
     font-family: 'Droid Sans Mono', sans-serif;
     font-size:12px;
