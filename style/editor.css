@@ -10,8 +10,8 @@ body
 {
   background-color:#486f97;
   padding: 10px;
-  width: 410px;
-  height: 100%;
+  width: 380px;
+  height: 1000px;
 }
 
 #input
@@ -25,22 +25,24 @@ body
 
 #editor textarea
 {
-    background-color:#e0e0e0;
-    resize: none;
-    border: 0;
-    margin: 0;
+  background-color:#e0e0e0;
+  resize: none;
+  border: 0;
+  margin: 0;
 
-    width: 400px;
+  width: 380px;
 
-    font-family: 'Droid Sans Mono', sans-serif;
-    font-size:12px;
-    color:#3f3f3f;
+  font-family: 'Droid Sans Mono', sans-serif;
+  font-size:12px;
+  color:#3f3f3f;
 }
+
+
 
 #tabs
 {
   position: absolute;
-  left: 440px; right: 10px; top: 10px; bottom: 10px;
+  left: 410px; right: 10px; top: 10px; bottom: 10px;
 }
 
 #tabs li a
@@ -59,11 +61,11 @@ body
 
 .textAreaWithLines
 {
-    background-color:#c0c0c0;
+  background-color:#c0c0c0;
 
-    font-family: 'Droid Sans Mono', sans-serif;
-    font-size:12px;
-    color:#3f3f3f;
+  font-family: 'Droid Sans Mono', sans-serif;
+  font-size:12px;
+  color:#3f3f3f;
 }
 
 .textAreaWithLines textarea, .textAreaWithLines div
