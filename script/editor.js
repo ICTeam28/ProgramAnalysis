@@ -28,7 +28,7 @@
    * Initialises the editor
    */
   var initEditor = function () {
-    var lineNoOffsetTop = 4;
+    var lineNoOffsetTop = 2;
 
     var ta = document.getElementById('input');
     var editor = new Behave({
@@ -43,24 +43,30 @@
     });
 
     var el = document.createElement('div');
-    ta.parentNode.insertBefore(el,ta);
+    ta.parentNode.insertBefore(el, ta);
     el.appendChild(ta);
 
     $(el)
       .attr('class', 'textAreaWithLines')
-      .css('width', (ta.offsetWidth + 30) + 'px')
-      .css('height', (ta.offsetHeight + 2) + 'px')
+      .css('width', ta.offsetWidth + 'px')
+      .css('height', ta.offsetHeight + 'px')
       .css('overflow', 'hidden')
       .css('position', 'relative');
 
+    $(ta)
+      .css('left', '30px')
+      .css('position', 'absolute')
+      .css('width', ta.offsetWidth - 30 + 'px')
+
     var lineObj = document.createElement('div');
-    lineObj.style.position = 'absolute';
-    lineObj.style.top = lineNoOffsetTop + 'px';
-    lineObj.style.left = '0px';
-    lineObj.style.width = '30px';
-    el.insertBefore(lineObj,ta);
-    lineObj.style.textAlign = 'right';
-    lineObj.className='lineObj';
+    $(lineObj)
+      .css('position', 'absolute')
+      .css('top', lineNoOffsetTop + 'px')
+      .css('left', '-2px')
+      .css('width', '30px')
+      .css('textAlign', 'right')
+      .attr('class', 'lineObj')
+    el.insertBefore(lineObj, ta);
 
     var string = '';
     for (var no = 1; no < 200; no++) {

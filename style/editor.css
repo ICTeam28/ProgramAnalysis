@@ -1,24 +1,21 @@
 body
 {
+  background-color:#324356;
+  padding: 0;
+  margin: 0;
   overflow: hidden;
 }
 
 #editor
 {
-  position: absolute;
-  width: 425px; left: 0px; top: 0px; bottom: 0px;
+  background-color:#465e77;
+  padding: 10px;
+  width: 410px;
+  height: 100%;
 }
 
 #input
 {
-  position: absolute;
-  left: 30px;
-  right: 0px;
-  background-color:#cfcfcf;
-  resize: none;
-  font-family: 'Droid Sans Mono', sans-serif;
-  font-size:12px;
-  color:#3f3f3f;
 }
 
 #input:focus
@@ -28,7 +25,16 @@ body
 
 #editor textarea
 {
-  resize: none;
+    background-color:#cfcfcf;
+    resize: none;
+    border: 0;
+    margin: 0;
+
+    width: 400px;
+
+    font-family: 'Droid Sans Mono', sans-serif;
+    font-size:12px;
+    color:#3f3f3f;
 }
 
 #tabs
@@ -51,7 +57,8 @@ body
   height: calc(100% - 28px);
 }
 
-.textAreaWithLines {
+.textAreaWithLines
+{
     background-color:#b0b0b0;
 
     font-family: 'Droid Sans Mono', sans-serif;
@@ -59,11 +66,12 @@ body
     color:#3f3f3f;
 }
 
-.textAreaWithLines textarea, .textAreaWithLines div {
-    border:0px;
+.textAreaWithLines textarea, .textAreaWithLines div
+{
 }
 
-.lineObj {
+.lineObj
+{
 }
 
 /*******************************************************************************
@@ -216,6 +224,6 @@ body
 {
   dominant-baseline: central;
   text-anchor: middle;
-  font-family: "Courier New";
+  font-family: "Droid Sans Mono";
   font-size: 32px;
 }
