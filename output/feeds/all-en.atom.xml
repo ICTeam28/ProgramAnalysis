@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>A Pelican Blog</title><link href="/" rel="alternate"></link><link href="/feeds/all-en.atom.xml" rel="self"></link><id>/</id><updated>2014-01-27T21:07:00Z</updated><entry><title>Static Analysis SUX!</title><link href="/static-analysis-sux.html" rel="alternate"></link><updated>2014-01-27T21:07:00Z</updated><author><name>Nic Prettejohn</name></author><id>tag:,2014-01-27:static-analysis-sux.html</id><summary type="html">&lt;p&gt;Yeah, it's pretty dull.&lt;/p&gt;</summary><category term="pelican"></category><category term="publishing"></category></entry><entry><title>Static Analysis is the Bomb!</title><link href="/static-analysis-is-the-bomb.html" rel="alternate"></link><updated>2014-01-27T21:00:00Z</updated><author><name>Nic Prettejohn</name></author><id>tag:,2014-01-27:static-analysis-is-the-bomb.html</id><summary type="html">&lt;p&gt;This is an example post demonstrating how to write new content and summaries.&lt;/p&gt;
+&lt;p&gt;Some things to remember:
+ * Use cool markdown features.
+ * You can &lt;em&gt;emphasise&lt;/em&gt; things if you like.
+ * But the main structuring is left to the layout program of the static site 
+generator.&lt;/p&gt;
+&lt;p&gt;Johnson &lt;a href="http://dx.doi.org/10.1002/aris.201" title="Data sharing in the sciences"&gt;[1]&lt;/a&gt; didn't agree with ...&lt;/p&gt;
+&lt;h1&gt;Be sure to do citations!&lt;/h1&gt;
+&lt;p&gt;I learned that all frogs are actually toads &lt;a href="http://google.com/?q=Frogs+Are+Toads"&gt;@citation&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Don't forget all the vital meta-data at the top of the page.&lt;/p&gt;</summary><category term="pelican"></category><category term="publishing"></category></entry></feed>

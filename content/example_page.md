@@ -1,5 +1,5 @@
 Title: Static Analysis is the Bomb!
-Date: 2010-12-03 10:20
+Date: 2014-01-27 21:00
 Category: General
 Tags: pelican, publishing
 Slug: static-analysis-is-the-bomb
@@ -14,4 +14,15 @@ Some things to remember:
  * But the main structuring is left to the layout program of the static site 
 generator.
 
+Johnson [[1]][@Johnson2006] didn't agree with ...
+
+
+Be sure to do citations!
+========================
+I learned that all frogs are actually toads [@citation][@a].
+
 Don't forget all the vital meta-data at the top of the page.
+
+
+[@a]: http://google.com/?q=Frogs+Are+Toads
+[@Johnson2006]: http://dx.doi.org/10.1002/aris.201 "Data sharing in the sciences"
