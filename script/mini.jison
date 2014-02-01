@@ -51,49 +51,89 @@
 
 program
   : root EOF
-    { return { 'op': 'prog', 'funcs': $1 }; }
+    {
+      return {
+        'op': 'prog',
+        'funcs': $1
+      };
+    }
   | EOF
-    { return { 'op': 'prog', 'funcs': [] }; }
+    {
+      return {
+        'op': 'prog',
+        'funcs': []
+      };
+    }
   ;
 
 root
   : func
-    { $$ = [$1]; }
+    {
+      $$ = [$1];
+    }
   | root func
-    { $1.push($2); $$ = $1; }
+    {
+      $1.push($2); $$ = $1;
+    }
   ;
 
 func
   : FUNC ID funcArgsOpt bodyOpt
-    { $$ = { 'op': 'func', 'name': $2, 'args': $3, 'body': $4 }; }
+    {
+      $$ = {
+        'op': 'func',
+        'name': $2,
+        'args': $3,
+        'body': $4,
+        'loc': @1
+      };
+    }
   ;
 
 funcArgsOpt
   : '(' funcArgs ')'
-    { $$ = $2; }
+    {
+      $$ = $2;
+    }
   | '(' ')'
-    { $$ = []; }
+    {
+      $$ = [];
+    }
   ;
 
 funcArgs
   : ID
-    { $$ = [$1]; }
+    {
+      $$ = [$1];
+    }
   | funcArgs ',' ID
-    { $1.push($3); $$ = $1; }
+    {
+      $1.push($3);
+      $$ = $1;
+    }
   ;
 
 bodyOpt
   : '{' body '}'
-    { $$ = $2; }
+    {
+      $$ = $2;
+    }
   | '{' '}'
-    { $$ = []; }
+    {
+      $$ = [];
+    }
   ;
 
 body
   : statement
-    { $$ = [$1]; }
+    {
+      $$ = [$1];
+    }
   | body statement
-    { $1.push($2); $$ = $1; }
+    {
+      $1.push($2);
+      $$ = $1;
+    }
   ;
 
 statement
@@ -105,79 +145,270 @@ statement
 
 return
   : RETURN expr ';'
-    { $$ = { 'op': 'return', 'expr': $2 }; }
+    {
+      $$ = {
+        'op': 'return',
+        'expr': $2,
+        'loc': @1
+      };
+    }
   ;
 
 while
   : WHILE '(' expr ')' bodyOpt
-    { $$ = { 'op': 'while', 'cond': $3, 'body': $5 }; }
+    {
+      $$ = {
+        'op': 'while',
+        'cond': $3,
+        'body': $5,
+        'loc': @1
+      };
+    }
   ;
 
 ifElse
   : IF '(' expr ')' bodyOpt ELSE bodyOpt
-    { $$ = { 'op': 'if', 'cond': $3, 'true': $5, 'false': $7 }; }
+    {
+      $$ = {
+        'op': 'if',
+        'cond': $3,
+        'true': $5,
+        'false': $7,
+        'loc': @1
+      };
+    }
   ;
 
 assignment
   : ID '=' expr ';'
-    { $$ = { 'op': 'assign', 'name': $1, 'expr': $3 }; }
+    {
+      $$ = {
+        'op': 'assign',
+        'name': $1,
+        'expr': $3,
+        'loc': @1
+      };
+    }
   ;
 
 expr
   : '(' expr ')'
-    { $$ = $2; }
+    {
+      $$ = $2;
+    }
   | expr '*' expr
-    { $$ = { 'op': 'bin', 'p': '*', 'lhs': $1, 'rhs': $3 }; }
+    {
+      $$ = {
+        'op': 'bin',
+        'p': '*',
+        'lhs': $1,
+        'rhs': $3,
+        'loc': @2
+      };
+    }
   | expr '/' expr
-    { $$ = { 'op': 'bin', 'p': '/', 'lhs': $1, 'rhs': $3 }; }
+    {
+      $$ = {
+        'op': 'bin',
+        'p': '/',
+        'lhs': $1,
+        'rhs': $3,
+        'loc': @2
+      };
+    }
   | expr '%' expr
-    { $$ = { 'op': 'bin', 'p': '%', 'lhs': $1, 'rhs': $3 }; }
+    {
+      $$ = {
+        'op': 'bin',
+        'p': '%',
+        'lhs': $1,
+        'rhs': $3,
+        'loc': @2
+      };
+    }
   | expr '^' expr
-    { $$ = { 'op': 'bin', 'p': '^', 'lhs': $1, 'rhs': $3 }; }
+    {
+      $$ = {
+        'op': 'bin',
+        'p': '^',
+        'lhs': $1,
+        'rhs': $3,
+        'loc': @2
+      };
+    }
   | expr '+' expr
-    { $$ = { 'op': 'bin', 'p': '+', 'lhs': $1, 'rhs': $3 }; }
+    {
+      $$ = {
+        'op': 'bin',
+        'p': '+',
+        'lhs': $1,
+        'rhs': $3,
+        'loc': @2
+      };
+    }
   | expr '-' expr
-    { $$ = { 'op': 'bin', 'p': '-', 'lhs': $1, 'rhs': $3 }; }
+    {
+      $$ = {
+        'op': 'bin',
+        'p': '-',
+        'lhs': $1,
+        'rhs': $3,
+        'loc': @2
+      };
+    }
   | expr '==' expr
-    { $$ = { 'op': 'bin', 'p': '==', 'lhs': $1, 'rhs': $3 }; }
+    {
+      $$ = {
+        'op': 'bin',
+        'p': '==',
+        'lhs': $1,
+        'rhs': $3,
+        'loc': @2
+      };
+    }
   | expr '!=' expr
-    { $$ = { 'op': 'bin', 'p': '!=', 'lhs': $1, 'rhs': $3 }; }
-  | expr '<' expr
-    { $$ = { 'op': 'bin', 'p': '<', 'lhs': $1, 'rhs': $3 }; }
+    {
+      $$ = {
+        'op': 'bin',
+        'p': '!=',
+        'lhs': $1,
+        'rhs': $3,
+        'loc': @2
+      };
+    }
   | expr '<=' expr
-    { $$ = { 'op': 'bin', 'p': '<=', 'lhs': $1, 'rhs': $3 }; }
-  | expr '>' expr
-    { $$ = { 'op': 'bin', 'p': '>', 'lhs': $1, 'rhs': $3 }; }
+    {
+      $$ = {
+        'op': 'bin',
+        'p': '<=',
+        'lhs': $1,
+        'rhs': $3,
+        'loc': @2
+      };
+    }
   | expr '>=' expr
-    { $$ = { 'op': 'bin', 'p': '>=', 'lhs': $1, 'rhs': $3 }; }
+    {
+      $$ = {
+        'op': 'bin',
+        'p': '>=',
+        'lhs': $1,
+        'rhs': $3,
+        'loc': @2
+      };
+    }
   | expr '&&' expr
-    { $$ = { 'op': 'bin', 'p': '&&', 'lhs': $1, 'rhs': $3 }; }
+    {
+      $$ = {
+        'op': 'bin',
+        'p': '&&',
+        'lhs': $1,
+        'rhs': $3,
+        'loc': @2
+      };
+    }
   | expr '||' expr
-    { $$ = { 'op': 'bin', 'p': '||', 'lhs': $1, 'rhs': $3 }; }
+    {
+      $$ = {
+        'op': 'bin',
+        'p': '||',
+        'lhs': $1,
+        'rhs': $3,
+        'loc': @2
+      };
+    }
+  | expr '>' expr
+    {
+      $$ = {
+        'op': 'bin',
+        'p': '>',
+        'lhs': $1,
+        'rhs': $3,
+        'loc': @2
+      };
+    }
+  | expr '<' expr
+    {
+      $$ = {
+        'op': 'bin',
+        'p': '<',
+        'lhs': $1,
+        'rhs': $3,
+        'loc': @2
+      };
+    }
   | '!' expr
-    { $$ = { 'op': 'un', 'p': '!', 'expr': $2 }; }
+    {
+      $$ = {
+        'op': 'un',
+        'p': '!',
+        'expr': $2,
+        'loc': @1
+      };
+    }
   | '-' expr %prec NEG
-    { $$ = { 'op': 'un', 'p': '-', 'expr': $2 }; }
+    {
+      $$ = {
+        'op': 'un',
+        'p': '-',
+        'expr': $2,
+        'loc': @1
+      };
+    }
   | '~' expr
-    { $$ = { 'op': 'un', 'p': '~', 'expr': $2 }; }
+    {
+      $$ = {
+        'op': 'un',
+        'p': '~',
+        'expr': $2,
+        'loc': @1
+      };
+    }
   | NUMBER
-    { $$ = { 'op': 'num', 'val': Number(yytext) }; }
+    {
+      $$ = {
+        'op': 'num',
+        'val': Number(yytext),
+        'loc': @1
+      };
+    }
   | ID callArgsOpt
-    { $$ = { 'op': 'call', 'name': $1, 'args': $2 }; }
+    {
+      $$ = {
+        'op': 'call',
+        'name': $1,
+        'args': $2,
+        'loc': @1
+      };
+    }
   | ID
-    { $$ = { 'op': 'var', 'name': $1 }; }
+    {
+      $$ = {
+        'op': 'var',
+        'name': $1,
+        'loc': @1
+      };
+    }
   ;
 
 callArgsOpt
   : '(' callArgs ')'
-    { $$ = $2; }
+    {
+      $$ = $2;
+    }
   | '(' ')'
-    { $$ = []; }
+    {
+      $$ = [];
+    }
   ;
 
 callArgs
   : expr
-    { $$ = [$1]; }
+    {
+      $$ = [$1];
+    }
   | callArgs ',' expr
-    { $1.push($3); $$ = $1; }
+    {
+      $1.push($3);
+      $$ = $1;
+    }
   ;

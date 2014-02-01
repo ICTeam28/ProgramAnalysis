@@ -88,6 +88,7 @@
         $("#error-report").html('');
         $("#warn-list").html('');
         ast = mini.parse($(ta).val());
+        console.log(ast);
         ast = env.pruneAST(ast);
         env.checkAST(ast);
         imf = env.genIMF(ast);
