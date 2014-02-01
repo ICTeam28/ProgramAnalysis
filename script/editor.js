@@ -95,7 +95,7 @@
         env.drawAST(ast, $("#ast-svg").get(0));
         env.drawIMF(imf);
       } catch (e) {
-        $("#error-report").text(e + " " + e.stack);
+        $("#error-report").text(e);
       }
     };
 
