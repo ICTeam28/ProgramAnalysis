@@ -411,6 +411,44 @@
   };
 
   /**
+   * Generates Semantic Error messages 
+   * @param {Object} location
+   * @param {String} name
+   * @param {Number/String} expected
+   * @param {Number/String} given
+   * @return {Object} Error
+   */
+  var SemanticError = function (location, name, expected, given) {
+    var message;
+
+    switch (name) {
+    case 'Undefined variable':
+      message = "Semantic Error: Undefined variable '" + given +
+                "' on line " + location.first_line;
+      break;
+    case 'To few arguments':
+      message = "Semantic Error: Function on line " + location.first_line +
+                " is given to few arguments\nExpecting: " + expected +
+                "\nGot: " + given;
+      break;
+    case 'To many arguments':
+      message = "Semantic Error: Function on line " + location.first_line +
+                " is given to many arguments\nExpecting: " + expected +
+                "\nGot: " + given;
+      break;
+    case 'Undefined function':
+      message = "Semantic Error: Undefined function '" + given +
+                "' on line " + location.first_line;
+      break;
+    }
+
+    return { name: name,
+             message: message,
+             toString: function () { return this.message; }
+           };
+  };
+
+  /**
    * Check whether a node in the abstract syntax tree is correct or not
    * @param {Object} node Node to be checked
    * @param {Object<String, Int>} funcs Arities of defined functions
@@ -459,15 +497,17 @@
       return;
     case 'call':
       if (funcs[node.name] === undefined) {
-        throw new Error('Undefined function "' + node.name + '"');
+        throw new SemanticError(node.loc, 'Undefined function', "", node.name);
       }
 
       if (node.args.length < funcs[node.name]) {
-        throw new Error('Too few arguments for "' + node.name + '"');
+        throw new SemanticError(node.loc, 'To few arguments',
+                                funcs[node.name], node.args.length);
       }
 
       if (node.args.length > funcs[node.name]) {
-        throw new Error('Too many arguments for "' + node.name + '"');
+        throw new SemanticError(node.loc, 'To many arguments',
+                                node.args.length, funcs[node.name]);
       }
 
       node.args.map(function (arg) {
@@ -483,7 +523,7 @@
       return;
     case 'var':
       if (vars.indexOf(node.name) === -1) {
-        throw new Error('Undefined variable "' + node.name + '"');
+        throw new SemanticError(node.loc, 'Undefined variable', "", node.name);
       }
       return;
     case 'num':
