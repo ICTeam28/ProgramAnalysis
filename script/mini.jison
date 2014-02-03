@@ -3,6 +3,7 @@
 %%
 
 \s+                     /* skip whitespace */
+"//"[^\n]*              /* Ignore comment */
 'func'                  return 'FUNC';
 'return'                return 'RETURN';
 'if'                    return 'IF';
