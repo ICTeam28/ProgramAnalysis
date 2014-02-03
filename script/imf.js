@@ -173,13 +173,45 @@
   };
 
   /**
+   * Marks instructions which were removed between optimisation steps
+   * @param {Object<String, ImmInstr>} fst
+   * @param {Object<String, ImmInstr>} snd
+   */
+  var diff = function (fst, snd) {
+    var i, j, found;
+
+    var compare = function (a, b) {
+      return a.first_line === b.first_line &&
+             a.first_column === b.first_column &&
+             a.last_line === b.last_line &&
+             a.last_column === b.last_column;
+    }
+
+    for (i in fst) {
+      if (fst.hasOwnProperty(i)) {
+        found = false;
+        for (j in snd) {
+          if (snd.hasOwnProperty(j)) {
+            if (compare(snd[j].loc, fst[i].loc)) {
+              found = true;
+              break;
+            }
+          }
+        }
+        fst[i].kill = !found;
+      }
+    }
+    return fst;
+  };
+
+  /**
    * Draws an intermediate instruction
    * @param {Number} i Index of the operation
    * @param {ImmInstr} ops List of all instructions
    * @param {SVGSVGElement} p Parent SVG Node
    */
   var draw = function (i, ops, p) {
-    var g, rect, line, text, op, points, j, y, str, fill, hover, range;
+    var g, rect, line, text, op, points, j, y, str, fill, hover, range, pattern;
 
     op = ops[i];
     str = op.toString();
@@ -195,6 +227,18 @@
     rect.setAttributeNS(null, "x", 0);
     rect.setAttributeNS(null, "y", 0);
     g.appendChild(rect);
+
+    // Draw a hatched line if the instruction is marked as killed
+    if (op.kill) {
+      pattern = document.createElementNS(NS, "rect");
+      pattern.setAttributeNS(null, "height", 48);
+      pattern.setAttributeNS(null, "width", 198);
+      pattern.setAttributeNS(null, "x", 1);
+      pattern.setAttributeNS(null, "y", 1);
+      pattern.setAttributeNS(null, "class", "kill");
+      pattern.setAttributeNS(null, "fill", "url(#hatch)");
+      g.appendChild(pattern);
+    }
 
     text = document.createElementNS(NS, "text");
     text.setAttributeNS(null, "dominant-baseline", "central");
@@ -321,6 +365,21 @@
     path = document.createElementNS(NS, "path");
     path.setAttributeNS(null, "class", "arrow");
     path.setAttributeNS(null, "d", points);
+    marker.appendChild(path);
+
+    // Diagonally hatched line
+    marker = document.createElementNS(NS, 'pattern');
+    marker.setAttributeNS(null, 'id', 'hatch');
+    marker.setAttributeNS(null, 'width', 16);
+    marker.setAttributeNS(null, 'height', 16);
+    marker.setAttributeNS(null, 'patternUnits', 'userSpaceOnUse');
+    defs.appendChild(marker);
+
+    path = document.createElementNS(NS, 'path');
+    path.setAttributeNS(null, 'class', 'hatch');
+    path.setAttributeNS(null, 'd', 'M-4,4 l8,-8 M0,16 l16,-16 M12,20 l8,-8')
+    path.setAttributeNS(null, 'stroke', '#ff0000');
+    path.setAttributeNS(null, 'stroke-width', 1);
     marker.appendChild(path);
   };
 
@@ -581,9 +640,9 @@
       renamed = env.renameVariables(live, igraph.colour);
 
       imf[ast.funcs[i].name] = {
-        'Unoptimized Code': drawIMF(code),
-        'Constant folding': drawIMF(folded),
-        'Dead Variable Removal': drawIMF(live),
+        'Unoptimized Code': drawIMF(diff(code, folded)),
+        'Constant folding': drawIMF(diff(folded, live)),
+        'Dead Variable Removal': drawIMF(diff(live, renamed)),
         'Interference Graph': drawIGraph(igraph),
         'Renamed variables': drawIMF(renamed)
       };

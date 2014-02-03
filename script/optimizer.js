@@ -524,7 +524,7 @@
 
     do {
       changed = false;
-      imf = env.reduceBranches(env.mergeLabels(reduceExpr(imf)));
+      imf = env.reduceIMF(reduceExpr(imf));
     } while (changed);
 
     return env.reduceIMF(imf);
