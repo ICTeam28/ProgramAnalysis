@@ -174,7 +174,7 @@ while
         'op': 'while',
         'cond': $3,
         'body': $5,
-        'loc': range(@1, @5)
+        'loc': @5
       };
     }
   ;
@@ -187,7 +187,9 @@ ifElse
         'cond': $3,
         'true': $5,
         'false': $7,
-        'loc': range(@1, @7)
+        'loc': range(@1, @7),
+        'lt': @5,
+        'lf': @7
       };
     }
   ;

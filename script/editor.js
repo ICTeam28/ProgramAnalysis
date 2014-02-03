@@ -1,5 +1,5 @@
 /*jslint browser:true, ass:true */
-/*global mini, Behave, BehaveHooks */
+/*global mini, ace */
 /**
  * @fileOverview User Interface
  */
@@ -64,7 +64,7 @@
    * Initialises the editor
    */
   var initEditor = function () {
-    var editor, marker;
+    var editor;
 
     env.editor = editor = ace.edit("editor").getSession();
     editor.setTabSize(2);
@@ -162,7 +162,6 @@
         return false;
       })
       .on('mousedown', function (e) {
-        var root = svg.firstChild;
         var mx = e.pageX, my = e.pageY;
         var ox = holder.scrollLeft();
         var oy = holder.scrollTop();
@@ -181,7 +180,7 @@
         e.stopPropagation();
         return false;
       })
-      .on('leave', function(e) {
+      .on('leave', function (e) {
         console.log("A");
         $(svg)
           .off('mousemove.drag')

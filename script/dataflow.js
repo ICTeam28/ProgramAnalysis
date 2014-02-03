@@ -414,4 +414,4 @@
       'colour': colour
     };
   };
-} (window.topics = window.topics || {}));
+}(window.topics = window.topics || {}));

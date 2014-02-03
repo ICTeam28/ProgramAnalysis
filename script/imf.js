@@ -110,6 +110,9 @@
     this.loc = loc;
     this.next = [];
 
+    // True if this op is going to be killed in the next optimisation step
+    this.kill = false;
+
     // Data flow results which affect this instruction
     this.rd = { 'in': [], 'out': [] };
     this.lv = { 'in': [], 'out': [] };
@@ -176,7 +179,7 @@
    * @param {SVGSVGElement} p Parent SVG Node
    */
   var draw = function (i, ops, p) {
-    var g, rect, line, text, op, points, j, y, str, fill, hover, marker, range;
+    var g, rect, line, text, op, points, j, y, str, fill, hover, range;
 
     op = ops[i];
     str = op.toString();
@@ -259,9 +262,9 @@
 
     rect.setAttributeNS(null, 'style', fill);
     $(rect)
-      .hover(function() {
+      .hover(function () {
         rect.setAttributeNS(null, 'style', hover);
-      }, function() {
+      }, function () {
         rect.setAttributeNS(null, 'style', fill);
       })
       .click(function () {
@@ -507,7 +510,7 @@
       lcond = 'L' + (nextLabel++);
       lend = 'L' + (nextLabel++);
 
-      imf.push(new ImmInstr('lbl', node.loc, lcond));
+      imf.push(new ImmInstr('lbl', node.cond.loc, lcond));
       imf.push(new ImmInstr('njmp', node.loc, node.cond, lend));
 
       // Body
@@ -526,20 +529,20 @@
       lend = 'L' + (nextLabel++);
       ltrue = 'L' + (nextLabel++);
 
-      imf.push(new ImmInstr('cjmp', node.loc, node.cond, ltrue));
+      imf.push(new ImmInstr('cjmp', node.cond.loc, node.cond, ltrue));
 
       // False branch
       for (i = 0; i < node.false.length; ++i) {
         generate(node.false[i], imf, fs);
       }
-      imf.push(new ImmInstr('jmp', node.loc, lend));
+      imf.push(new ImmInstr('jmp', node.lf, lend));
 
       // True branch
-      imf.push(new ImmInstr('lbl', node.loc, ltrue));
+      imf.push(new ImmInstr('lbl', node.lt, ltrue));
       for (i = 0; i < node['true'].length; ++i) {
         generate(node['true'][i], imf, fs);
       }
-      imf.push(new ImmInstr('lbl', node.loc, lend));
+      imf.push(new ImmInstr('lbl', node.lf, lend));
 
       break;
     }
@@ -562,15 +565,20 @@
       code = [];
 
       generate(ast.funcs[i], code, fs);
+
+      // Basic simplification
       code = env.prune(buildGraph(code));
-      folded = env.prune(env.foldConstants(code));
+      folded = env.foldConstants(code);
+
+      // Data Flow analysis
       env.reachingDefs(folded);
       env.liveVariables(folded);
       env.availableExp(folded);
+
+      // Simplification based on analysis results
       live = env.removeDeadVars(folded);
       igraph = env.interferenceGraph(live);
       renamed = env.renameVariables(live, igraph.colour);
-      renamed = env.optimiseRenamed(renamed);
 
       imf[ast.funcs[i].name] = {
         'Unoptimized Code': drawIMF(code),
