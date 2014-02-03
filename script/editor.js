@@ -6,9 +6,26 @@
 (function (env) {
   "use strict";
 
+  /**
+   * Ace editor instance
+   * @type {?Object}
+   */
+  env.editor = null;
+
+  /**
+   * Reference to the last marker
+   * @type {?ace.Marker}
+   */
+  env.marker = null;
+
+  /**
+   * Ace editor range (required in order to avoid conflicts)
+   * @type {?Range}
+   */
+  env.AceRange = ace.require('ace/range').Range;
+
   var SOURCE =
     'func testp(x) {\n' +
-    '  x = 0;\n' +
     '  x = ~~~x;\n' +
     '  z = 0;\n' +
     '  y = 4;\n' +
@@ -49,19 +66,18 @@
   var initEditor = function () {
     var editor, marker;
 
-    editor = ace.edit("editor");
-    editor.getSession().setTabSize(2);
-    editor.getSession().setUseSoftTabs(true);
+    env.editor = editor = ace.edit("editor").getSession();
+    editor.setTabSize(2);
+    editor.setUseSoftTabs(true);
 
-    editor.getSession().on('change', function () {
+    editor.on('change', function () {
       var ast, imf, src, line;
 
       $("#warn-list").html('');
-      editor.getSession().setAnnotations([]);
+      editor.setAnnotations([]);
 
       // Parse & display everything
       try {
-
         src = editor.getValue();
         ast = mini.parse(src);
         ast = env.pruneAST(ast);
@@ -74,7 +90,7 @@
         switch (e.constructor) {
         case Error:
           line = e.toString().split('\n')[0].split(' ')[5].split(':')[0];
-          editor.getSession().setAnnotations([
+          editor.setAnnotations([
             {
               row: parseInt(line, 10) - 1,
               column: 0,
@@ -84,7 +100,7 @@
           ]);
           break;
         case env.SemanticError:
-          editor.getSession().setAnnotations([
+          editor.setAnnotations([
             {
               row: e.line - 1,
               column: 0,

@@ -23,6 +23,8 @@
     "#ffff00", "#00ffff", "#ff00ff",
     "#cc0000", "#00cc00", "#0000cc",
     "#cccc00", "#00cccc", "#cc00cc",
+    "#660000", "#006600", "#000066",
+    "#666600", "#006666", "#cc0066",
   ];
 
   /**
@@ -62,50 +64,6 @@
   var nextLabel = 0;
 
   /**
-   * Intermediate form instruction
-   * @param {String} op Instruction opcode
-   * @constructor
-   */
-  var ImmInstr = function (op, arg1, arg2) {
-    this.op = op;
-    this.next = [];
-    this.rd = { 'in': [], 'out': [] };
-    this.lv = { 'in': [], 'out': [] };
-
-    switch (this.op) {
-    case 'lbl':
-      this.label = arg1;
-      break;
-    case 'ret':
-      this.expr = arg1;
-      break;
-    case 'jmp':
-      this.label = arg1;
-      break;
-    case 'cjmp':
-      this.expr = arg1;
-      this.label = arg2;
-      break;
-    case 'njmp':
-      this.expr = arg1;
-      this.label = arg2;
-      break;
-    case 'arg':
-      this.arg = arg1;
-      this.expr = arg2;
-      break;
-    case 'call':
-      this.expr = arg1;
-      this.func = arg2;
-      break;
-    case 'str':
-      this.dest = arg1;
-      this.expr = arg2;
-      break;
-    }
-  };
-
-  /**
    * Converts an expression into a string
    * @param {Object} node
    * @return {String}
@@ -142,6 +100,55 @@
   };
 
   /**
+   * Intermediate form instruction
+   * @param {String} op Instruction opcode
+   * @param {Object} loc Location of the object in the source file
+   * @constructor
+   */
+  var ImmInstr = function (op, loc, arg1, arg2) {
+    this.op = op;
+    this.loc = loc;
+    this.next = [];
+
+    // Data flow results which affect this instruction
+    this.rd = { 'in': [], 'out': [] };
+    this.lv = { 'in': [], 'out': [] };
+    this.ae = { 'in': [], 'out': [] };
+
+    switch (this.op) {
+    case 'lbl':
+      this.label = arg1;
+      break;
+    case 'ret':
+      this.expr = arg1;
+      break;
+    case 'jmp':
+      this.label = arg1;
+      break;
+    case 'cjmp':
+      this.expr = arg1;
+      this.label = arg2;
+      break;
+    case 'njmp':
+      this.expr = arg1;
+      this.label = arg2;
+      break;
+    case 'arg':
+      this.arg = arg1;
+      this.expr = arg2;
+      break;
+    case 'call':
+      this.expr = arg1;
+      this.func = arg2;
+      break;
+    case 'str':
+      this.dest = arg1;
+      this.expr = arg2;
+      break;
+    }
+  };
+
+  /**
    * Converts an instruction to a string
    * @this {ImmInstr}
    */
@@ -169,7 +176,7 @@
    * @param {SVGSVGElement} p Parent SVG Node
    */
   var draw = function (i, ops, p) {
-    var g, rect, line, text, op, points, j, y, str;
+    var g, rect, line, text, op, points, j, y, str, fill, hover, marker, range;
 
     op = ops[i];
     str = op.toString();
@@ -228,18 +235,43 @@
 
     switch (op.op) {
     case 'lbl':
-      rect.setAttributeNS(null, 'style', 'fill:green');
+      fill = 'fill:#005500';
+      hover = 'fill:#009900';
       break;
     case 'jmp':
-      rect.setAttributeNS(null, 'style', 'fill:#00cc00');
-      break;
+    case 'njmp':
     case 'cjmp':
-      rect.setAttributeNS(null, 'style', 'fill:#00cc00');
+      fill = 'fill:#00cc00';
+      hover = 'fill:#00ff00';
       break;
     case 'ret':
-      rect.setAttributeNS(null, 'style', 'fill:blue');
+      fill = 'fill:#0000cc';
+      hover = 'fill:#0000ff';
+      break;
+    default:
+      hover = 'fill: #eeeeee';
+      fill = 'fill: #cccccc';
       break;
     }
+
+    range = new env.AceRange(op.loc.first_line - 1, op.loc.first_column,
+                             op.loc.last_line - 1, op.loc.last_column);
+
+    rect.setAttributeNS(null, 'style', fill);
+    $(rect)
+      .hover(function() {
+        rect.setAttributeNS(null, 'style', hover);
+      }, function() {
+        rect.setAttributeNS(null, 'style', fill);
+      })
+      .click(function () {
+        if (env.marker) {
+          env.editor.removeMarker(env.marker);
+          env.marker = null;
+        }
+
+        env.marker = env.editor.addMarker(range, "ace_selection", "text");
+      });
   };
 
   /**
@@ -462,52 +494,52 @@
 
     switch (node.op) {
     case 'func':
-      imf.push(new ImmInstr('lbl', 'f_' + node.name));
+      imf.push(new ImmInstr('lbl', node.loc, 'f_' + node.name));
       for (i = 0; i < node.body.length; ++i) {
         generate(node.body[i], imf, fs);
       }
-      imf.push(new ImmInstr('ret', { 'op': 'num', 'val': 0 }));
+      imf.push(new ImmInstr('ret', node.loc, { 'op': 'num', 'val': 0 }));
       break;
     case 'return':
-      imf.push(new ImmInstr('ret', node.expr));
+      imf.push(new ImmInstr('ret', node.loc, node.expr));
       break;
     case 'while':
       lcond = 'L' + (nextLabel++);
       lend = 'L' + (nextLabel++);
 
-      imf.push(new ImmInstr('lbl', lcond));
-      imf.push(new ImmInstr('njmp', node.cond, lend));
+      imf.push(new ImmInstr('lbl', node.loc, lcond));
+      imf.push(new ImmInstr('njmp', node.loc, node.cond, lend));
 
       // Body
       for (i = 0; i < node.body.length; ++i) {
         generate(node.body[i], imf, fs);
       }
 
-      imf.push(new ImmInstr('jmp', lcond));
-      imf.push(new ImmInstr('lbl', lend));
+      imf.push(new ImmInstr('jmp', node.loc, lcond));
+      imf.push(new ImmInstr('lbl', node.loc, lend));
 
       break;
     case 'assign':
-      imf.push(new ImmInstr('str', node.name, node.expr));
+      imf.push(new ImmInstr('str', node.loc, node.name, node.expr));
       break;
     case 'if':
       lend = 'L' + (nextLabel++);
       ltrue = 'L' + (nextLabel++);
 
-      imf.push(new ImmInstr('cjmp', node.cond, ltrue));
+      imf.push(new ImmInstr('cjmp', node.loc, node.cond, ltrue));
 
       // False branch
       for (i = 0; i < node.false.length; ++i) {
         generate(node.false[i], imf, fs);
       }
-      imf.push(new ImmInstr('jmp', lend));
+      imf.push(new ImmInstr('jmp', node.loc, lend));
 
       // True branch
-      imf.push(new ImmInstr('lbl', ltrue));
+      imf.push(new ImmInstr('lbl', node.loc, ltrue));
       for (i = 0; i < node['true'].length; ++i) {
         generate(node['true'][i], imf, fs);
       }
-      imf.push(new ImmInstr('lbl', lend));
+      imf.push(new ImmInstr('lbl', node.loc, lend));
 
       break;
     }

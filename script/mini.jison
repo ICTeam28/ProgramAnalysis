@@ -1,3 +1,15 @@
+%{
+  function range(beg, end)
+  {
+    return {
+      'first_column': beg.first_column,
+      'last_column': end.last_column,
+      'first_line': beg.first_line,
+      'last_line': end.last_line
+    };
+  }
+%}
+
 /* Lexer for the mini language */
 %lex
 %%
@@ -86,7 +98,7 @@ func
         'name': $2,
         'args': $3,
         'body': $4,
-        'loc': @1
+        'loc': range(@0, @3)
       };
     }
   ;
@@ -150,7 +162,7 @@ return
       $$ = {
         'op': 'return',
         'expr': $2,
-        'loc': @1
+        'loc': range(@1, @3)
       };
     }
   ;
@@ -162,7 +174,7 @@ while
         'op': 'while',
         'cond': $3,
         'body': $5,
-        'loc': @1
+        'loc': range(@1, @5)
       };
     }
   ;
@@ -175,7 +187,7 @@ ifElse
         'cond': $3,
         'true': $5,
         'false': $7,
-        'loc': @1
+        'loc': range(@1, @7)
       };
     }
   ;
@@ -187,7 +199,7 @@ assignment
         'op': 'assign',
         'name': $1,
         'expr': $3,
-        'loc': @1
+        'loc': range(@0, @4)
       };
     }
   ;
@@ -378,7 +390,7 @@ expr
         'op': 'call',
         'name': $1,
         'args': $2,
-        'loc': @1
+        'loc': range(@1, @2)
       };
     }
   | ID
