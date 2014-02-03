@@ -240,7 +240,7 @@
     line.setAttributeNS(null, "points", points);
     parent.appendChild(line);
 
-    return { 'width': w + 5, 'height': off };
+    return { 'width': w, 'height': off };
   };
 
   /**
@@ -255,11 +255,21 @@
     switch (node.op) {
     case 'prog':
       drawLabel("PROG", node.loc, p);
-      return drawChildren(node.funcs, p);
+      child = drawChildren(node.funcs, p);
+
+      return {
+        'width': Math.max(50, child.width + 5),
+        'height': Math.max(30, child.height + 5)
+      };
     case 'func':
       text = 'FUNC ' + node.name + '(' + node.args.join(',') + ')';
-      drawLabel(text, node.loc, p);
-      return drawChildren(node.body, p);
+      w = drawLabel(text, node.loc, p);
+      child = drawChildren(node.body, p);
+
+      return {
+        'width': Math.max(w + 5, child.width),
+        'height': child.height
+      };
     case 'return':
       line = document.createElementNS(NS, "polyline");
       line.setAttributeNS(null, "points", "70 15 90 15");
@@ -270,7 +280,9 @@
       p.appendChild(g);
 
       drawLabel('RETURN', node.loc, p);
-      return drawAST(node.expr, g);
+      child = drawAST(node.expr, g);
+
+      return { 'width': child.width + 90, 'height': child.height };
     case 'while':
       // Predicate
       drawLabel('WHILE', node.loc, p);
@@ -287,7 +299,12 @@
       cond = drawAST(node.cond, g);
 
       // Body
-      return drawChildren(node.body, p, 15 + cond.height);
+      child = drawChildren(node.body, p, 15 + cond.height);
+
+      return {
+        'width': Math.max(child.width, cond.width + 70),
+        'height': child.height
+      };
     case 'assign':
       // Variable Name
       w = drawLabel(node.name, node.loc, p);

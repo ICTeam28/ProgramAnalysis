@@ -5,7 +5,6 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <link rel='stylesheet' type='text/css' href='style/editor.css'/>
     <link rel='stylesheet' type='text/css' href='style/jquery-ui.css'/>
-    <link rel="stylesheet" type="text/css" href="style/bootstrap.css"/>
     <!--<link rel='stylesheet' type='text/css' href='http://fonts.googleapis.com/css?family=Droid+Sans+Mono' />-->
     <script type='text/javascript' src='script/jquery.js'></script>
     <script type='text/javascript' src='script/jquery-ui.js'></script>
@@ -18,12 +17,49 @@
     <script type='text/javascript' src='script/editor.js'></script>
   </head>
   <body>
+    <ul id="preset" style="display:none">
+      <li data-id="edit" data-name="Last Edited">
+      </li>
+      <li data-id="fibonacci" data-name="Fibonacci">
+func fib(n) {
+  a = 0;
+  b = 1;
+  c = 0;
+  while (n > 0) {
+    c = a + b;
+    a = b;
+    b = c;
+    n = n - 1;
+  }
+}
+      </li>
+      <li data-id="sum" data-name="Sum">
+func sum(x, y, z) {
+  return x + y + z;
+}
+      </li>
+      <li data-id="const" data-name="Constant">
+func testp(x) {
+  x = 0;
+  x = ~~~x;
+  z = 0;
+  y = 4;
+  q = 3;
+  if (y > x + 0) {
+    z = y;
+  } else {
+    z = y * y;
+  }
+  x = z;
+  return x + 2 + 3 + 4 + y + 6 + 5 + z + y + x * 0;
+}
+      </li>
+    </ul>
+    <div id="sidebar">
+      <div class='handle'>Presets</div>
+      <ul></ul>
+    </div>
     <div id="editor"></div>
-      <ul id="select">
-        <li value="last edited" class="btn btn-outline-inverse btn-lg">Last edited</li>
-        <li value="fibonacci" class="btn btn-outline-inverse btn-lg">Fibo</li>
-        <li value="sum" class="btn btn-outline-inverse btn-lg">Sum</li>
-      </ul>   
     <div id="tabs">
       <ul>
         <li><a href="#tabs-1">Abstract Syntax Tree</a></li>
@@ -34,7 +70,7 @@
       </ul>
       <div id="tabs-1">
         <div id="ast-svg-holder">
-          <svg id="ast-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+          <svg style='width:0px;height:0px' id="ast-svg" xmlns="http://www.w3.org/2000/svg"></svg>
         </div>
       </div>
       <div id="tabs-2">

@@ -19,39 +19,16 @@
   env.marker = null;
 
   /**
+   * List of preset sources
+   * @type {Object<String, String>}
+   */
+  env.source = {};
+
+  /**
    * Ace editor range (required in order to avoid conflicts)
    * @type {?Range}
    */
   env.AceRange = ace.require('ace/range').Range;
-
-  var SUM =
-    'func sum(x, y, z) {\n' +
-    '  return x + y + z;\n' +
-    '}\n';
-
-  var TEST =
-    'func testp(x) {\n' +
-    '  x = 0;\n' +
-    '  x = ~~~x;\n' +
-    '  z = 0;\n' +
-    '  y = 4;\n' +
-    '  q = 3;\n' +
-    '  if (y > x + 0) {\n' +
-    '    z = y;\n' +
-    '  } else {\n' +
-    '    z = y * y;\n' +
-    '  }\n' +
-    '  x = z;\n' +
-    '  return x + 2 + 3 + 4 + y + 6 + 5 + z + y + x * 0;\n' +
-    '}\n';
-
-  var FUNCTIONS = {
-    'last edited': '',
-    'fibonacci': TEST,
-    'sum': SUM
-  };
-
-  var lastViewed;
 
   /**
    * Reports a new warning
@@ -62,13 +39,47 @@
   };
 
   /**
-   * Initialise the console
-   * TODO: it would be nice if we could have a command-line thing which
-   * would allow us to interpret a program in javascript and ask for user
-   * input
+   * Initialise the sidebar with preset functions
    */
-  var initConsole = function () {
-    return;
+  var initSidebar = function () {
+    var sidebar;
+
+    sidebar = $("#sidebar > ul");
+    $("#preset > li").each(function (idx, item) {
+      var id, name, source;
+
+      source = $(item).text().replace(/^\s\s*/, '').replace(/\s\s*$/, '');
+      id = $(item).attr('data-id');
+      name = $(item).attr('data-name');
+
+      if (idx === 0) {
+        source = localStorage.getItem('source');
+        source = source ? source : 'func main() {\n}';
+      }
+
+      env.source[id] = source;
+      $("<li data-id='" + id + "'>" + name + "</li>")
+        .on('click', function () {
+          $("#sidebar > ul").css('left', -sidebar.width() - 5);
+          $("#sidebar > ul > li").removeClass('selected');
+          $(this).addClass('selected');
+          env.editor.setValue(env.source[id]);
+        })
+        .addClass(idx === 0 ? 'selected' : '')
+        .appendTo(sidebar);
+
+      if (idx === 0) {
+        env.editor.setValue(source);
+      }
+    });
+
+    $("#sidebar > .handle").on('mouseenter', function () {
+      sidebar.animate({ 'left': 5 }, 'fast');
+    });
+
+    $("#editor").on('mouseover', function () {
+      sidebar.animate({ 'left': -sidebar.width() - 5 }, 'fast');
+    });
   };
 
   /**
@@ -82,11 +93,16 @@
     editor.setUseSoftTabs(true);
 
     editor.on('change', function () {
-      var ast, imf, src, line;
+      var ast, imf, src, line, file;
 
       if (env.marker) {
         env.editor.removeMarker(env.marker);
         env.marker = null;
+      }
+
+      file = $("#sidebar .selected").attr('data-id');
+      if (file === 'edit') {
+        localStorage.setItem('source', env.editor.getValue());
       }
 
       $("#warn-list").html('');
@@ -130,30 +146,6 @@
         }
       }
     });
-
-
-    $("#select > li").each(function (){
-      var $this = $(this);
-      $this.on('click', function(){
-        if (FUNCTIONS[this.getAttribute('value')] === undefined) {
-          throw new Error("Error: Function undefined");
-        } else {
-
-          if (lastViewed === 'last edited') {
-            localStorage.setItem('last edited', editor.getValue());
-          }
-
-          if (localStorage[this.getAttribute('value')] !== undefined) {
-            editor.setValue(localStorage[this.getAttribute('value')]);
-          } else {
-            editor.setValue(FUNCTIONS[this.getAttribute('value')], -1);
-          }
-
-          lastViewed = this.getAttribute('value');
-        }
-      });
-    })
-    $("#select > li[value='last edited']").click();
   };
 
   /**
@@ -214,7 +206,6 @@
         return false;
       })
       .on('leave', function (e) {
-        console.log("A");
         $(svg)
           .off('mousemove.drag')
           .css('cursor', 'auto');
@@ -237,11 +228,9 @@
   $(function () {
     $("#tabs").tabs();
 
-    initConsole();
     initEditor();
+    initSidebar();
     initAST();
     initIMF();
-
-    $("#input").trigger('keyup');
   });
 }(window.topics = window.topics || {}));
