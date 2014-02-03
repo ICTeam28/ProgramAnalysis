@@ -9,35 +9,10 @@ body
 #editor
 {
   background-color:#486f97;
-  padding: 10px;
-  width: 380px;
-  height: 1000px;
+  position: absolute;
+  top: 0px; left: 0px; bottom: 0px;
+  width: 400px;
 }
-
-#input
-{
-}
-
-#input:focus
-{
-  outline: 0px none transparent;
-}
-
-#editor textarea
-{
-  background-color:#e1e1e1;
-  resize: none;
-  border: 0;
-  margin: 0;
-
-  width: 380px;
-
-  font-family: 'Droid Sans Mono', sans-serif;
-  font-size:12px;
-  color:#3f3f3f;
-}
-
-
 
 #tabs
 {
@@ -57,23 +32,6 @@ body
   padding: 0px;
   width: 100%;
   height: calc(100% - 28px);
-}
-
-.textAreaWithLines
-{
-  background-color:#c0c0c0;
-
-  font-family: 'Droid Sans Mono', sans-serif;
-  font-size:12px;
-  color:#3f3f3f;
-}
-
-.textAreaWithLines textarea, .textAreaWithLines div
-{
-}
-
-.lineObj
-{
 }
 
 /*******************************************************************************

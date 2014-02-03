@@ -6,6 +6,25 @@
 (function (env) {
   "use strict";
 
+  var SOURCE =
+    'func testp(x) {\n' +
+    '  x = 0;\n' +
+    '  x = ~~~x;\n' +
+    '  z = 0;\n' +
+    '  y = 4;\n' +
+    '  q = 3;\n' +
+    '  if (y > x + 0) {\n' +
+    '    z = y;\n' +
+    '  } else {\n' +
+    '    z = y * y;\n' +
+    '  }\n' +
+    '  x = z;\n' +
+    '  return x + 2 + 3 + 4 + y + 6 + 5 + z + y + x * 0;\n' +
+    '}\n\n' +
+    'func main() {\n' +
+    '  return testp(1);\n' +
+    '}\n';
+
   /**
    * Reports a new warning
    */
@@ -28,68 +47,22 @@
    * Initialises the editor
    */
   var initEditor = function () {
-    var lineNoOffsetTop = 2;
+    var editor, marker;
 
-    var ta = document.getElementById('input');
-    var editor = new Behave({
-      textarea: ta,
-      replaceTab: true,
-      softTabs: true,
-      tabSize: 4,
-      autoOpen: true,
-      overwrite: true,
-      autoStrip: true,
-      autoIndent: true
-    });
+    editor = ace.edit("editor");
+    editor.getSession().setTabSize(2);
+    editor.getSession().setUseSoftTabs(true);
 
-    var el = document.createElement('div');
-    ta.parentNode.insertBefore(el, ta);
-    el.appendChild(ta);
+    editor.getSession().on('change', function () {
+      var ast, imf, src, line;
 
-    $(el)
-      .attr('class', 'textAreaWithLines')
-      .css('width', ta.offsetWidth + 'px')
-      .css('height', ta.offsetHeight + 'px')
-      .css('overflow', 'hidden')
-      .css('position', 'relative');
-
-    $(ta)
-      .css('left', '30px')
-      .css('position', 'absolute')
-      .css('width', ta.offsetWidth - 30 + 'px');
-
-    var lineObj = document.createElement('div');
-    $(lineObj)
-      .css('position', 'absolute')
-      .css('top', lineNoOffsetTop + 'px')
-      .css('left', '-2px')
-      .css('width', '30px')
-      .css('textAlign', 'right')
-      .attr('class', 'lineObj');
-    el.insertBefore(lineObj, ta);
-
-    var string = '', no;
-    for (no = 1; no < 200; no++) {
-      if (string.length > 0) {
-        string = string + '<br>';
-      }
-      string = string + no;
-    }
-
-    // Update line numbers on various events
-    lineObj.innerHTML = string;
-
-    var update = function () {
-      var ast, imf, src;
-
-      lineObj.style.top = (ta.scrollTop * -1 + lineNoOffsetTop) + 'px';
+      $("#warn-list").html('');
+      editor.getSession().setAnnotations([]);
 
       // Parse & display everything
       try {
-        $("#error-report").html('');
-        $("#warn-list").html('');
 
-        src = $(ta).val();
+        src = editor.getValue();
         ast = mini.parse(src);
         ast = env.pruneAST(ast);
         env.checkAST(ast);
@@ -100,19 +73,33 @@
       } catch (e) {
         switch (e.constructor) {
         case Error:
-          $("#error-report").text(e);
+          line = e.toString().split('\n')[0].split(' ')[5].split(':')[0];
+          editor.getSession().setAnnotations([
+            {
+              row: parseInt(line, 10) - 1,
+              column: 0,
+              text: e.toString(),
+              type: 'error',
+            }
+          ]);
           break;
         case env.SemanticError:
-          $("#error-report").text(e.toString(src));
+          editor.getSession().setAnnotations([
+            {
+              row: e.line - 1,
+              column: 0,
+              text: e.toString(src),
+              type: 'error',
+            }
+          ]);
           break;
         default:
           throw e;
         }
       }
-    };
+    });
 
-    update();
-    BehaveHooks.add([ 'keydown', 'keyup', 'mousedown', 'scroll' ], update);
+    editor.setValue(SOURCE, -1);
   };
 
   /**
