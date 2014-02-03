@@ -160,13 +160,14 @@
    * Renders the label of a node, adjusting width to the length of the text
    * and centering the text inside the box
    * @param {String} label Text to display
+   * @param {Object} loc Token  location
    * @param {SVGElement} parent SVG parent node
    * @param {?Number} x X offset
    * @param {?Number} y Y offset
    * @return {Number} Returns the width of the rendered element
    */
-  var drawLabel = function (label, parent, x, y) {
-    var rect, text, width;
+  var drawLabel = function (label, loc, parent, x, y) {
+    var rect, text, width, range;
 
     x = x || 0;
     y = y || 0;
@@ -189,6 +190,20 @@
     text.textContent = label;
     parent.appendChild(text);
 
+    if (loc) {
+      range = new env.AceRange(loc.first_line - 1, loc.first_column,
+                               loc.last_line - 1, loc.last_column);
+
+      $(rect).click(function () {
+        if (env.marker) {
+          env.editor.removeMarker(env.marker);
+          env.marker = null;
+        }
+
+        env.marker = env.editor.addMarker(range, "ace_selection", "text");
+      });
+    }
+
     return width;
   };
 
@@ -201,7 +216,7 @@
    * @return {Number} Total height of the rendered elements
    */
   var drawChildren = function (nodes, parent, off) {
-    var line, points = "30 30", g, i;
+    var line, points = "30 30", g, i, w = 0, child;
 
     off = off || 45;
 
@@ -216,14 +231,16 @@
       points += " 30 " + (off + 15);
 
       /*global drawAST */
-      off += drawAST(nodes[i], g) + 5;
+      child = drawAST(nodes[i], g);
+      w = Math.max(w, child.width + 40);
+      off += child.height + 5;
     }
 
     line = document.createElementNS(NS, "polyline");
     line.setAttributeNS(null, "points", points);
     parent.appendChild(line);
 
-    return off;
+    return { 'width': w + 5, 'height': off };
   };
 
   /**
@@ -232,16 +249,16 @@
    * @return {Number} Height of the element which was rendered
    */
   var drawAST = function (node, p) {
-    var text, line, g, lhs, rhs, cond, expr;
+    var text, line, g, lhs, rhs, cond, expr, child;
     var w, h, i;
 
     switch (node.op) {
     case 'prog':
-      drawLabel("PROG", p);
+      drawLabel("PROG", node.loc, p);
       return drawChildren(node.funcs, p);
     case 'func':
       text = 'FUNC ' + node.name + '(' + node.args.join(',') + ')';
-      drawLabel(text, p);
+      drawLabel(text, node.loc, p);
       return drawChildren(node.body, p);
     case 'return':
       line = document.createElementNS(NS, "polyline");
@@ -252,11 +269,11 @@
       g.setAttribute("transform", "translate(90, 0)");
       p.appendChild(g);
 
-      drawLabel('RETURN', p);
-      return drawAST(node.expr, g).height;
+      drawLabel('RETURN', node.loc, p);
+      return drawAST(node.expr, g);
     case 'while':
       // Predicate
-      drawLabel('WHILE', p);
+      drawLabel('WHILE', node.loc, p);
       g = document.createElementNS(NS, "g");
       g.setAttribute("transform", "translate(70, 0)");
       p.appendChild(g);
@@ -273,7 +290,7 @@
       return drawChildren(node.body, p, 15 + cond.height);
     case 'assign':
       // Variable Name
-      w = drawLabel(node.name, p);
+      w = drawLabel(node.name, node.loc, p);
       g = document.createElementNS(NS, "g");
       g.setAttribute("transform", "translate(" + (w + 10) + ", 0)");
       p.appendChild(g);
@@ -284,13 +301,12 @@
       line.setAttributeNS(null, "x2", w + 10);
       line.setAttributeNS(null, "y2", "15");
       p.appendChild(line);
-      expr = drawAST(node.expr, g);
 
       // Expression
-      return drawChildren(node.expr, p, 10 + expr.height);
+      return drawAST(node.expr, g);
     case 'if':
       // Condition
-      drawLabel('IF', p);
+      drawLabel('IF', node.loc, p);
       g = document.createElementNS(NS, "g");
       g.setAttribute("transform", "translate(50, 0)");
       p.appendChild(g);
@@ -304,9 +320,10 @@
 
       cond = drawAST(node.cond, g);
       h = 30 + cond.height;
+      w = cond.width;
 
       // True branch
-      drawLabel('TRUE', p, 30, h - 15);
+      drawLabel('TRUE', node.loc, p, 30, h - 15);
       g = document.createElementNS(NS, "g");
       g.setAttribute("transform", "translate(15, " + (h - 15) + ")");
       p.appendChild(g);
@@ -314,21 +331,26 @@
       line.setAttributeNS(null, "points", "15 30 15 " + h + " 30 " + h);
       p.appendChild(line);
 
-      h += 10 + drawChildren(node['true'], g);
+      child = drawChildren(node['true'], g);
+      h += 10 + child.height;
+      w = Math.max(w, child.width);
 
       // False branch
-      drawLabel('FALSE', p, 30, h - 15);
+      drawLabel('FALSE', node.loc, p, 30, h - 15);
       g = document.createElementNS(NS, "g");
       g.setAttribute("transform", "translate(15, " + (h - 15) + ")");
       p.appendChild(g);
       line = document.createElementNS(NS, "polyline");
       line.setAttributeNS(null, "points", "15 30 15 " + h + " 30 " + h);
       p.appendChild(line);
-      h += drawChildren(node['false'], g);
 
-      return h - 10;
+      child = drawChildren(node['false'], g);
+      h += child.height;
+      w = Math.max(w, child.width);
+
+      return { 'width': w, 'height': h - 10 };
     case 'bin':
-      drawLabel(node.p, p);
+      drawLabel(node.p, node.loc, p);
 
       if (nodeCount(node.lhs) > nodeCount(node.rhs)) {
         lhs = node.rhs;
@@ -386,7 +408,7 @@
 
       return { 'width': w, 'height': h };
     case 'un':
-      drawLabel(node.p, p);
+      drawLabel(node.p, node.loc, p);
 
       g = document.createElementNS(NS, "g");
       g.setAttribute("transform", "translate(0, 50)");
@@ -422,7 +444,7 @@
         h = Math.max(h, lhs.height);
       }
       return {
-        'width': Math.max(drawLabel(node.name + '(..)', p), w),
+        'width': Math.max(drawLabel(node.name + '(..)', node.loc, p), w),
         'height': 50 + h
       };
     case 'num':
@@ -446,13 +468,13 @@
         lhs = drawAST(node.oexpr, g, true);
 
         return {
-          'width': 60 + drawLabel(text, p) + lhs.width,
+          'width': 60 + drawLabel(text, node.loc, p) + lhs.width,
           'height': lhs.height
         };
       }
 
       return {
-        'width': drawLabel(text, p),
+        'width': drawLabel(text, node.loc, p),
         'height': 30
       };
     }
@@ -548,7 +570,7 @@
    * @param {Object} ast
    */
   env.drawAST = function (ast, svg) {
-    var g, i;
+    var g, i, size;
 
     // Delete the old drawing
     for (i = 0; i < svg.children.length; ++i) {
@@ -559,7 +581,9 @@
     g = document.createElementNS(NS, "g");
     svg.appendChild(g);
 
-    drawAST(ast, g);
+    size = drawAST(ast, g);
+    svg.style.width = size.width + "px";
+    svg.style.height = size.height + "px";
   };
 
   /**

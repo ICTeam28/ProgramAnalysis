@@ -98,7 +98,7 @@ func
         'name': $2,
         'args': $3,
         'body': $4,
-        'loc': range(@0, @3)
+        'loc': range(@0, @4)
       };
     }
   ;

@@ -73,6 +73,11 @@
     editor.on('change', function () {
       var ast, imf, src, line;
 
+      if (env.marker) {
+        env.editor.removeMarker(env.marker);
+        env.marker = null;
+      }
+
       $("#warn-list").html('');
       editor.setAnnotations([]);
 
@@ -148,7 +153,7 @@
    * Initializes the tab which displays the abstract syntax tree
    */
   var initAST = function () {
-    var svg = $("#ast-svg").get(0);
+    var svg = $("#ast-svg").get(0), holder = $("#ast-svg-holder");
 
     $(svg)
       .on('selectstart', function (e) {
@@ -159,23 +164,33 @@
       .on('mousedown', function (e) {
         var root = svg.firstChild;
         var mx = e.pageX, my = e.pageY;
-        var transform = root.getAttribute("transform");
-        var ox = 0, oy = 0;
-
-        if (transform) {
-          transform = transform.split('(')[1].split(',');
-          ox = parseInt(transform[0], 10);
-          oy = parseInt(transform[1], 10);
-        }
+        var ox = holder.scrollLeft();
+        var oy = holder.scrollTop();
 
         $(this)
           .css('cursor', 'move')
           .on('mousemove.drag', function (e) {
-            var mX = ox - mx + e.pageX;
-            var mY = oy - my + e.pageY;
-            root.setAttribute("transform", "translate(" + mX + "," + mY + ")");
+            var mX = ox + mx - e.pageX;
+            var mY = oy + my - e.pageY;
+            $("#ast-svg-holder")
+              .scrollTop(mY)
+              .scrollLeft(mX);
           });
+
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      })
+      .on('leave', function(e) {
+        console.log("A");
+        $(svg)
+          .off('mousemove.drag')
+          .css('cursor', 'auto');
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
       });
+
     $(window)
       .on('mouseup', function () {
         $(svg)
