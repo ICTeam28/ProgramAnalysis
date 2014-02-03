@@ -6,7 +6,7 @@
 (function (env) {
   "use strict";
 
-  var SOURCE =
+  var SOURCES =
     'func testp(x) {\n' +
     '  x = 0;\n' +
     '  x = ~~~x;\n' +
@@ -24,6 +24,35 @@
     'func main() {\n' +
     '  return testp(1);\n' +
     '}\n';
+
+  var SUM =
+    'func sum(x, y, z) {\n' +
+    '  return x + y + z;\n' +
+    '}\n';
+
+  var TEST =
+    'func testp(x) {\n' +
+    '  x = 0;\n' +
+    '  x = ~~~x;\n' +
+    '  z = 0;\n' +
+    '  y = 4;\n' +
+    '  q = 3;\n' +
+    '  if (y > x + 0) {\n' +
+    '    z = y;\n' +
+    '  } else {\n' +
+    '    z = y * y;\n' +
+    '  }\n' +
+    '  x = z;\n' +
+    '  return x + 2 + 3 + 4 + y + 6 + 5 + z + y + x * 0;\n' +
+    '}\n';
+
+  var FUNCTIONS = {
+    'last edited': '',
+    'fibonacci': TEST,
+    'sum': SUM
+  };
+
+  var lastViewed;
 
   /**
    * Reports a new warning
@@ -47,7 +76,7 @@
    * Initialises the editor
    */
   var initEditor = function () {
-    var editor, marker;
+    var editor;
 
     editor = ace.edit("editor");
     editor.getSession().setTabSize(2);
@@ -99,7 +128,29 @@
       }
     });
 
-    editor.setValue(SOURCE, -1);
+
+    $("#select > li").each(function (){
+      var $this = $(this);
+      $this.on('click', function(){
+        if (FUNCTIONS[this.getAttribute('value')] === undefined) {
+          throw new Error("Error: Function undefined");
+        } else {
+
+          if (lastViewed === 'last edited') {
+            localStorage.setItem('last edited', editor.getValue());
+          }
+
+          if (localStorage[this.getAttribute('value')] !== undefined) {
+            editor.setValue(localStorage[this.getAttribute('value')]);
+          } else {
+            editor.setValue(FUNCTIONS[this.getAttribute('value')], -1);
+          }
+
+          lastViewed = this.getAttribute('value');
+        }
+      });
+    })
+    $("#select > li[value='last edited']").click();
   };
 
   /**

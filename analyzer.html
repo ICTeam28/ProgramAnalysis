@@ -5,6 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <link rel='stylesheet' type='text/css' href='style/editor.css'/>
     <link rel='stylesheet' type='text/css' href='style/jquery-ui.css'/>
+    <link rel="stylesheet" type="text/css" href="style/bootstrap.css"/>
     <!--<link rel='stylesheet' type='text/css' href='http://fonts.googleapis.com/css?family=Droid+Sans+Mono' />-->
     <script type='text/javascript' src='script/jquery.js'></script>
     <script type='text/javascript' src='script/jquery-ui.js'></script>
@@ -18,6 +19,11 @@
   </head>
   <body>
     <div id="editor"></div>
+      <ul id="select">
+        <li value="last edited" class="btn btn-outline-inverse btn-lg">Last edited</li>
+        <li value="fibonacci" class="btn btn-outline-inverse btn-lg">Fibo</li>
+        <li value="sum" class="btn btn-outline-inverse btn-lg">Sum</li>
+      </ul>   
     <div id="tabs">
       <ul>
         <li><a href="#tabs-1">Abstract Syntax Tree</a></li>

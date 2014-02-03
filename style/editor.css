@@ -10,6 +10,20 @@ body
   position: absolute;
   top: 0px; left: 0px; bottom: 0px;
   width: 400px;
+  font-size: 13px;
+}
+
+#select {
+  list-style: none;
+  position: absolute;
+  bottom: 0px;
+  left: 16px;
+}
+
+#select > li
+{
+  display: inline-block;
+  border: #CCC solid 2px;
 }
 
 #tabs
@@ -20,7 +34,7 @@ body
 
 #tabs li a
 {
-  font-size: 10px;
+  font-size: 14px;
 }
 
 #tabs > div
