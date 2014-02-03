@@ -126,7 +126,7 @@
       }
     }
 
-    return env.prune(ret);
+    return env.reduceIMF(ret);
   };
 
   /**
@@ -188,7 +188,7 @@
       }
     }
 
-    return imfp;
+    return env.reduceIMF(imfp);
   };
 
   /**
@@ -196,12 +196,12 @@
    * @param {Object<Number, ImmInstr>} imf
    * @return {Object<Number, ImmInstr>} imfp
    */
-  env.optimiseRenamed = function (imf) {
+  env.removeAssignments = function (imf) {
     var imfp = $.extend(true, {}, imf);
     var i, j, k, next;
 
     for (i in imfp) {
-      if (imfp[i].hasOwnProperty) {
+      if (imfp.hasOwnProperty(i)) {
         if (imfp[i].op === 'str') {
           if (imfp[i].expr.op === 'var' && imfp[i].expr.name === imfp[i].dest) {
             if (imfp[i].next.length === 1) {
@@ -274,7 +274,7 @@
       if (imfp.hasOwnProperty(i)) {
         if (imfp[i].op === 'jmp') {
           next = imfp[i].next[0];
-          if (next == parseInt(i) + 1) {
+          if (next === parseInt(i, 10) + 1) {
             for (j in imfp) {
               if (imfp.hasOwnProperty(j)) {
                 for (k = 0; k < imfp[j].next.length; ++k) {
@@ -299,17 +299,18 @@
    */
   env.removeLabels = function (imf) {
     var imfp = $.extend(true, {}, imf);
-    var i, j, k, l, m, next, inDegree;
+    var i, j, k, m, next, inDegree;
 
     /**
      * Computes inDegree of a given node
      * @param {Number} node
      */
     var getInDegree = function (node) {
-      for (l in imfp) {
-        if (imfp.hasOwnProperty(l)) {
-          for (m = 0; m < imfp[l].next.length; m++) {
-            if (imfp[l].next[m] === node) {
+      var q;
+      for (q in imfp) {
+        if (imfp.hasOwnProperty(q)) {
+          for (m = 0; m < imfp[q].next.length; m++) {
+            if (imfp[q].next[m] === node) {
               inDegree = inDegree + 1;
             }
           }
@@ -378,9 +379,11 @@
         case 'jmp':
           if (imfp[i].next[0] === parseInt(i, 10) + 1) {
             for (j in imfp) {
-              for (k = 0; k < imfp[j].next.length; ++k) {
-                if (imfp[j].next[k] === parseInt(i, 10)) {
-                  imfp[j].next[k] = imfp[i].next[0];
+              if (imfp.hasOwnProperty(j)) {
+                for (k = 0; k < imfp[j].next.length; ++k) {
+                  if (imfp[j].next[k] === parseInt(i, 10)) {
+                    imfp[j].next[k] = imfp[i].next[0];
+                  }
                 }
               }
             }
@@ -390,7 +393,7 @@
       }
     }
 
-    return env.mergeLabels(env.prune(imfp));
+    return imfp;
   };
 
   /**
@@ -444,7 +447,7 @@
 
     // Combines information from two different states
     var unify = function (a, b) {
-      var i, k, u = {};
+      var i, u = {};
 
       for (i in a) {
         if (a.hasOwnProperty(i)) {
@@ -480,15 +483,14 @@
           back = false;
           state = {};
           for (j in imfp) {
-            if (imfp.hasOwnProperty(j) && i != j) {
+            if (imfp.hasOwnProperty(j) && i !== j) {
               for (k = 0; k < imfp[j].next.length; ++k) {
                 if (imfp[j].next[k] === parseInt(i, 10)) {
                   if (parseInt(j, 10) > parseInt(i, 10)) {
                     back = true;
                     break;
-                  } else {
-                    state = unify(state, states[j]);
                   }
+                  state = unify(state, states[j]);
                 }
               }
 
@@ -522,9 +524,24 @@
 
     do {
       changed = false;
-      imf = env.reduceBranches(env.mergeLabels(reduceExpr(imf)));2
+      imf = env.reduceIMF(reduceExpr(imf));
     } while (changed);
 
-    return imf;
+    return env.reduceIMF(imf);
+  };
+
+  /**
+   * Removes unused labels & instructions
+   */
+  env.reduceIMF = function (imf) {
+    var imfp;
+
+    imfp = env.removeLabels(imf);
+    imfp = env.removeAssignments(imfp);
+    imfp = env.removeJumps(imfp);
+    imfp = env.reduceBranches(imfp);
+    imfp = env.prune(imfp);
+
+    return imfp;
   };
 }(window.topics = window.topics || {}));

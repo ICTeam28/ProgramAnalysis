@@ -23,6 +23,8 @@
     "#ffff00", "#00ffff", "#ff00ff",
     "#cc0000", "#00cc00", "#0000cc",
     "#cccc00", "#00cccc", "#cc00cc",
+    "#660000", "#006600", "#000066",
+    "#666600", "#006666", "#cc0066",
   ];
 
   /**
@@ -62,50 +64,6 @@
   var nextLabel = 0;
 
   /**
-   * Intermediate form instruction
-   * @param {String} op Instruction opcode
-   * @constructor
-   */
-  var ImmInstr = function (op, arg1, arg2) {
-    this.op = op;
-    this.next = [];
-    this.rd = { 'in': [], 'out': [] };
-    this.lv = { 'in': [], 'out': [] };
-
-    switch (this.op) {
-    case 'lbl':
-      this.label = arg1;
-      break;
-    case 'ret':
-      this.expr = arg1;
-      break;
-    case 'jmp':
-      this.label = arg1;
-      break;
-    case 'cjmp':
-      this.expr = arg1;
-      this.label = arg2;
-      break;
-    case 'njmp':
-      this.expr = arg1;
-      this.label = arg2;
-      break;
-    case 'arg':
-      this.arg = arg1;
-      this.expr = arg2;
-      break;
-    case 'call':
-      this.expr = arg1;
-      this.func = arg2;
-      break;
-    case 'str':
-      this.dest = arg1;
-      this.expr = arg2;
-      break;
-    }
-  };
-
-  /**
    * Converts an expression into a string
    * @param {Object} node
    * @return {String}
@@ -142,6 +100,58 @@
   };
 
   /**
+   * Intermediate form instruction
+   * @param {String} op Instruction opcode
+   * @param {Object} loc Location of the object in the source file
+   * @constructor
+   */
+  var ImmInstr = function (op, loc, arg1, arg2) {
+    this.op = op;
+    this.loc = loc;
+    this.next = [];
+
+    // True if this op is going to be killed in the next optimisation step
+    this.kill = false;
+
+    // Data flow results which affect this instruction
+    this.rd = { 'in': [], 'out': [] };
+    this.lv = { 'in': [], 'out': [] };
+    this.ae = { 'in': [], 'out': [] };
+
+    switch (this.op) {
+    case 'lbl':
+      this.label = arg1;
+      break;
+    case 'ret':
+      this.expr = arg1;
+      break;
+    case 'jmp':
+      this.label = arg1;
+      break;
+    case 'cjmp':
+      this.expr = arg1;
+      this.label = arg2;
+      break;
+    case 'njmp':
+      this.expr = arg1;
+      this.label = arg2;
+      break;
+    case 'arg':
+      this.arg = arg1;
+      this.expr = arg2;
+      break;
+    case 'call':
+      this.expr = arg1;
+      this.func = arg2;
+      break;
+    case 'str':
+      this.dest = arg1;
+      this.expr = arg2;
+      break;
+    }
+  };
+
+  /**
    * Converts an instruction to a string
    * @this {ImmInstr}
    */
@@ -163,13 +173,45 @@
   };
 
   /**
+   * Marks instructions which were removed between optimisation steps
+   * @param {Object<String, ImmInstr>} fst
+   * @param {Object<String, ImmInstr>} snd
+   */
+  var diff = function (fst, snd) {
+    var i, j, found;
+
+    var compare = function (a, b) {
+      return a.first_line === b.first_line &&
+             a.first_column === b.first_column &&
+             a.last_line === b.last_line &&
+             a.last_column === b.last_column;
+    }
+
+    for (i in fst) {
+      if (fst.hasOwnProperty(i)) {
+        found = false;
+        for (j in snd) {
+          if (snd.hasOwnProperty(j)) {
+            if (compare(snd[j].loc, fst[i].loc)) {
+              found = true;
+              break;
+            }
+          }
+        }
+        fst[i].kill = !found;
+      }
+    }
+    return fst;
+  };
+
+  /**
    * Draws an intermediate instruction
    * @param {Number} i Index of the operation
    * @param {ImmInstr} ops List of all instructions
    * @param {SVGSVGElement} p Parent SVG Node
    */
   var draw = function (i, ops, p) {
-    var g, rect, line, text, op, points, j, y, str;
+    var g, rect, line, text, op, points, j, y, str, fill, hover, range, pattern;
 
     op = ops[i];
     str = op.toString();
@@ -185,6 +227,18 @@
     rect.setAttributeNS(null, "x", 0);
     rect.setAttributeNS(null, "y", 0);
     g.appendChild(rect);
+
+    // Draw a hatched line if the instruction is marked as killed
+    if (op.kill) {
+      pattern = document.createElementNS(NS, "rect");
+      pattern.setAttributeNS(null, "height", 48);
+      pattern.setAttributeNS(null, "width", 198);
+      pattern.setAttributeNS(null, "x", 1);
+      pattern.setAttributeNS(null, "y", 1);
+      pattern.setAttributeNS(null, "class", "kill");
+      pattern.setAttributeNS(null, "fill", "url(#hatch)");
+      g.appendChild(pattern);
+    }
 
     text = document.createElementNS(NS, "text");
     text.setAttributeNS(null, "dominant-baseline", "central");
@@ -228,18 +282,43 @@
 
     switch (op.op) {
     case 'lbl':
-      rect.setAttributeNS(null, 'style', 'fill:green');
+      fill = 'fill:#005500';
+      hover = 'fill:#009900';
       break;
     case 'jmp':
-      rect.setAttributeNS(null, 'style', 'fill:#00cc00');
-      break;
+    case 'njmp':
     case 'cjmp':
-      rect.setAttributeNS(null, 'style', 'fill:#00cc00');
+      fill = 'fill:#00cc00';
+      hover = 'fill:#00ff00';
       break;
     case 'ret':
-      rect.setAttributeNS(null, 'style', 'fill:blue');
+      fill = 'fill:#0000cc';
+      hover = 'fill:#0000ff';
+      break;
+    default:
+      hover = 'fill: #eeeeee';
+      fill = 'fill: #cccccc';
       break;
     }
+
+    range = new env.AceRange(op.loc.first_line - 1, op.loc.first_column,
+                             op.loc.last_line - 1, op.loc.last_column);
+
+    rect.setAttributeNS(null, 'style', fill);
+    $(rect)
+      .hover(function () {
+        rect.setAttributeNS(null, 'style', hover);
+      }, function () {
+        rect.setAttributeNS(null, 'style', fill);
+      })
+      .click(function () {
+        if (env.marker) {
+          env.editor.removeMarker(env.marker);
+          env.marker = null;
+        }
+
+        env.marker = env.editor.addMarker(range, "ace_selection", "text");
+      });
   };
 
   /**
@@ -286,6 +365,21 @@
     path = document.createElementNS(NS, "path");
     path.setAttributeNS(null, "class", "arrow");
     path.setAttributeNS(null, "d", points);
+    marker.appendChild(path);
+
+    // Diagonally hatched line
+    marker = document.createElementNS(NS, 'pattern');
+    marker.setAttributeNS(null, 'id', 'hatch');
+    marker.setAttributeNS(null, 'width', 16);
+    marker.setAttributeNS(null, 'height', 16);
+    marker.setAttributeNS(null, 'patternUnits', 'userSpaceOnUse');
+    defs.appendChild(marker);
+
+    path = document.createElementNS(NS, 'path');
+    path.setAttributeNS(null, 'class', 'hatch');
+    path.setAttributeNS(null, 'd', 'M-4,4 l8,-8 M0,16 l16,-16 M12,20 l8,-8')
+    path.setAttributeNS(null, 'stroke', '#ff0000');
+    path.setAttributeNS(null, 'stroke-width', 1);
     marker.appendChild(path);
   };
 
@@ -462,52 +556,52 @@
 
     switch (node.op) {
     case 'func':
-      imf.push(new ImmInstr('lbl', 'f_' + node.name));
+      imf.push(new ImmInstr('lbl', node.loc, 'f_' + node.name));
       for (i = 0; i < node.body.length; ++i) {
         generate(node.body[i], imf, fs);
       }
-      imf.push(new ImmInstr('ret', { 'op': 'num', 'val': 0 }));
+      imf.push(new ImmInstr('ret', node.loc, { 'op': 'num', 'val': 0 }));
       break;
     case 'return':
-      imf.push(new ImmInstr('ret', node.expr));
+      imf.push(new ImmInstr('ret', node.loc, node.expr));
       break;
     case 'while':
       lcond = 'L' + (nextLabel++);
       lend = 'L' + (nextLabel++);
 
-      imf.push(new ImmInstr('lbl', lcond));
-      imf.push(new ImmInstr('njmp', node.cond, lend));
+      imf.push(new ImmInstr('lbl', node.cond.loc, lcond));
+      imf.push(new ImmInstr('njmp', node.loc, node.cond, lend));
 
       // Body
       for (i = 0; i < node.body.length; ++i) {
         generate(node.body[i], imf, fs);
       }
 
-      imf.push(new ImmInstr('jmp', lcond));
-      imf.push(new ImmInstr('lbl', lend));
+      imf.push(new ImmInstr('jmp', node.loc, lcond));
+      imf.push(new ImmInstr('lbl', node.loc, lend));
 
       break;
     case 'assign':
-      imf.push(new ImmInstr('str', node.name, node.expr));
+      imf.push(new ImmInstr('str', node.loc, node.name, node.expr));
       break;
     case 'if':
       lend = 'L' + (nextLabel++);
       ltrue = 'L' + (nextLabel++);
 
-      imf.push(new ImmInstr('cjmp', node.cond, ltrue));
+      imf.push(new ImmInstr('cjmp', node.cond.loc, node.cond, ltrue));
 
       // False branch
       for (i = 0; i < node.false.length; ++i) {
         generate(node.false[i], imf, fs);
       }
-      imf.push(new ImmInstr('jmp', lend));
+      imf.push(new ImmInstr('jmp', node.lf, lend));
 
       // True branch
-      imf.push(new ImmInstr('lbl', ltrue));
+      imf.push(new ImmInstr('lbl', node.lt, ltrue));
       for (i = 0; i < node['true'].length; ++i) {
         generate(node['true'][i], imf, fs);
       }
-      imf.push(new ImmInstr('lbl', lend));
+      imf.push(new ImmInstr('lbl', node.lf, lend));
 
       break;
     }
@@ -530,20 +624,25 @@
       code = [];
 
       generate(ast.funcs[i], code, fs);
+
+      // Basic simplification
       code = env.prune(buildGraph(code));
-      folded = env.prune(env.foldConstants(code));
+      folded = env.foldConstants(code);
+
+      // Data Flow analysis
       env.reachingDefs(folded);
       env.liveVariables(folded);
       env.availableExp(folded);
+
+      // Simplification based on analysis results
       live = env.removeDeadVars(folded);
       igraph = env.interferenceGraph(live);
       renamed = env.renameVariables(live, igraph.colour);
-      renamed = env.optimiseRenamed(renamed);
 
       imf[ast.funcs[i].name] = {
-        'Unoptimized Code': drawIMF(code),
-        'Constant folding': drawIMF(folded),
-        'Dead Variable Removal': drawIMF(live),
+        'Unoptimized Code': drawIMF(diff(code, folded)),
+        'Constant folding': drawIMF(diff(folded, live)),
+        'Dead Variable Removal': drawIMF(diff(live, renamed)),
         'Interference Graph': drawIGraph(igraph),
         'Renamed variables': drawIMF(renamed)
       };

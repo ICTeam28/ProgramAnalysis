@@ -49,10 +49,16 @@ body
 /*******************************************************************************
 * AST Viewer
 *******************************************************************************/
-#ast-svg
+#ast-svg-holder
 {
   position: absolute;
+  width: 100%; height: 100%;
   left: 0; top: 0; right: 0; bottom: 0;
+  overflow: auto;
+}
+
+#ast-svg
+{
 }
 
 #ast-svg rect
@@ -60,11 +66,13 @@ body
   fill: #cccccc;
   stroke: #000000;
   stroke-width: 2;
+  cursor: pointer;
 }
 
 #ast-svg .old rect
 {
   fill: #666666;
+  cursor: pointer;
 }
 
 #ast-svg .old rect:hover
@@ -98,6 +106,7 @@ body
 #ast-svg text
 {
   pointer-events: none;
+  font-family: "Droid Sans Mono";
 }
 
 /*******************************************************************************
@@ -157,45 +166,60 @@ body
   margin-right: auto;
 }
 
-#imf-tabs .imf rect
+#imf-tabs .imf > g rect:not(.kill)
 {
-  fill: #cccccc;
+  fill: rgba(200, 200, 200, 0.7);
   stroke: #000000;
   stroke-width: 2;
+  cursor: pointer;
 }
 
-#imf-tabs .imf line,
-#imf-tabs .imf polyline,
-#imf-tabs .imf path:not(.arrow)
+#imf-tabs .imf > g .kill
+{
+  pointer-events: none;
+  stroke: none;
+}
+
+#imf-tabs .imf > g line,
+#imf-tabs .imf > g polyline,
+#imf-tabs .imf > path
 {
   fill: none;
   stroke: #000000;
   stroke-width: 2;
+}
+
+#imf-tabs .imf > g text
+{
+  font-family: "Droid Sans Mono";
+  pointer-events: none;
 }
 
 #imf-tabs .igraph
 {
   position: absolute;
-  top: 0px; left: 0px; right: 0px; bottom: 0px2;
+  width: 100%; height: 100%;
+  top: 0px; left: 0px; right: 0px; bottom: 0px;
 }
 
-#imf-tabs .igraph circle
+#imf-tabs .igraph > g circle
 {
   stroke: #000000;
   stroke-width: 2;
 }
 
-#imf-tabs .igraph path:not(.arrow)
+#imf-tabs .igraph > path
 {
   fill: none;
   stroke: #000000;
   stroke-width: 2;
 }
 
-#imf-tabs .igraph text
+#imf-tabs .igraph > g text
 {
   dominant-baseline: central;
   text-anchor: middle;
   font-family: "Droid Sans Mono";
   font-size: 32px;
+  pointer-events: none;
 }
