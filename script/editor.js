@@ -1,5 +1,5 @@
 /*jslint browser:true, ass:true */
-/*global mini, Behave */
+/*global mini, Behave, BehaveHooks */
 /**
  * @fileOverview User Interface
  */
@@ -32,14 +32,14 @@
 
     var ta = document.getElementById('input');
     var editor = new Behave({
-        textarea: ta,
-        replaceTab: true,
-        softTabs: true,
-        tabSize: 4,
-        autoOpen: true,
-        overwrite: true,
-        autoStrip: true,
-        autoIndent: true
+      textarea: ta,
+      replaceTab: true,
+      softTabs: true,
+      tabSize: 4,
+      autoOpen: true,
+      overwrite: true,
+      autoStrip: true,
+      autoIndent: true
     });
 
     var el = document.createElement('div');
@@ -56,7 +56,7 @@
     $(ta)
       .css('left', '30px')
       .css('position', 'absolute')
-      .css('width', ta.offsetWidth - 30 + 'px')
+      .css('width', ta.offsetWidth - 30 + 'px');
 
     var lineObj = document.createElement('div');
     $(lineObj)
@@ -65,30 +65,32 @@
       .css('left', '-2px')
       .css('width', '30px')
       .css('textAlign', 'right')
-      .attr('class', 'lineObj')
+      .attr('class', 'lineObj');
     el.insertBefore(lineObj, ta);
 
-    var string = '';
-    for (var no = 1; no < 200; no++) {
-        if (string.length > 0)
-            string = string + '<br>';
-        string = string + no;
+    var string = '', no;
+    for (no = 1; no < 200; no++) {
+      if (string.length > 0) {
+        string = string + '<br>';
+      }
+      string = string + no;
     }
 
     // Update line numbers on various events
     lineObj.innerHTML = string;
 
     var update = function () {
+      var ast, imf, src;
+
       lineObj.style.top = (ta.scrollTop * -1 + lineNoOffsetTop) + 'px';
 
       // Parse & display everything
       try {
-        var ast, imf;
-
         $("#error-report").html('');
         $("#warn-list").html('');
-        ast = mini.parse($(ta).val());
-        console.log(ast);
+
+        src = $(ta).val();
+        ast = mini.parse(src);
         ast = env.pruneAST(ast);
         env.checkAST(ast);
         imf = env.genIMF(ast);
@@ -96,7 +98,16 @@
         env.drawAST(ast, $("#ast-svg").get(0));
         env.drawIMF(imf);
       } catch (e) {
-        $("#error-report").text(e);
+        switch (e.constructor) {
+        case Error:
+          $("#error-report").text(e);
+          break;
+        case env.SemanticError:
+          $("#error-report").text(e.toString(src));
+          break;
+        default:
+          throw e;
+        }
       }
     };
 

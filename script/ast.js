@@ -99,13 +99,61 @@
       all(ast.false);
       break;
     case 'call':
-      all(call.args);
+      all(ast.args);
       break;
     case 'bin':
       count = nodeCount(ast.lhs) + nodeCount(ast.rhs);
       break;
     }
     return count + 1;
+  };
+
+  /**
+   * Generates Semantic error messages
+   * @param {Object} location Location, as specified by the parser
+   * @param {String} message Message to be displayed
+   */
+  env.SemanticError = function (location, message) {
+    this.line = location.first_line;
+    this.char = location.first_column;
+    this.message = message;
+  };
+
+  /**
+   * Converts an error message to a string in a format similar to JISON
+   * @param {?String} Input source code
+   */
+  env.SemanticError.prototype.toString = function (src) {
+    var msg = '', line = 1, chr = 0, i, buf = '', j = 0, found = false;
+
+    msg += 'Error: Semantic error on line ' + this.line + ':\n';
+    if (src) {
+      for (i = 0; i < src.length; ++i) {
+        if (src.charAt(i) === '\n') {
+          line++;
+          chr = 0;
+        } else {
+          chr++;
+          buf += src.charAt(i);
+          j += found ? 0 : 1;
+        }
+
+        if (line === this.line && chr === this.char) {
+          found = true;
+        }
+      }
+
+      if (j < 22) {
+        msg += buf.substring(0, 40) + '\n';
+        msg += new Array(j + 1).join('-') + '^\n';
+      } else {
+        msg += '...' + buf.substring(j - 18, j + 22) + '\n';
+        msg += '---------------------^\n';
+      }
+    }
+    msg += this.message;
+
+    return msg;
   };
 
   /**
@@ -184,7 +232,7 @@
    * @return {Number} Height of the element which was rendered
    */
   var drawAST = function (node, p) {
-    var text, line, g, lhs, rhs, cond, tmp, expr;
+    var text, line, g, lhs, rhs, cond, expr;
     var w, h, i;
 
     switch (node.op) {
@@ -411,44 +459,6 @@
   };
 
   /**
-   * Generates Semantic Error messages 
-   * @param {Object} location
-   * @param {String} name
-   * @param {Number/String} expected
-   * @param {Number/String} given
-   * @return {Object} Error
-   */
-  var SemanticError = function (location, name, expected, given) {
-    var message;
-
-    switch (name) {
-    case 'Undefined variable':
-      message = "Semantic Error: Undefined variable '" + given +
-                "' on line " + location.first_line;
-      break;
-    case 'To few arguments':
-      message = "Semantic Error: Function on line " + location.first_line +
-                " is given to few arguments\nExpecting: " + expected +
-                "\nGot: " + given;
-      break;
-    case 'To many arguments':
-      message = "Semantic Error: Function on line " + location.first_line +
-                " is given to many arguments\nExpecting: " + expected +
-                "\nGot: " + given;
-      break;
-    case 'Undefined function':
-      message = "Semantic Error: Undefined function '" + given +
-                "' on line " + location.first_line;
-      break;
-    }
-
-    return { name: name,
-             message: message,
-             toString: function () { return this.message; }
-           };
-  };
-
-  /**
    * Check whether a node in the abstract syntax tree is correct or not
    * @param {Object} node Node to be checked
    * @param {Object<String, Int>} funcs Arities of defined functions
@@ -497,17 +507,18 @@
       return;
     case 'call':
       if (funcs[node.name] === undefined) {
-        throw new SemanticError(node.loc, 'Undefined function', "", node.name);
+        throw new env.SemanticError(node.loc, "Undefined function: '" +
+                                              node.name + "'");
       }
 
       if (node.args.length < funcs[node.name]) {
-        throw new SemanticError(node.loc, 'To few arguments',
-                                funcs[node.name], node.args.length);
+        throw new env.SemanticError(node.loc, "Too few arguments to '" +
+                                              node.name + "'");
       }
 
       if (node.args.length > funcs[node.name]) {
-        throw new SemanticError(node.loc, 'To many arguments',
-                                node.args.length, funcs[node.name]);
+        throw new env.SemanticError(node.loc, 'Too many arguments',
+                                    node.args.length, funcs[node.name]);
       }
 
       node.args.map(function (arg) {
@@ -523,7 +534,8 @@
       return;
     case 'var':
       if (vars.indexOf(node.name) === -1) {
-        throw new SemanticError(node.loc, 'Undefined variable', "", node.name);
+        throw new env.SemanticError(node.loc, "Undefined variable '" +
+                                              node.name + "'");
       }
       return;
     case 'num':
@@ -556,24 +568,25 @@
    * @throws {Error} Exception is throw when type check failed
    */
   env.checkAST = function (ast) {
-    var arities = {}, i, j, idx, func;
+    var arities = {}, i, j, idx, f;
 
     if (ast.op !== 'prog') {
-      throw new Error('Invalid program');
+      throw new env.SemanticError({ 'first_char': 0, 'first_line': 0 },
+                                  'Invalid program');
     }
 
     for (i = 0; i < ast.funcs.length; ++i) {
-      func = ast.funcs[i];
-      if (func.op !== 'func') {
-        throw new Error('Invalid function');
+      f = ast.funcs[i];
+      if (f.op !== 'func') {
+        throw new env.SemanticError(f.loc, 'Invalid function');
       }
 
-      arities[func.name] = func.args.length;
-      for (j = 0; j < func.args.length; ++j) {
-        idx = func.args.indexOf(func.args[j]);
+      arities[f.name] = f.args.length;
+      for (j = 0; j < f.args.length; ++j) {
+        idx = f.args.indexOf(f.args[j]);
         if (idx !== j && idx !== -1) {
-          throw new Error('Duplicate argument name "' + func.args[j] +
-                          '" in "' + func.name + '"');
+          throw new env.SemanticError(f.loc, 'Duplicate name "' + f.args[j] +
+                                             '" in "' + f.name + '"');
         }
       }
     }
@@ -595,13 +608,14 @@
       if (['+', '==', '*'].indexOf(a.p) === -1) {
         return false;
       }
+
       // Descends down the tree and finds another node which takes a constant
       // and an expression
       function descend(node, val) {
         var branch;
 
         if (node.op !== 'bin' || a.p !== node.p) {
-          return;
+          return false;
         }
 
         if (node.lhs.op === 'num') {
@@ -613,7 +627,7 @@
               'op': 'num',
               'val': env.binop(node.p, node.lhs.val, val)
             }
-          }
+          };
         }
 
         if (node.rhs.op === 'num') {
@@ -625,10 +639,10 @@
               'op': 'num',
               'val': env.binop(node.p, node.rhs.val, val)
             }
-          }
+          };
         }
 
-        if (branch = descend(node.lhs, val)) {
+        if ((branch = descend(node.lhs, val)) !== false) {
           return {
             'op': 'bin',
             'p': node.p,
@@ -637,7 +651,7 @@
           };
         }
 
-        if (branch = descend(node.rhs, val)) {
+        if ((branch = descend(node.rhs, val)) !== false) {
           return {
             'op': 'bin',
             'p': node.p,
@@ -698,14 +712,18 @@
           'val': val,
           'oexpr': ast
         };
-      } else if (ast.p === '*') {
+      }
+
+      if (ast.p === '*') {
         if (lhs.val === 0 || rhs.val === 0) {
           return {
             'op': 'num',
             'val': 0,
             'oexpr': ast
-          }
-        } else if (lhs.val === 1 || rhs.val === 1) {
+          };
+        }
+
+        if (lhs.val === 1 || rhs.val === 1) {
           val = $.extend(true, {}, lhs.val === 1 ? rhs : lhs);
           val.oexpr = { 'op': 'bin', 'p': ast.p, 'rhs': rhso, 'lhs': lhso };
           return val;
@@ -722,7 +740,7 @@
 
       ast.lhs = lhs;
       ast.rhs = rhs;
-      if (val = lift(ast)) {
+      if ((val = lift(ast)) !== false) {
         val.oexpr = {
           'op': 'bin',
           'p': ast.p,
@@ -741,7 +759,9 @@
           'val': env.unop(ast.p, expr.val),
           'oexpr': ast
         };
-      } else if (expr.op === 'un' && expr.p === ast.p) {
+      }
+
+      if (expr.op === 'un' && expr.p === ast.p) {
         val = $.extend(true, {}, expr.expr);
         val.oexpr = ast;
         return val;
