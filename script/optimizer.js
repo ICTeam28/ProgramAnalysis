@@ -35,7 +35,7 @@
     // Checks whether an op has side effects or leads to another op which
     // has side effects
     var hasSideEffects = function (i) {
-      var p, count = 0;
+      var p;
 
       if (loop[i] || !imf[i]) {
         return false;
@@ -48,18 +48,11 @@
 
       for (p = 0; p < imf[i].next.length; ++p) {
         if (hasSideEffects(imf[i].next[p])) {
-          ++count;
+          return true;
         }
       }
 
-      if (count === 0) {
-        return false;
-      } else if (count === imf[i].next.length) {
-        return true;
-      } else {
-        throw new env.SemanticError(imf[i].loc, 'Not all control paths return' +
-                                                ' a value');
-      }
+      return false;
     };
 
     // Eliminates ops with no side effects
@@ -67,6 +60,16 @@
       loop = {};
       if (hasSideEffects(reachable[i])) {
         visited.push(reachable[i]);
+      }
+    }
+
+    // Checks whether all control paths return a value
+    for (i = 0; i < visited.length; ++i) {
+      for (j = 0; j < imf[visited[i]].next.length; ++j) {
+        if (visited.indexOf(imf[visited[i]].next[j]) === -1) {
+          throw new env.SemanticError(imf[visited[i]].loc, 'Not all control ' +
+                                      'paths return a value');
+        }
       }
     }
 
