@@ -40,12 +40,20 @@
    */
   var initConsole = function () {
     $("#tabs-terminal").terminal(function (cmd, term) {
-      var words, func, args, parts, re, worker, finish;
+      var words, func, args, parts, re, worker, finish, i;
 
       try {
         words = cmd.split(' ');
         switch (words[0]) {
           case 'help':
+            term.echo('help - Displays this message');
+            term.echo('list - Lists available functions');
+            term.echo('func(arg1, arg2,...) - Call a function');
+            break;
+          case 'list':
+            for (i in env.executable) {
+              term.echo(i + '(' + env.executable[i][0].args.join(',') + ')');
+            }
             break;
           default:
             re = new RegExp('^[_a-zA-Z][a-zA-Z0-9_]*\\s*' +
@@ -77,7 +85,6 @@
             worker.addEventListener('message', function (msg) {
               try {
                 var ans = JSON.parse(msg.data);
-
                 term.enable();
                 if (ans.t === 'err') {
                   term.error(ans.msg);
@@ -184,6 +191,7 @@
 
       $("#warn-list").html('');
       editor.setAnnotations([]);
+      env.executable = {};
 
       // Parse & display everything
       try {

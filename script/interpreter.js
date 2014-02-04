@@ -141,7 +141,7 @@
       ret = (new VM(data.imf)).call(data.func, data.args);
       self.postMessage(JSON.stringify({ t: 'suc', msg: ret.toString(10) }));
     } catch (err) {
-      self.postMessage(JSON.stringify({ t: 'err', msg: err.toString() }));
+      self.postMessage(JSON.stringify(err));
     }
   });
 }());
