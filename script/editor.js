@@ -31,14 +31,6 @@
   env.AceRange = ace.require('ace/range').Range;
 
   /**
-   * Reports a new warning
-   */
-  env.warning = function (text) {
-    $('<div>' + text + '</div>')
-      .appendTo("#warn-list");
-  };
-
-  /**
    * Initialise the sidebar with preset functions
    */
   var initSidebar = function () {

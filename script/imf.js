@@ -68,7 +68,7 @@
    * @param {Object} node
    * @return {String}
    */
-  var exprToString = function (node) {
+  env.exprToString = function (node) {
     var str;
 
     switch (node.op) {
@@ -79,23 +79,23 @@
     case 'bin':
       str = '';
       if (node.lhs.op === 'bin' && PRIORITY[node.lhs.p] < PRIORITY[node.p]) {
-        str += '(' + exprToString(node.lhs) + ')';
+        str += '(' + env.exprToString(node.lhs) + ')';
       } else {
-        str += exprToString(node.lhs);
+        str += env.exprToString(node.lhs);
       }
 
       str += node.p;
 
       if (node.rhs.op === 'bin' && PRIORITY[node.rhs.p] < PRIORITY[node.p]) {
-        str += '(' + exprToString(node.rhs) + ')';
+        str += '(' + env.exprToString(node.rhs) + ')';
       } else {
-        str += exprToString(node.rhs);
+        str += env.exprToString(node.rhs);
       }
       return str;
     case 'un':
-      return '(' + node.p + exprToString(node.expr) + ')';
+      return '(' + node.p + env.exprToString(node.expr) + ')';
     case 'call':
-      return node.name + '(' + node.args.map(exprToString).join(',') + ')';
+      return node.name + '(' + node.args.map(env.exprToString).join(',') + ')';
     }
   };
 
@@ -160,15 +160,15 @@
     case 'lbl':
       return this.label + ':';
     case 'ret':
-      return 'ret ' + exprToString(this.expr);
+      return 'ret ' + env.exprToString(this.expr);
     case 'jmp':
       return 'jmp ' + this.label;
     case 'cjmp':
-      return 'cjmp ' + this.label + ',' + exprToString(this.expr);
+      return 'cjmp ' + this.label + ',' + env.exprToString(this.expr);
     case 'njmp':
-      return 'njmp ' + this.label + ',' + exprToString(this.expr);
+      return 'njmp ' + this.label + ',' + env.exprToString(this.expr);
     case 'str':
-      return 'str ' + this.dest + ',' + exprToString(this.expr);
+      return 'str ' + this.dest + ',' + env.exprToString(this.expr);
     }
   };
 
@@ -560,7 +560,6 @@
       for (i = 0; i < node.body.length; ++i) {
         generate(node.body[i], imf, fs);
       }
-      imf.push(new ImmInstr('ret', node.loc, { 'op': 'num', 'val': 0 }));
       break;
     case 'return':
       imf.push(new ImmInstr('ret', node.loc, node.expr));

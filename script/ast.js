@@ -232,7 +232,7 @@
 
       /*global drawAST */
       child = drawAST(nodes[i], g);
-      w = Math.max(w, child.width + 40);
+      w = Math.max(w, child.width);
       off += child.height + 5;
     }
 
@@ -240,7 +240,7 @@
     line.setAttributeNS(null, "points", points);
     parent.appendChild(line);
 
-    return { 'width': w, 'height': off };
+    return { 'width': w + 40, 'height': off };
   };
 
   /**
@@ -267,7 +267,7 @@
       child = drawChildren(node.body, p);
 
       return {
-        'width': Math.max(w + 5, child.width),
+        'width': Math.max(w, child.width),
         'height': child.height
       };
     case 'return':
@@ -337,7 +337,7 @@
 
       cond = drawAST(node.cond, g);
       h = 30 + cond.height;
-      w = cond.width;
+      w = cond.width + 50;
 
       // True branch
       drawLabel('TRUE', node.loc, p, 30, h - 15);
@@ -350,7 +350,7 @@
 
       child = drawChildren(node['true'], g);
       h += 10 + child.height;
-      w = Math.max(w, child.width);
+      w = Math.max(w, child.width + 30);
 
       // False branch
       drawLabel('FALSE', node.loc, p, 30, h - 15);
@@ -363,7 +363,7 @@
 
       child = drawChildren(node['false'], g);
       h += child.height;
-      w = Math.max(w, child.width);
+      w = Math.max(w, child.width + 30);
 
       return { 'width': w, 'height': h - 10 };
     case 'bin':

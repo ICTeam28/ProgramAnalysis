@@ -21,6 +21,11 @@
       if (reachable.indexOf(i) !== -1) {
         return;
       }
+
+      if (!imf[i]) {
+        return;
+      }
+
       reachable.push(i);
       imf[i].next.map(visit);
     }(0));
@@ -30,9 +35,9 @@
     // Checks whether an op has side effects or leads to another op which
     // has side effects
     var hasSideEffects = function (i) {
-      var p;
+      var p, count = 0;
 
-      if (loop[i]) {
+      if (loop[i] || !imf[i]) {
         return false;
       }
 
@@ -43,11 +48,18 @@
 
       for (p = 0; p < imf[i].next.length; ++p) {
         if (hasSideEffects(imf[i].next[p])) {
-          return true;
+          ++count;
         }
       }
 
-      return false;
+      if (count === 0) {
+        return false;
+      } else if (count === imf[i].next.length) {
+        return true;
+      } else {
+        throw new env.SemanticError(imf[i].loc, 'Not all control paths return' +
+                                                ' a value');
+      }
     };
 
     // Eliminates ops with no side effects
@@ -204,14 +216,12 @@
       if (imfp.hasOwnProperty(i)) {
         if (imfp[i].op === 'str') {
           if (imfp[i].expr.op === 'var' && imfp[i].expr.name === imfp[i].dest) {
-            if (imfp[i].next.length === 1) {
-              next = imfp[i].next[0];
-              for (j in imfp) {
-                if (imfp.hasOwnProperty(j)) {
-                  for (k = 0; k < imfp[j].next.length; ++k) {
-                    if (imfp[j].next[k] === parseInt(i, 10)) {
-                      imfp[j].next[k] = next;
-                    }
+            next = imfp[i].next[0];
+            for (j in imfp) {
+              if (imfp.hasOwnProperty(j)) {
+                for (k = 0; k < imfp[j].next.length; ++k) {
+                  if (imfp[j].next[k] === parseInt(i, 10)) {
+                    imfp[j].next[k] = next;
                   }
                 }
               }
@@ -358,9 +368,10 @@
       if (imfp.hasOwnProperty(i)) {
         switch (imfp[i].op) {
         case 'cjmp':
+        case 'njmp':
           if (imfp[i].expr.op === 'num') {
             // If condition is true, jump to target
-            if (imfp[i].expr.val !== 0) {
+            if (imfp[i].expr.val !== (imfp[i].op === 'cjmp' ? 0 : 1)) {
               for (j = 0; j < imfp[i].next.length; ++j) {
                 if (imfp[i].next[j] !== parseInt(i, 10) + 1) {
                   next = imfp[i].next[j];
