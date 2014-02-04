@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <link rel='stylesheet' type='text/css' href='style/editor.css'/>
     <link rel='stylesheet' type='text/css' href='style/jquery-ui.css'/>
-    <!--<link rel='stylesheet' type='text/css' href='http://fonts.googleapis.com/css?family=Droid+Sans+Mono' />-->
+    <link rel='stylesheet' type='text/css' href='http://fonts.googleapis.com/css?family=Droid+Sans+Mono' />
     <script type='text/javascript' src='script/jquery.js'></script>
     <script type='text/javascript' src='script/jquery-ui.js'></script>
     <script type='text/javascript' src='script/ace.js'></script>
@@ -20,6 +20,49 @@
     <ul id="preset" style="display:none">
       <li data-id="edit" data-name="Last Edited">
       </li>
+      <li data-id="sum" data-name="Sum">
+func sum(x, y, z) { 
+  return x + y + z;
+}
+      </li>
+      <li data-id="maxOf3" data-name="MaxOf3">
+func maxOf3(x, y, z) {
+  if (x > y) {
+    if (x > z) {
+      return x;
+    } else {
+      return z;
+    }
+  } else {
+    if (y > z) {
+      return y;
+    } else {
+      return z;
+    }
+  }
+}
+      </li>
+      <li data-id="squaredDigs" data-name="SquaredDigs">
+func sumSquaredDigits(n) {
+  r = 0;
+  ld = 0;
+  while (n > 0) {
+    ld = n % 10;
+    r = r + ld * ld;
+    n = n / 10;
+  }
+  return r;
+}
+      </li> 
+      <li data-id="returnsEven" data-name="ReturnsEven">
+func returnsEven(n) {
+  k = 2;
+  while (n > 1) {
+    k = k * n;
+    n = n - 1;
+  }
+  return k;
+}
       <li data-id="fibonacci" data-name="Fibonacci">
 func fib(n) {
   a = 0;
@@ -31,11 +74,29 @@ func fib(n) {
     b = c;
     n = n - 1;
   }
+  return c;
 }
       </li>
-      <li data-id="sum" data-name="Sum">
-func sum(x, y, z) {
-  return x + y + z;
+      <li data-id="factorial" data-name="Factorial">
+func fact(n) {
+  f = 1;
+  while (n > 1) {
+    f = f * n;
+    n = n - 1;
+  }
+  return f;
+}
+      </li>
+      <li data-id="gcd" data-name="GCD">
+func gcd(a, b) {
+  while ((a > 0) && (b > 0)){
+    if (a >= b) {
+      a = a % b;
+    } else {
+      b = b % a;
+    }
+  }
+  return a + b;
 }
       </li>
       <li data-id="const" data-name="Constant">
@@ -48,7 +109,7 @@ func testp(x) {
   if (y > x + 0) {
     z = y;
   } else {
-    z = y * y;
+      z = y * y;
   }
   x = z;
   return x + 2 + 3 + 4 + y + 6 + 5 + z + y + x * 0;
