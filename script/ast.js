@@ -104,7 +104,11 @@
     case 'bin':
       count = nodeCount(ast.lhs) + nodeCount(ast.rhs);
       break;
+    case 'un':
+      count = nodeChound(ast.expr);
+      break;
     }
+
     return count + 1;
   };
 
@@ -590,8 +594,8 @@
     var g, i, size;
 
     // Delete the old drawing
-    for (i = 0; i < svg.children.length; ++i) {
-      svg.removeChild(svg.children[i]);
+    for (i = 0; i < svg.childNodes.length; ++i) {
+      svg.removeChild(svg.childNodes[i]);
     }
 
     // Create a new root

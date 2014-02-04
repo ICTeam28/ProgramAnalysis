@@ -5,6 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <link rel='stylesheet' type='text/css' href='style/editor.css'/>
     <link rel='stylesheet' type='text/css' href='style/jquery-ui.css'/>
+    <link rel='stylesheet' type='text/css' href='style/terminal.css'/>
     <!--<link rel='stylesheet' type='text/css' href='http://fonts.googleapis.com/css?family=Droid+Sans+Mono' />-->
     <script type='text/javascript' src='script/jquery.js'></script>
     <script type='text/javascript' src='script/jquery-ui.js'></script>
@@ -15,6 +16,7 @@
     <script type='text/javascript' src='script/dataflow.js'></script>
     <script type='text/javascript' src='script/optimizer.js'></script>
     <script type='text/javascript' src='script/editor.js'></script>
+    <script type='text/javascript' src='script/terminal.js'></script>
   </head>
   <body>
     <ul id="preset" style="display:none">
@@ -123,26 +125,21 @@ func testp(x) {
     <div id="editor"></div>
     <div id="tabs">
       <ul>
-        <li><a href="#tabs-1">Abstract Syntax Tree</a></li>
-        <li><a href="#tabs-2">Intermediate form</a></li>
-        <li><a href="#tabs-3">x64 Assembly</a></li>
-        <li><a href="#tabs-4">ARM Assembly</a></li>
+        <li><a href="#tabs-ast">Abstract Syntax Tree</a></li>
+        <li><a href="#tabs-imf">Intermediate form</a></li>
+        <li><a href="#tabs-terminal">Console</a></li>
       </ul>
-      <div id="tabs-1">
+      <div id="tabs-ast">
         <div id="ast-svg-holder">
           <svg style='width:0px;height:0px' id="ast-svg" xmlns="http://www.w3.org/2000/svg"></svg>
         </div>
       </div>
-      <div id="tabs-2">
+      <div id="tabs-imf">
         <div id="imf-tabs">
           <ul></ul>
         </div>
       </div>
-      <div id="tabs-3">
-        x64 Assembly
-      </div>
-      <div id="tabs-4">
-        ARM Assembly
+      <div id="tabs-terminal">
       </div>
     </div>
   </body>

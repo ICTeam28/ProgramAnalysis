@@ -198,6 +198,12 @@
                 imfp[i].dest = newName;
               }
             }
+
+            if (imfp[i].op === 'lbl' && imfp[i].args) {
+              imfp[i].args = imfp[i].args.map(function (a) {
+                return a === j ? newName : a;
+              });
+            }
           }
         }
       }

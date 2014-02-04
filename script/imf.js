@@ -136,14 +136,6 @@
       this.expr = arg1;
       this.label = arg2;
       break;
-    case 'arg':
-      this.arg = arg1;
-      this.expr = arg2;
-      break;
-    case 'call':
-      this.expr = arg1;
-      this.func = arg2;
-      break;
     case 'str':
       this.dest = arg1;
       this.expr = arg2;
@@ -557,6 +549,7 @@
     switch (node.op) {
     case 'func':
       imf.push(new ImmInstr('lbl', node.loc, 'f_' + node.name));
+      imf[imf.length - 1].args = node.args;
       for (i = 0; i < node.body.length; ++i) {
         generate(node.body[i], imf, fs);
       }
@@ -637,6 +630,9 @@
       live = env.removeDeadVars(folded);
       igraph = env.interferenceGraph(live);
       renamed = env.renameVariables(live, igraph.colour);
+
+      // Save executable code for the interpreter
+      env.executable[ast.funcs[i].name] = renamed;
 
       imf[ast.funcs[i].name] = {
         'Unoptimized Code': drawIMF(diff(code, folded)),

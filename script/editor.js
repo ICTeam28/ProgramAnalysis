@@ -19,6 +19,11 @@
   env.marker = null;
 
   /**
+   * Interpretable code
+   */
+  env.executable = {};
+
+  /**
    * List of preset sources
    * @type {Object<String, String>}
    */
@@ -29,6 +34,86 @@
    * @type {?Range}
    */
   env.AceRange = ace.require('ace/range').Range;
+
+  /**
+   * Initialises the interactive console
+   */
+  var initConsole = function () {
+    $("#tabs-terminal").terminal(function (cmd, term) {
+      var words, func, args, parts, re, worker, finish;
+
+      try {
+        words = cmd.split(' ');
+        switch (words[0]) {
+          case 'help':
+            break;
+          default:
+            re = new RegExp('^[_a-zA-Z][a-zA-Z0-9_]*\\s*' +
+                            '\\((\\s*' +
+                              '((0|[1-9][0-9]*)\\s*,\\s*)*' +
+                              '(0|[_1-9][0-9]*)\\s*' +
+                            ')?\\s*\\)$');
+            if (!re.test(cmd)) {
+              term.error("Invalid command: '" + cmd + "'");
+              break;
+            }
+
+            parts = cmd.split('(');
+            args = parts[1].split(')')[0].replace(/\s+/g, '');
+
+            if (args === "") {
+              args = [];
+            } else {
+              args = args.split(',').map(function (str) {
+                return parseInt(str, 10);
+              });
+            }
+
+            term.disable();
+
+            // Star the worker, but time it out after 1 minute
+            finish = false;
+            worker = new Worker('script/interpreter.js');
+            worker.addEventListener('message', function (msg) {
+              try {
+                var ans = JSON.parse(msg.data);
+
+                term.enable();
+                if (ans.t === 'err') {
+                  term.error(ans.msg);
+                } else {
+                  term.echo(ans.msg);
+                }
+              } catch (e) {
+                term.error("Computation failed: " + e.toString());
+              }
+              finish = true;
+            });
+            worker.postMessage(JSON.stringify({
+              'imf': env.executable,
+              'func': parts[0],
+              'args': args
+            }));
+
+            setTimeout(function () {
+              if (!finish) {
+                worker.terminate();
+                finish = true;
+                term.enable();
+                term.error('Computation timed out');
+              }
+            }, 1000);
+            break;
+        }
+      } catch (e) {
+        term.error(e.toString());
+      }
+    }, {
+      prompt: '>',
+      name: 'mini',
+      greetings: 'Mini console'
+    });
+  };
 
   /**
    * Initialise the sidebar with preset functions
@@ -222,6 +307,7 @@
 
     initEditor();
     initSidebar();
+    initConsole();
     initAST();
     initIMF();
   });
