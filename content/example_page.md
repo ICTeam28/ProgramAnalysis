@@ -11,7 +11,7 @@ This is an example post demonstrating how to write new content and summaries.
 Some things to remember:
  * Use cool markdown features.
  * You can *emphasise* things if you like.
- * But the main structuring is left to the layout program of the static site 
+ * But the main structuring is left to the layout program of the static site
 generator.
 
 Don't forget all the vital meta-data at the top of the page.
