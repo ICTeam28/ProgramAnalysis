@@ -1,0 +1,98 @@
+<p>Title: Data Flow Analysis Date: 02.02.2014 Category: Data Flow Analysis Tags: pelican, publishing Author: Nandor Licker Summary: Summary of Data Flow Analysis</p>
+<h1 id="live-variable-analysis">Live Variable Analysis</h1>
+<p>Live Variable Analysis is used to determine which variables defined at a certain point in a program are going to be used later on. This type of analysis can be used to eliminate assigments to variables whose values are not read or are overwritten. The results can also be used to minimize storage by reassigning the same registers/memory locations to variables which are not live at the same point.</p>
+<p>In the case of live variable analysis, the kill function returns the set of variables which are overwritten by a statement and the gen function returns the set of variables which are used in a statement.</p>
+<p>For example, for the following function written in mini:</p>
+<pre><code>func smoothstep(t) {
+  y = 0;                  // 0
+  x = t ^ 2;              // 1
+  square = 3 * x;         // 2
+  cube = 2 * x * t;       // 3
+  return square - cube;   // 4
+}</code></pre>
+<p>The kill and gen function would be defined as follows:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="left">kill</th>
+<th align="left">gen</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">0</td>
+<td align="left">y</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">1</td>
+<td align="left">x</td>
+<td align="left">t</td>
+</tr>
+<tr class="odd">
+<td align="left">2</td>
+<td align="left">square</td>
+<td align="left">x</td>
+</tr>
+<tr class="even">
+<td align="left">3</td>
+<td align="left">cube</td>
+<td align="left">x, t</td>
+</tr>
+<tr class="odd">
+<td align="left">4</td>
+<td align="left"></td>
+<td align="left">square, cube</td>
+</tr>
+</tbody>
+</table>
+<p>By solving the set of equations using chaotic iteration we get:</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="left">liveIn</th>
+<th align="left">liveOut</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">0</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">1</td>
+<td align="left">t</td>
+<td align="left">x, t</td>
+</tr>
+<tr class="odd">
+<td align="left">2</td>
+<td align="left">x, t</td>
+<td align="left">square, x, t</td>
+</tr>
+<tr class="even">
+<td align="left">3</td>
+<td align="left">square, x, t</td>
+<td align="left">square, cube</td>
+</tr>
+<tr class="odd">
+<td align="left">4</td>
+<td align="left">square, cube</td>
+<td align="left"></td>
+</tr>
+</tbody>
+</table>
+<h1 id="assignment-of-variables-to-registersmemory-locations">Assignment of variables to registers/memory locations</h1>
+<p>If two variables are live at the same point in 2a program, they need to be allocated to different registers or they need different locations in memory. Allocation can be optimised by building an <em>interference graph</em> from the results of the analysis where nodes represent variables and the edges are placed between the variables which cannot be allocated to the same location. To determine the optimal allocation, the <em>minimal coloring of the graph</em> has to be determined. Unfortunaly, this problem has been proven to be NP-Complete. Assuming P does not equal NP, there is no feasible solution to compute an optimal assignment in reasonable time. Fortunately, there are some heuristic algorithms which can provide a good distribution. In the simulation, we have implemented the <em>Welsh-Powell</em> algorithm.</p>
+<div class="figure">
+<img src="../images/igraph.png" alt="Interference Graph" /><p class="caption">Interference Graph</p>
+</div>
+<h1 id="references">References</h1>
+<ol style="list-style-type: decimal">
+<li>Nielson, Flemming, Hanne R. Nielson, and Chris Hankin. Principles of program analysis. Springer, 1999.</li>
+<li>Karp, Richard M. Reducibility among combinatorial problems. Springer US, 1972.</li>
+<li>Welsh, D. J., &amp; Powell, M. B. (1967). An upper bound for the chromatic number of a graph and its application to timetabling problems. The Computer Journal, 10(1), 85-86.</li>
+<li>Brélaz, D. (1979). New methods to color the vertices of a graph. Communications of the ACM, 22(4), 251-256.</li>
+</ol>
