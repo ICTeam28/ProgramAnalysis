@@ -14,6 +14,13 @@ Some things to remember:
  * But the main structuring is left to the layout program of the static site 
 generator.
 
+Give references a reference ID using the at sign @ as a prefix for the 
+identifier.
+When the website is compiled an extension will look for these ids and
+substitute in the correct markdown to make the references look nice in HTML.
+
+This saves having to number them all manually and worry about formatting.
+
 Johnson [@Johnson2006] didn't agree with ...
 
 
@@ -23,6 +30,16 @@ I learned that all frogs are actually toads. [@a]
 
 Don't forget all the vital meta-data at the top of the page.
 
+Reference links do not have to numbered or even put in the correct order - 
+this is done at compile time.
+
 
 [@a]: http://google.com/?q=Frogs+Are+Toads
+Reference links must be the last thing on the page. Any content inbetween
+ links will not appear in the compiled page.
+
+Try to refernece a particular section of the page where possible. Do this
+within quotes as below and it will be included next to a link to the reference
+wikipedia style!
+
 [@Johnson2006 "Page 6, section 2"]: http://dx.doi.org/10.1002/aris.201
