@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+  <title>
+    {% block title %}
+    {{ SITENAME }}
+    {% if title %}
+      &middot; {{ title }}
+    {% endif %}
+    {% endblock %}
+  </title>
+  {% if article %}
+    {% set content = article %}
+  {% elif page %}
+    {% set content = page %}
+  {% endif %}
+  {% if content %}
+    {% if content.latex %}
+      {{ content.latex }}
+    {% endif %}
+  {% endif %}
+  <link rel="stylesheet" type="text/css" href="{{ SITEURL }}/theme/css/main.css" />
+  <link rel="stylesheet" type="text/css" href="{{ SITEURL }}/theme/css/bootstrap.css" />
+  <link href='http://fonts.googleapis.com/css?family=Fenix' rel='stylesheet' type='text/css'>
+</head>
+<body>
+  {% include 'navigation.html' %} 
+  {% block content %}
+  {% endblock %}
+  <script type="text/javascript" src="{{ SITEURL }}/theme/js/jquery.js"></script>
+  <script type="text/javascript" src="{{ SITEURL }}/theme/js/parallax.js"></script>
+  <script type="text/javascript" src="{{ SITEURL }}/theme/js/stickynav.js"></script>
+    {% if content and content.citation %}
+      {{ content.citation}}
+    {% endif %}
+</body>
+</html>
