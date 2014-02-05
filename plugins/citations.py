@@ -101,6 +101,12 @@ class MarkdownCitationReader(MarkdownReader):
                 lambda m: '<h{0}{1}>'.format(int(m.group(1))+n, m.group(2)),
                 html)
 
+    @staticmethod
+    def bootstrap_tables(html):
+        ''' Adds the 'table' class to all tables'''
+        return re.sub('<table>', '<table class="table table-condensed">',
+                html)
+
     def read(self, source_path):
         self._md = Markdown(extensions=self.extensions)
 
@@ -109,13 +115,14 @@ class MarkdownCitationReader(MarkdownReader):
             content = self._md.convert(text)
 
         content = MarkdownCitationReader.reduce_heading_tag_size(content)
+        content = MarkdownCitationReader.bootstrap_tables(content)
 
 
         metadata = self._parse_metadata(self._md.Meta)
 
         if not 'citation' in metadata.keys():
             metadata['citation'] = citationScript
-
+        
         return content, metadata
 
 def add_reader(readers):
