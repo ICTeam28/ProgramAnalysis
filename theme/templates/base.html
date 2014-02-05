@@ -31,7 +31,7 @@
   <script type="text/javascript" src="{{ SITEURL }}/theme/js/jquery.js"></script>
   <script type="text/javascript" src="{{ SITEURL }}/theme/js/parallax.js"></script>
   <script type="text/javascript" src="{{ SITEURL }}/theme/js/stickynav.js"></script>
-    {% if content.citation %}
+    {% if content and content.citation %}
       {{ content.citation}}
     {% endif %}
 </body>
