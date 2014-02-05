@@ -14,6 +14,10 @@ Some things to remember:
  * But the main structuring is left to the layout program of the static site 
 generator.
 
+Images go in theme/static/images
+
+Covers go in theme/static/images/cover and must be in jpg format.
+
 Give references a reference ID using the at sign @ as a prefix for the 
 identifier.
 When the website is compiled an extension will look for these ids and
