@@ -1,0 +1,12 @@
+<nav class="navbar navbar-default" role="navigation" style="top:200px;">
+  <div class="container">
+    <div class="navbar-collapse collapse">
+      <ul class="nav navbar-nav navbar-right">
+        <li><a href="/">Home</a></li>
+      {% for page in pages %}
+        <li><a href="{{ page.url }}">{{ page.title }}</a></li>
+      {% endfor %}
+      </ul>
+    </div>
+  </div>
+</nav>

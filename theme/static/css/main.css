@@ -1,0 +1,89 @@
+body, html {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  height: 100%;
+  width: 100%;
+  font-family: 'Fenix', serif!important;
+  font-size: 16px!important;
+  padding-top: 0;
+}
+
+/* Home */
+/********/
+/* Hero */
+header {
+  height: 230px;
+  padding: 20px;
+  text-align: center;
+  background-color: #222;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+/* Categories */
+section {
+  background-color: #FEFEFE!important;
+  border: solid 1px #222;
+}
+section.category-picture {
+  background: no-repeat;
+  background-size: cover;
+  width: 100%;
+  height: 400px;
+  -moz-transform: translate3d(0px, 0px, 0px);
+  -ms-transform: translate3d(0px, 0px, 0px);
+  -webkit-transform: translate3d(0px, 0px, 0px);
+  transform: translate3d(0px, 0px, 0px);
+  background-position: 50% 50%;
+}
+section.category-intro {
+  display: block;
+  -moz-transform: translate3d(0px, 0px, 0px);
+  -ms-transform: translate3d(0px, 0px, 0px);
+  -o-transform: translate3d(0px, 0px, 0px);
+  -webkit-transform: translate3d(0px, 0px, 0px);
+  transform: translate3d(0px, 0px, 0px); height: 550px;
+  background: #FFF;
+  height: 300px;
+  padding: 10px 50px;
+}
+
+.cite-highlight {
+  background-color: #FF0;
+}
+
+/*** Articles ***/
+article {
+  width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 30px;
+  padding-top: 10px;
+  padding-left: 50px;
+  padding-right: 50px;
+  padding-bottom: 50px;
+  border: 2px solid #EEE;
+  border-radius:         5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius:    5px;
+  -ms-border-radius:     5px;
+}
+
+article div.article-title h1 {
+  text-align: center;
+  border-bottom: 1px solid #333;
+  font-size: 70.199px!important;
+  margin-bottom: 30px;
+}
+
+
+/*** NAVBAR ***/
+.navbar {
+  z-index: 100;
+  position: absolute;
+  margin: 0!important;
+  float: right;
+  width: 100%;
+}
