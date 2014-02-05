@@ -19,9 +19,6 @@
     {% if content.latex %}
       {{ content.latex }}
     {% endif %}
-    {% if content.citation %}
-      {{ content.citation}}
-    {% endif %}
   {% endif %}
   <link rel="stylesheet" type="text/css" href="{{ SITEURL }}/theme/css/main.css" />
   <link rel="stylesheet" type="text/css" href="{{ SITEURL }}/theme/css/bootstrap.css" />
@@ -34,5 +31,8 @@
   <script type="text/javascript" src="{{ SITEURL }}/theme/js/jquery.js"></script>
   <script type="text/javascript" src="{{ SITEURL }}/theme/js/parallax.js"></script>
   <script type="text/javascript" src="{{ SITEURL }}/theme/js/stickynav.js"></script>
+    {% if content.citation %}
+      {{ content.citation}}
+    {% endif %}
 </body>
 </html>
