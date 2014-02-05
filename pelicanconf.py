@@ -1,6 +1,8 @@
 import sys
 import os
 from markdown import Markdown
+import shutil
+
 sys.path = ['./'] + sys.path
 
 PLUGIN_PATH = './plugins'
@@ -11,13 +13,26 @@ from plugins import citations
 PLUGINS = [citations,]
 
 SITENAME = 'Program Analysis: Analysis'
-SITEURL = 'http://output.dev'
+SITEURL = 'http://www.doc.ic.ac.uk/project/2013/163/g12163xx/web/'
 DEFAULT_LANG = u'en'
 DEFAULT_PAGINATION = False
 ARTICLE_DIR = './summaries/'
 PAGE_DIR = './pages/'
+OUTPUT_DIR = './output/'
 INTRODUCTION_DIR = './introductions/'
 THEME = './theme'
+
+APP_DIR = './app/'
+
+# TODO: REFACTOR ALL THIS
+DEPENDENCY_DIR_JS = './script'
+DEPENDENCY_DIR_CSS = './style'
+DEPENDENCY_DIR_IMAGES = './images'
+
+shutil.copytree(APP_DIR, OUTPUT_DIR + APP_DIR)
+shutil.copytree(DEPENDENCY_DIR_JS, OUTPUT_DIR + DEPENDENCY_DIR_JS)
+shutil.copytree(DEPENDENCY_DIR_CSS, OUTPUT_DIR + DEPENDENCY_DIR_CSS)
+shutil.copytree(DEPENDENCY_DIR_IMAGES, OUTPUT_DIR + DEPENDENCY_DIR_IMAGES)
 
 RELATIVE_URLS = True
 
