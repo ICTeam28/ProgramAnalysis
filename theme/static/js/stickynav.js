@@ -1,10 +1,19 @@
 (function (window){
-  var $window = $(window)
+  var isHomePage = window.location.pathname == '/'
+    , $window = $(window)
     , busy = false
     , $nav = $('nav.navbar')
-    , navOffset = $nav.offset().top
     , nav = $nav[0];
 
+  if (!isHomePage) {
+    nav.classList.add('navbar-fixed-top');
+    nav.style.top = '0px';
+    document.body.style.paddingTop = $nav.height() + 'px';
+    return;
+  }
+
+  var $hero = $('#hero')
+    , navOffset = $hero.offset().top + $hero.height();
 
   window.requestAnimationFrame = window.requestAnimationFrame || 
                                  window.mozRequestAnimationFrame ||
@@ -33,6 +42,8 @@
       busy = false;
     });
   }
+
+  stickyNavScroll();
 
   window.addEventListener('scroll', stickyNavScroll);
 })(window)
