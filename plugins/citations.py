@@ -17,21 +17,26 @@ citationScript = '''
 <script>
 (function (document){
 var root = window.location.href.replace(window.location.hash, '')
-  , links = document.querySelectorAll('a');
+  , links = document.querySelectorAll('a')
+  , lastClicked = null;
 
 for (var i=0; i<links.length; i++){
   var item = links[i];
-  if (item.href.indexOf(root + '#cite_') != -1) {
-    var target_name = item.href.split('#')[1];
-    item.onclick(function (e){
-      document.getElementById(target_name).classList.add('%s')
-    })
+  if (item.href.indexOf(root + '#cite_') != -1){
+    item.addEventListener('click', (function (e){
+      if (lastClicked != null){
+        lastClicked.classList.remove('%s');
+      }
+      var ref = document.getElementById(e.target.hash.substr(1));
+      ref.classList.add('%s')
+      lastClicked = ref;
+    }));
   }
 }
 
 })(document);
 </script>
-''' % HIGHLIGHT
+''' % (HIGHLIGHT, HIGHLIGHT)
 
 
 logger = logging.getLogger(__name__)
