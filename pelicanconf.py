@@ -10,7 +10,7 @@ PLUGIN_PATH = './plugins'
 TIMEZONE = 'Europe/London'
 
 from plugins import citations
-PLUGINS = [citations,]
+PLUGINS = [citations,latex]
 
 SITENAME = 'Program Analysis: Analysis'
 SITEURL = 'http://www.doc.ic.ac.uk/project/2013/163/g12163xx/web/'
