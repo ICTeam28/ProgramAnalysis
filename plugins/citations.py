@@ -87,7 +87,7 @@ class MarkdownCitationReader(MarkdownReader):
             link_url   = bound_link.group(3)
 
             references.insert(cite_id,
-                '<p>[{0}]<a name="cite_{0}" id="cite_{0}" class="reference" href="{2}">{2}</a>{1}</p>'\
+                '<p>[{0}]<a name="cite_{0}" id="cite_{0}" class="reference" href="{2}">{2}</a> {1}</p>'\
                 .format(cite_id, link_title or '', link_url))
 
             first_reference_start = min(link_start, first_reference_start)
