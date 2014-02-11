@@ -5,3 +5,4 @@
 *.swo
 *.pyc
 output/
+app/script/mini.js
