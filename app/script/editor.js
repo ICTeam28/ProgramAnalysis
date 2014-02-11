@@ -81,7 +81,7 @@
 
             // Star the worker, but time it out after 1 minute
             finish = false;
-            worker = new Worker('script/interpreter.js');
+            worker = new Worker('./interpreter.js');
             worker.addEventListener('message', function (msg) {
               try {
                 var ans = JSON.parse(msg.data);
@@ -116,7 +116,7 @@
         term.error(e.toString());
       }
     }, {
-      prompt: '>',
+      prompt: '> ',
       name: 'mini',
       greetings: 'Mini console'
     });
