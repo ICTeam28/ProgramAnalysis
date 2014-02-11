@@ -172,11 +172,15 @@
   var initEditor = function () {
     var editor;
 
-    env.editor = editor = ace.edit("editor").getSession();
-    editor.setTabSize(2);
-    editor.setUseSoftTabs(true);
+    var editor = ace.edit("editor");
+    var session = editor.getSession();
+    env.editor = session;
+    session.setTabSize(2);
+    session.setUseSoftTabs(true);
+    editor.setTheme("ace/theme/tomorrow");
+    session.setMode("ace/mode/mini");
 
-    editor.on('change', function () {
+    session.on('change', function () {
       var ast, imf, src, line, file;
 
       if (env.marker) {
@@ -190,12 +194,12 @@
       }
 
       $("#warn-list").html('');
-      editor.setAnnotations([]);
+      session.setAnnotations([]);
       env.executable = {};
 
       // Parse & display everything
       try {
-        src = editor.getValue();
+        src = session.getValue();
         ast = mini.parse(src);
         ast = env.pruneAST(ast);
         env.checkAST(ast);
@@ -207,7 +211,7 @@
         switch (e.constructor) {
         case Error:
           line = e.toString().split('\n')[0].split(' ')[5].split(':')[0];
-          editor.setAnnotations([
+          session.setAnnotations([
             {
               row: parseInt(line, 10) - 1,
               column: 0,
@@ -217,7 +221,7 @@
           ]);
           break;
         case env.SemanticError:
-          editor.setAnnotations([
+          session.setAnnotations([
             {
               row: e.line - 1,
               column: 0,
