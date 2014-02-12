@@ -9,7 +9,7 @@ PLUGIN_PATH = './plugins'
 
 TIMEZONE = 'Europe/London'
 
-from plugins import citations
+from plugins import citations, latex
 PLUGINS = [citations,latex]
 
 SITENAME = 'Program Analysis: Analysis'
