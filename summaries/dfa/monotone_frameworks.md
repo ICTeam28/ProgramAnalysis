@@ -15,7 +15,7 @@ $$
   liveOut(i) & = 
     \begin{cases}
       \emptyset & \text{if } i \text{ is the last statement}\\\\
-      \displaystyle \bigcup_{i' \in succ(i)} liveIn(i') & \text{otherwise}
+      \displaystyle \bigcup_{(i,i')\in CFG^R} liveIn(i') & \text{otherwise}
     \end{cases} \\\\
   liveIn(i) & = gen(i)\cup(liveOut(i) \setminus kill(i))
 \end{aligned}
@@ -26,7 +26,7 @@ $$
   rdIn(i) & = 
     \begin{cases}
       \emptyset & \text{if } i \text{ is the first statement}\\\\
-      \displaystyle \bigcup_{i' \in prev(i)} rdOut(i') & \text{otherwise}
+      \displaystyle \bigcup_{(i,i')\in CFG} rdOut(i') & \text{otherwise}
     \end{cases} \\\\
   rdOut(i) & = gen(i)\cup(rdIn(i) \setminus kill(i))
 \end{aligned}
@@ -37,7 +37,7 @@ $$
   aeIn(i) & = 
     \begin{cases}
       \emptyset & \text{if } i \text{ is the first statement}\\\\
-      \displaystyle \bigcap_{i' \in prev(i)} aeOut(i') & \text{otherwise}
+      \displaystyle \bigcap_{(i,i')\in CFG} aeOut(i') & \text{otherwise}
     \end{cases} \\\\
   aeOut(i) & = gen(i)\cup(aeIn(i) \setminus kill(i))
 \end{aligned}
@@ -48,7 +48,7 @@ $$
   vbIn(i) & = 
     \begin{cases}
       \emptyset & \text{if } i \text{ is the last statement}\\\\
-      \displaystyle \bigcap_{i' \in succ(i)} vbOut(i') & \text{otherwise}
+      \displaystyle \bigcap_{(i,i')\in CFG^R} vbOut(i') & \text{otherwise}
     \end{cases} \\\\
   vbOut(i) & = gen(i)\cup(vbIn(i) \setminus kill(i))
 \end{aligned}
@@ -62,7 +62,7 @@ $$
   analysis_\bullet(i) & =
     \begin{cases}
       INIT & \text{if } i \in TERM\\\\
-      \displaystyle \bigsqcup_{i' \in link(i)} analysis_\circ(i') & \text{otherwise}
+      \displaystyle \bigsqcup_{(i,i')\in F} analysis_\circ(i') & \text{otherwise}
     \end{cases}\\\\
   analysis_\circ(i) & = f_l(analysis_\bullet(i))
 \end{aligned}
@@ -73,19 +73,19 @@ Where:
 + $INIT$ is the initial/final state (usually $\emptyset$)
 + $TERM$ is the set of terminal statements (entry/exit points) 
 + $\bigsqcup$ is either $\bigcup$ or $\bigcap$
-+ $link(i)$ is the set of predecessors/successors of a statement
-+ f_l is the transfer function2
++ $F$ is either the control flow graph or the reversed control flow graph
++ $f_l$ is the transfer function
 
 In case of *forward analyses* (Reaching Definitions and Available Expressions),
 TERM contains the entry points of a program (an example would be the first
 statement in a function), $analysis_\circ$ computes exit conditions, 
-$analysis_\bullet$ computes entry conditions and $link(i)$ is the set of 
-predecessors of a statement.
+$analysis_\bullet$ computes entry conditions and the normal control flow graph
+is used.
 
 For *backward analyses* (Live Variables and Very Busy Expressions), TERM is the
 set of exit points (return statements, for example), $analysis_\circ$ computes 
-entry conditions, $analysis_\bullet$ computes exit conditions and $link(i)$ is 
-the set of successors of a statement.
+entry conditions, $analysis_\bullet$ computes exit conditions and the reversed
+flow graph is used.
 
 Monotone Frameworks
 ===================
@@ -93,14 +93,17 @@ Monotone Frameworks
 Maximal Fixed Point (MFP) solution
 ==================================
 
-An iterative algorithm exists to compute the least solution to a set of data
-flow equations:
+The worklist algorithm [@Rayside] can be used to compute the least solution to a set of
+data flow equations.
 
 Meet Over All Paths (MOP) solution
 ==================================
 
 It has been proven that the MOP solution cannot be computed for an arbitrary
 monotone framework[@Kam].
+
+References
+----------
 
 [@Nielson "Nielson, Flemming, Hanne R. Nielson, and Chris Hankin. Principles of program analysis. Springer, 1999. Page 40-50"]: http://www2.imm.dtu.dk/~hrni/PPA/ppa.html
 [@Kam "Kam, John B., and Jeffrey D. Ullman. "Monotone data flow analysis frameworks." Acta Informatica 7.3 (1977): 305-317."]: http://download.springer.com/static/pdf/742/art%253A10.1007%252FBF00290339.pdf?auth66=1392462225_8a41583af61c21dd0a5acf990295390a&ext=.pdf

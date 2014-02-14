@@ -4,5 +4,6 @@
 .DS_Store
 *.swo
 *.pyc
+output
 output/
 app/script/mini.js

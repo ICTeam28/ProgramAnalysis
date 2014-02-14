@@ -58,10 +58,10 @@ class MarkdownCitationReader(MarkdownReader):
 
         citations = MarkdownCitationReader.RE_CITE.finditer(text)
         cite_id = 0
-        first_reference_start = len(text)
-        last_reference_end = 0
         references = []
         offset = 0
+        ref_offset = 0
+        refs = {}
         for citation_match in citations:
             RE_BOUND_LINK = re.compile(
                 MarkdownCitationReader.BOUND_LINK.format(citation_match.group(1))
@@ -73,7 +73,24 @@ class MarkdownCitationReader(MarkdownReader):
                 )
                 continue
 
-            cite_id += 1
+            if citation_match.group(1) in refs:
+                cite_id = refs[citation_match.group(1)]
+            else:
+                cite_id += 1
+                refs[citation_match.group(1)] = cite_id
+                bound_link = RE_BOUND_LINK.search(text)
+
+                link_start = bound_link.start()
+                link_end   = bound_link.end()
+                link_title = bound_link.group(2)
+                link_url   = bound_link.group(3)
+
+                references.insert(cite_id,
+                    '<p>[{0}] {1} <a name="cite_{0}" id="cite_{0}" class="reference" href="{2}">{2}</a></p>'\
+                    .format(cite_id, link_title or '', link_url))
+                ref_offset = max(ref_offset, len(text) - link_start)
+
+
             cite_start = citation_match.start() + offset
             cite_end   = citation_match.end() + offset
             repl = '[[{0}]](#cite_{0})'.format(cite_id)
@@ -82,27 +99,8 @@ class MarkdownCitationReader(MarkdownReader):
             text = text[:cite_start]\
                     + '[[{0}]](#cite_{0})'.format(cite_id)\
                     + text[cite_end:]
-            
-            bound_link = RE_BOUND_LINK.search(text)
 
-            link_start = bound_link.start()
-            link_end   = bound_link.end()
-            link_title = bound_link.group(2)
-            link_url   = bound_link.group(3)
-
-            references.insert(cite_id,
-                '<p>[{0}] {1} <a name="cite_{0}" id="cite_{0}" class="reference" href="{2}">{2}</a></p>'\
-                .format(cite_id, link_title or '', link_url))
-
-            first_reference_start = min(link_start, first_reference_start)
-
-
-        if first_reference_start == len(text):
-            # No references
-            return text
-
-        text = text[:first_reference_start] + '\n'.join(references)
-        return text
+        return text[:-ref_offset] + '\n'.join(references)
 
     @staticmethod
     def reduce_heading_tag_size(html, n=1):
