@@ -1,10 +1,10 @@
-Title: Static Analysis is the Bomb!
+Title: Example page
 Date: 2014-01-27 21:00
 Category: Analysis
 Tags: pelican, publishing
 Slug: static-analysis-is-the-bomb
 Author: Nic Prettejohn
-Summary: An introduction on why Static Analysis is so cool!
+Summary: Static Analysis
 
 This is an example post demonstrating how to write new content and summaries.
 

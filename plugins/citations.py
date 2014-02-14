@@ -61,6 +61,7 @@ class MarkdownCitationReader(MarkdownReader):
         first_reference_start = len(text)
         last_reference_end = 0
         references = []
+        offset = 0
         for citation_match in citations:
             RE_BOUND_LINK = re.compile(
                 MarkdownCitationReader.BOUND_LINK.format(citation_match.group(1))
@@ -71,9 +72,12 @@ class MarkdownCitationReader(MarkdownReader):
                     'Unbound citation : {}'.format(citation_match.group(1))
                 )
                 continue
+
             cite_id += 1
-            cite_start = citation_match.start()
-            cite_end   = citation_match.end()
+            cite_start = citation_match.start() + offset
+            cite_end   = citation_match.end() + offset
+            repl = '[[{0}]](#cite_{0})'.format(cite_id)
+            offset += len(repl) - (cite_end - cite_start)
 
             text = text[:cite_start]\
                     + '[[{0}]](#cite_{0})'.format(cite_id)\
