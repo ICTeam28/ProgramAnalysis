@@ -40,6 +40,6 @@ For instance, static analysis can reduce the collection of data by guaranteeing 
 
 Traditionally, static and dynamic analysis have been viewed as distinct approaches with different techniques.
 However, static and dynamic analysis can interact by enhancing each other, and blending the strengths of both approaches.
+[@Ref]
 
-Source:
-[Static and dynamic analysis: synergy and duality](http://homes.cs.washington.edu/~mernst/pubs/staticdynamic-woda2003.pdf)
+[@Ref "Static and dynamic analysis: synergy and duality"]: http://homes.cs.washington.edu/~mernst/pubs/staticdynamic-woda2003.pdf
