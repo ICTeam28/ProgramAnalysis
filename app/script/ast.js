@@ -98,6 +98,12 @@
       all(ast.true);
       all(ast.false);
       break;
+    case 'goto':
+      count = 0;
+      break;
+    case 'label':
+      count = 0;
+      break;
     case 'call':
       all(ast.args);
       break;
@@ -287,6 +293,18 @@
       child = drawAST(node.expr, g);
 
       return { 'width': child.width + 90, 'height': child.height };
+    case 'label':
+      w = drawLabel('LABEL ' + node.label + ':', node.loc, p);
+      return {
+        'width': w,
+        'height': 30
+      };
+    case 'goto':
+      w = drawLabel('GOTO ' + node.label, node.loc, p);
+      return {
+        'width': w,
+        'height': 30
+      };
     case 'while':
       // Predicate
       drawLabel('WHILE', node.loc, p);

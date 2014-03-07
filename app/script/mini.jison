@@ -19,10 +19,12 @@
 'func'                  return 'FUNC';
 'return'                return 'RETURN';
 'if'                    return 'IF';
+'goto'                  return 'GOTO';
 'else'                  return 'ELSE';
 'while'                 return 'WHILE';
 [a-zA-Z_][a-zA-Z_0-9]*  return 'ID';
 0|[1-9][0-9]*           return 'NUMBER';
+':'                     return ':';
 '*'                     return '*';
 '/'                     return '/';
 '%'                     return '%';
@@ -154,6 +156,30 @@ statement
   | while
   | ifElse
   | assignment
+  | label
+  | goto
+  ;
+
+label
+  : ID ':'
+    {
+      $$ = {
+        'op': 'label',
+        'label': $1,
+        'loc': @1
+      }
+    }
+  ;
+
+goto
+  : GOTO ID ';'
+    {
+      $$ = {
+        'op': 'goto',
+        'label': $2,
+        'loc': @1
+      }
+    }
   ;
 
 return

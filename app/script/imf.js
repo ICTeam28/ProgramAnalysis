@@ -573,6 +573,12 @@
       imf.push(new ImmInstr('lbl', node.loc, lend));
 
       break;
+    case 'label':
+      imf.push(new ImmInstr('lbl', node.loc, node.label));
+      break;
+    case 'goto':
+      imf.push(new ImmInstr('jmp', node.loc, node.label));
+      break;
     case 'assign':
       imf.push(new ImmInstr('str', node.loc, node.name, node.expr));
       break;
@@ -618,7 +624,7 @@
       generate(ast.funcs[i], code, fs);
 
       // Basic simplification
-      code = env.prune(buildGraph(code));
+      code = buildGraph(code);
       folded = env.foldConstants(code);
 
       // Data Flow analysis
