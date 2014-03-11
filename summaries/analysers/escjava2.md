@@ -1,9 +1,9 @@
-Title: Very Busy Expressions
-Date: 27.01.2014
-Category: Data Flow Analysis
+Title: ESC/Java2
+Date: 11.03.2014
+Category: Analysers
 Tags: pelican, publishing
-Author: TBD
-Summary: Very Busy Expressions
+Author: Nandor Licker
+Summary: Overview of ESC/Java2
 
 Live Variable Analysis is used to determine which variables defined at a certain
 point in a program are going to be used later on. This type of analysis can be
