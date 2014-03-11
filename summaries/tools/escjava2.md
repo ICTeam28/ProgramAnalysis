@@ -210,7 +210,7 @@ Finally, we can put all the functions together to create the game:
       }
 
       Minesweeper game = new Minesweeper(rows, cols);
-      while (game.isAlive() && !game.isWon()) {
+      while (game.isAlive()) {
         int r = 1, c = 1;
 
         System.out.println(game.toString());
@@ -218,20 +218,19 @@ Finally, we can put all the functions together to create the game:
           System.out.print("Enter coordinates: ");
           r = in.nextInt();
           c = in.nextInt();
-        } while (r <= 0 || r > game.getHeight() ||
-                 c <= 0 || c > game.getWidth());
+        } while (r <= 0 || c <= 0 || r > game.getHeight() || c > game.getWidth());
 
         game.mark(r, c);
+        if (game.isWon()) {
+          //@ assert game.alive
+          System.out.println("Congratulatios, you win!");
+          return;
+        }
       }
 
+      //@ assert !game.alive
       System.out.println(game.toString());
-
-      if (game.isWon()) {
-        //@ assert game.alive
-        System.out.println("Congratulatios, you win!");
-      } else {
-        System.out.println("You loose!");
-      }
+      System.out.println("You loose!");
     }
 
 
