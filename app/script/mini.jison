@@ -155,6 +155,7 @@ statement
   : return
   | while
   | ifElse
+  | if
   | assignment
   | label
   | goto
@@ -216,6 +217,21 @@ ifElse
         'loc': range(@1, @7),
         'lt': @5,
         'lf': @7
+      };
+    }
+  ;
+
+if
+  : IF '(' expr ')' bodyOpt
+    {
+      $$ = {
+        'op': 'if',
+        'cond': $3,
+        'true': $5,
+        'false': null,
+        'loc': range(@1, @5),
+        'lt': @5,
+        'lf': null
       };
     }
   ;

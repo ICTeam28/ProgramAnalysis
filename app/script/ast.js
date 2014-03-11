@@ -375,17 +375,20 @@
       w = Math.max(w, child.width + 30);
 
       // False branch
-      drawLabel('FALSE', node.loc, p, 30, h - 15);
-      g = document.createElementNS(NS, "g");
-      g.setAttribute("transform", "translate(15, " + (h - 15) + ")");
-      p.appendChild(g);
-      line = document.createElementNS(NS, "polyline");
-      line.setAttributeNS(null, "points", "15 30 15 " + h + " 30 " + h);
-      p.appendChild(line);
+      if (node.false)
+      {
+        drawLabel('FALSE', node.loc, p, 30, h - 15);
+        g = document.createElementNS(NS, "g");
+        g.setAttribute("transform", "translate(15, " + (h - 15) + ")");
+        p.appendChild(g);
+        line = document.createElementNS(NS, "polyline");
+        line.setAttributeNS(null, "points", "15 30 15 " + h + " 30 " + h);
+        p.appendChild(line);
 
-      child = drawChildren(node['false'], g);
-      h += child.height;
-      w = Math.max(w, child.width + 30);
+        child = drawChildren(node['false'], g);
+        h += child.height;
+        w = Math.max(w, child.width + 30);
+      }
 
       return { 'width': w, 'height': h - 10 };
     case 'bin':
@@ -561,10 +564,12 @@
         checkAST(nd, funcs, vt);
       });
 
-      var vf = vars.slice(0);
-      node.false.map(function (nd) {
-        checkAST(nd, funcs, vf);
-      });
+      if (node.false) {
+        var vf = vars.slice(0);
+        node.false.map(function (nd) {
+          checkAST(nd, funcs, vf);
+        });
+      }
       return;
     case 'call':
       if (funcs[node.name] === undefined) {
@@ -758,7 +763,9 @@
     case 'if':
       ast.cond = env.pruneAST(ast.cond);
       ast.true = ast.true.map(env.pruneAST);
-      ast.false = ast.false.map(env.pruneAST);
+      if (ast.false) {
+        ast.false = ast.false.map(env.pruneAST);
+      }
       return ast;
     case 'call':
       ast.args = ast.args.map(env.pruneAST);

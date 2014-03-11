@@ -583,23 +583,32 @@
       imf.push(new ImmInstr('str', node.loc, node.name, node.expr));
       break;
     case 'if':
-      lend = 'L' + (nextLabel++);
-      ltrue = 'L' + (nextLabel++);
+      if (node.false) {
+        lend = 'L' + (nextLabel++);
+        ltrue = 'L' + (nextLabel++);
 
-      imf.push(new ImmInstr('cjmp', node.cond.loc, node.cond, ltrue));
+        imf.push(new ImmInstr('cjmp', node.cond.loc, node.cond, ltrue));
 
-      // False branch
-      for (i = 0; i < node.false.length; ++i) {
-        generate(node.false[i], imf, fs);
+        // False branch
+        for (i = 0; i < node.false.length; ++i) {
+          generate(node.false[i], imf, fs);
+        }
+        imf.push(new ImmInstr('jmp', node.lf, lend));
+
+        // True branch
+        imf.push(new ImmInstr('lbl', node.lt, ltrue));
+        for (i = 0; i < node['true'].length; ++i) {
+          generate(node['true'][i], imf, fs);
+        }
+        imf.push(new ImmInstr('lbl', node.lf, lend));
+      } else {
+        lend = 'L' + (nextLabel++);
+        imf.push(new ImmInstr('njmp', node.cond.loc, node.cond, lend));
+        for (i = 0; i < node.true.length; ++i) {
+          generate(node.true[i], imf, fs);
+        }
+        imf.push(new ImmInstr('lbl', node.lt, lend));
       }
-      imf.push(new ImmInstr('jmp', node.lf, lend));
-
-      // True branch
-      imf.push(new ImmInstr('lbl', node.lt, ltrue));
-      for (i = 0; i < node['true'].length; ++i) {
-        generate(node['true'][i], imf, fs);
-      }
-      imf.push(new ImmInstr('lbl', node.lf, lend));
 
       break;
     }
