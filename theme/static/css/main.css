@@ -46,7 +46,7 @@ section.category-intro {
   -webkit-transform: translate3d(0px, 0px, 0px);
   transform: translate3d(0px, 0px, 0px); height: 550px;
   background: #FFF;
-  height: 300px;
+  min-height: 300px;
   padding: 10px 50px;
 }
 
