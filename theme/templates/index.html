@@ -14,7 +14,7 @@
     <div class="row">
       <div class="col-xs-12 col-sm-6">
         {# This is a horrible way to do this #}
-        <p>{{ INTROS.get(cat) }}</p>
+        <p>{{ INTROS.get(cat|trim|lower) }}</p>
       </div>
       <div class="col-xs-12 col-sm-6">
         <ol class="list">

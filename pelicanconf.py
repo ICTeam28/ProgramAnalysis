@@ -48,4 +48,5 @@ for root, _, files in os.walk(INTRODUCTION_DIR):
         if ext != '.md':
             raise IOError('Introdutions must all be markdown.')
         with open(os.path.join(root, name), 'r') as f:
-            INTROS[category.lower()] = md.convert(f.read())
+            INTROS[category.strip().lower()] = md.convert(f.read())
+
