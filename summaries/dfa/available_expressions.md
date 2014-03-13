@@ -9,7 +9,7 @@ Expression *a+b* is said to be available at a point of a program
 if each path from the beginning of the program evaluates *a+b*
 and does not modify neither *a* nor *b*.
 
-Available Expressions analysis is useful for global common-subexpression elimination. [@Ullman] 
+Available Expressions analysis is useful for global common-subexpression elimination. [@Ullman]
 
 Data flow equations:
 $$
@@ -30,14 +30,14 @@ Consider the following program:
 
 Kill and Gen:
 
-| l |          kill(l)          | gen(l)  |
-|---|----------------------|----------|
-| 1 |            {}            |  {a+b}  |
-| 2 |            {}            |  {b+z}  |
-| 3 |         {b+z}         |  {a*y}  |
-| 4 |            {}            |  {a+b}  |
-| 5 |  {a+b,a+1,a*y}   |     {}    |
-| 6 |          {     }         |   {a+b} |
+| l |          kill(l)          | gen(l)   |
+|---|---------------------------|----------|
+| 1 |            {}             |  {a+b}   |
+| 2 |            {}             |  {b+z}   |
+| 3 |         {b+z}             |  {a*y}   |
+| 4 |            {}             |  {a+b}   |
+| 5 |  {a+b,a+1,a*y}            |     {}   |
+| 6 |          {     }          |   {a+b}  |
 
 We can form the following equations:
 
@@ -53,14 +53,14 @@ $$
 $$
 
 $$
-\begin{aligned}
-  AEexit(1) & = AEentry(1) \bigcup \{a+b\} \\\\
-  AEexit(2) & = AEentry(2) \bigcup \{b+z\} \\\\
-  AEexit(3) & = (AEentry(3) - \{b+z\}) \bigcup \{a*y\} \\\\
-  AEexit(4) & = AEentry(4) \bigcup \{a+b\} \\\\
-  AEexit(5) & = AEentry(5) - \{a+b,a*y,a+1\} \\\\
-  AEexit(6) & = (AEentry(6) - \{x+y\}) \bigcup \{a+b\} \\\\
-\end{aligned}
+  \begin{aligned}
+    AEexit(1) & = AEentry(1) \bigcup \\{a+b\\} \\\\
+    AEexit(2) & = AEentry(2) \bigcup \\{b+z\\} \\\\
+    AEexit(3) & = (AEentry(3) - \\{b+z\\}) \bigcup \\{a \ast y \\} \\\\
+    AEexit(4) & = AEentry(4) \bigcup \\{a+b\\} \\\\
+    AEexit(5) & = AEentry(5) - \\{ a+b, a \ast y, a+1 \\} \\\\
+    AEexit(6) & = (AEentry(6) - \\{x+y\\}) \bigcup \\{a+b\\}
+  \end{aligned}
 $$
 
 Using the chaotic iteration we get the following solution:
