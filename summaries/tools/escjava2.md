@@ -223,7 +223,7 @@ Finally, we can put all the functions together to create the game:
         game.mark(r, c);
         if (game.isWon()) {
           //@ assert game.alive
-          System.out.println("Congratulatios, you win!");
+          System.out.println("Congratulations, you win!");
           return;
         }
       }
