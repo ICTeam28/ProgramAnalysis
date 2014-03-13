@@ -46,7 +46,9 @@ for root, _, files in os.walk(INTRODUCTION_DIR):
     for name in files:
         category, ext = os.path.splitext(name)
         if ext != '.md':
-            raise IOError('Introdutions must all be markdown.')
+            print 'Skipping ' + name + ' as doesn\'t end in .md'
+            continue
         with open(os.path.join(root, name), 'r') as f:
+            print 'Considering ' + name
             INTROS[category.strip().lower()] = md.convert(f.read())
 

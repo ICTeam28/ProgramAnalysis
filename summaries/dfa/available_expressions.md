@@ -43,30 +43,30 @@ We can form the following equations:
 
 $$
   \begin{aligned}
-  AEentry(1) = \emptyset
-  AEentry(2) = AEexit(1)
-  AEentry(3) = AEexit(2)
-  AEentry(4) = AEexit(3) \bigcap AEexit(6)
-  AEentry(5) = AEexit(4)
-  AEentry(6) = AEexit(5)
+  AEentry(1) & = \emptyset	\\\\
+  AEentry(2) & = AEexit(1)	\\\\
+  AEentry(3) & = AEexit(2)	\\\\
+  AEentry(4) & = AEexit(3) \bigcap AEexit(6) \\\\
+  AEentry(5) & = AEexit(4) \\\\
+  AEentry(6) & = AEexit(5) \\\\
   \end{aligned}
 $$
 
 $$
-  \begin{aligned}
-  AEexit(1) = AEentry(1) \bigcup {a+b}
-  AEexit(2) = AEentry(2) \bigcup {b+z}
-  AEexit(3) = (AEentry(3) - {b+z}) \bigcup {a*y}
-  AEexit(4) = AEentry(4) \bigcup {a+b}
-  AEexit(5) = AEentry(5) - {a+b,a*y,a+1}
-  AEexit(6) = (AEentry(6) - {x+y}) \bigcup {a+b}
-  \end{aligned}
+\begin{aligned}
+  AEexit(1) & = AEentry(1) \bigcup \{a+b\} \\\\
+  AEexit(2) & = AEentry(2) \bigcup \{b+z\} \\\\
+  AEexit(3) & = (AEentry(3) - \{b+z\}) \bigcup \{a*y\} \\\\
+  AEexit(4) & = AEentry(4) \bigcup \{a+b\} \\\\
+  AEexit(5) & = AEentry(5) - \{a+b,a*y,a+1\} \\\\
+  AEexit(6) & = (AEentry(6) - \{x+y\}) \bigcup \{a+b\} \\\\
+\end{aligned}
 $$
 
 Using the chaotic iteration we get the following solution:
 
 | l |   AEentry(l)  |  AEexit(l)  |
-|---|-----------------|--------------|
+|:-:|:---------------:|:-------------:|
 | 1 |         {}         |    {a+b}     |
 | 2 |      {a+b}      | {a+b,b+z}  |
 | 3 |  {a+b,b+z}   |  {a+b,a*y}  |
