@@ -1,20 +1,20 @@
 Title: Available Expressions
-Date: 2014-12-03 23:25
+Date: 2014-03-12 23:25
 Category: Data Flow Analysis
 Tags: pelican, publishing
 Author: Ilija Radosavovic
 Summary: Available Expressions
 
-Expression *a+b* is said to be available at a point of a program
-if each path from the beginning of the program evaluates *a+b*
-and does not modify neither *a* nor *b*.
+Expression $a+b$ is said to be available at a point of a program
+if each path from the beginning of the program evaluates $a+b$
+and does not modify neither $a$ nor $b$.
 
 Available Expressions analysis is useful for global common-subexpression elimination. [@Ullman]
 
 Data flow equations:
 $$
   \begin{aligned}
-  AEentry(l) = \bigcap \text{predecessors} l' of l AEexit(l')
+  AEentry(l) = \bigcap \text{predecessors  } l' \text{of } l \text{ } AEexit(l') \\\\
   AEexit(l)  = (AEentry(l)-Kill(l)) \bigcup Gen(l)
   \end{aligned}
 $$
@@ -26,53 +26,59 @@ An expression is killed by the block if any of its variables are redefined in th
 
 Consider the following program:
 
-[x:=a+b]^1;[y=b+z]^2; [z=a*y]^3; while[y>a+b]^4 do ([a:=a+1]^5;[x:=a+b]^6)
+    [x:=a+b]^1; 
+    [y=b+z]^2;  
+    [z=a*y]^3;  
+    while [y>a+b]^4 do( 
+          [a:=a+1]^5; 
+          [x:=a+b]^6)
 
-Kill and Gen:
+The following table demonstrates results of Kill and Gen functions:
 
-| l |          kill(l)          | gen(l)   |
-|---|---------------------------|----------|
-| 1 |            {}             |  {a+b}   |
-| 2 |            {}             |  {b+z}   |
-| 3 |         {b+z}             |  {a*y}   |
-| 4 |            {}             |  {a+b}   |
-| 5 |  {a+b,a+1,a*y}            |     {}   |
-| 6 |          {     }          |   {a+b}  |
+|<center>$l$</center>| <center>Kill(l)</center> | <center>Gen(l)</center> |
+|:-:|:-----------------:|:---------------:|
+| 1 | $\\{\\}$          | $\\{a+b\\}$     |
+| 2 | $\\{\\}$          | $\\{b+z\\}$     |
+| 3 | $\\{b+z\\}$       | $\\{a \ast y\\}$|
+| 4 | $\\{\\}$          | $\\{a+b\\}$     |
+| 5 | $\\{a+b, a+1, a \ast y\\}$ | $\\{\\}$   |
+| 6 | $\\{\\}$          | $\\{a+b\\}$     |
 
 We can form the following equations:
 
 $$
   \begin{aligned}
-  AEentry(1) & = \emptyset	\\\\
-  AEentry(2) & = AEexit(1)	\\\\
-  AEentry(3) & = AEexit(2)	\\\\
-  AEentry(4) & = AEexit(3) \bigcap AEexit(6) \\\\
-  AEentry(5) & = AEexit(4) \\\\
-  AEentry(6) & = AEexit(5) \\\\
+   AEentry(1) & = \emptyset	\\\\
+   AEentry(2) & = AEexit(1)	\\\\
+   AEentry(3) & = AEexit(2)	\\\\
+   AEentry(4) & = AEexit(3) \bigcap AEexit(6) \\\\
+   AEentry(5) & = AEexit(4) \\\\
+   AEentry(6) & = AEexit(5) \\\\
   \end{aligned}
 $$
 
+
 $$
   \begin{aligned}
-    AEexit(1) & = AEentry(1) \bigcup \\{a+b\\} \\\\
-    AEexit(2) & = AEentry(2) \bigcup \\{b+z\\} \\\\
-    AEexit(3) & = (AEentry(3) - \\{b+z\\}) \bigcup \\{a \ast y \\} \\\\
-    AEexit(4) & = AEentry(4) \bigcup \\{a+b\\} \\\\
-    AEexit(5) & = AEentry(5) - \\{ a+b, a \ast y, a+1 \\} \\\\
-    AEexit(6) & = (AEentry(6) - \\{x+y\\}) \bigcup \\{a+b\\}
+   AEexit(1) & = AEentry(1) \bigcup \\{a+b\\} \\\\
+   AEexit(2) & = AEentry(2) \bigcup \\{b+z\\} \\\\
+   AEexit(3) & = (AEentry(3) - \\{b+z\\}) \bigcup \\{a \ast y \\} \\\\
+   AEexit(4) & = AEentry(4) \bigcup \\{a+b\\} \\\\
+   AEexit(5) & = AEentry(5) - \\{ a+b, a \ast y, a+1 \\} \\\\
+   AEexit(6) & = (AEentry(6) - \\{x+y\\}) \bigcup \\{a+b\\}
   \end{aligned}
 $$
 
 Using the chaotic iteration we get the following solution:
 
-| l |   AEentry(l)  |  AEexit(l)  |
-|:-:|:---------------:|:-------------:|
-| 1 |         {}         |    {a+b}     |
-| 2 |      {a+b}      | {a+b,b+z}  |
-| 3 |  {a+b,b+z}   |  {a+b,a*y}  |
-| 4 |      {a+b}     |     {a+b}     |
-| 5 |      {a+b}     |        {}        |
-| 6 |         {}        |     {a+b}     |
+|<center>$l$</center>| <center>AEentry(l)</center> | <center>AEexit(l)</center> |
+|:-:|:---------------:|:--------------------:|
+| 1 | $\\{\\}$        | $\\{a+b\\}$          |
+| 2 | $\\{a+b\\}$     | $\\{a+b, b+z\\}$     |
+| 3 | $\\{a+b, b+z\\}$| $\\{a+b, a \ast y\\}$|
+| 4 | $\\{a+b\\}$     | $\\{a+b\\}$          |
+| 5 | $\\{a+b\\}$     | $\\{\\}$             |
+| 6 | $\\{\\}$        | $\\{a+b\\}$          |
 
 
 References
