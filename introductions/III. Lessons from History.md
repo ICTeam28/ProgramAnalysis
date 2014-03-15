@@ -1,7 +1,7 @@
 If you want to be sure that your program works, you have two options: you
 either use Haskell or you do extensive testing. This sections presents a list
 of real-world disasters which were caused by programmer errors so simple that
-they could have been easily detected by most statis analysers (or would have
+they could have been easily detected by most static analysers (or would have
 never occured if Haskell would have been used).
 
 Fortunately, programmers have learnt from past mistakes: The Jet Propulsion
