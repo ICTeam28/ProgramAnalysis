@@ -17,7 +17,7 @@ fail to detect certain mistakes.
 Errors
 ------
 
-The errors that can be detecting using ESC/Java2 include:
+The errors that can be detected using ESC/Java2 include:
 
 1. **Null**: Reported when a reference might be null
 2. **IndexNegative**: Caused by negative array indices
