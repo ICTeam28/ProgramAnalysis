@@ -44,7 +44,7 @@ section.category-intro {
   -ms-transform: translate3d(0px, 0px, 0px);
   -o-transform: translate3d(0px, 0px, 0px);
   -webkit-transform: translate3d(0px, 0px, 0px);
-  transform: translate3d(0px, 0px, 0px); height: 550px;
+  transform: translate3d(0px, 0px, 0px); height: 300px;
   background: #FFF;
   min-height: 300px;
   padding: 10px 50px;
@@ -95,4 +95,9 @@ article div.article-author {
   margin: 0!important;
   float: right;
   width: 100%;
+}
+
+.demo {
+  position: absolute;
+  top: 0; left: 0;
 }

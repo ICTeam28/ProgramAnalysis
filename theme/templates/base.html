@@ -25,12 +25,34 @@
   <link href='http://fonts.googleapis.com/css?family=Fenix' rel='stylesheet' type='text/css'>
 </head>
 <body>
-  {% include 'navigation.html' %} 
+  {% include 'navigation.html' %}
   {% block content %}
   {% endblock %}
   <script type="text/javascript" src="{{ SITEURL }}/theme/js/jquery.js"></script>
   <script type="text/javascript" src="{{ SITEURL }}/theme/js/parallax.js"></script>
   <script type="text/javascript" src="{{ SITEURL }}/theme/js/stickynav.js"></script>
+  <script type="text/javascript">
+    (function () {
+      $(function () {
+        var demo = $("#demo");
+
+        var resize = function () {
+          var height = parseInt($(window).height()) - parseInt($(".navbar").outerHeight());
+          demo.parent()
+            .height(height)
+            .css("padding", 0);
+
+          demo
+            .height(height)
+            .width(parseInt($(window).width() - 1));
+
+          requestAnimationFrame(resize);
+        };
+
+        resize();
+      });
+    }) ();
+  </script>
     {% if content and content.citation %}
       {{ content.citation}}
     {% endif %}

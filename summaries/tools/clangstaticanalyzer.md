@@ -7,7 +7,7 @@ Summary: Overview of the Clang Static Analyser
 
 Clang is a front-end to the LLVM compiler architecture, which is a modularised
 set of libraries used for compiling software. Clang includes a static analyzer
-which is designed to detect runtime bugs in C, C++ and Objective-C code.
+which is designed to detect runtime bugs in C, C++ and Objective-C code. [@Ted]
 
 Features
 ----------
@@ -100,7 +100,7 @@ using scan-build gives this output:
 	scan-build: 2 bugs found.
 
 As we can see, scan-build has correctly identified both the issues that were
-spotted in the code. [@Ted] [@ScanBuild]
+spotted in the code. [@ScanBuild]
 
 References
 ==========

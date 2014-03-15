@@ -86,25 +86,25 @@ class MarkdownCitationReader(MarkdownReader):
                 link_url   = bound_link.group(3)
 
                 references.insert(cite_id,
-                    '<p>[{0}] {1} <a name="cite_{0}" id="cite_{0}" class="reference" href="{2}">{2}</a></p>'\
+                    '<p>[{0}] <a name="cite_{0}" id="cite_{0}" class="reference" href="{2}">{1}</a></p>'\
                     .format(cite_id, link_title or '', link_url))
                 ref_offset = max(ref_offset, len(text) - link_start)
 
 
             cite_start = citation_match.start() + offset
             cite_end   = citation_match.end() + offset
-            repl = '[[{0}]](#cite_{0})'.format(cite_id)
+            repl = '<sup>[[{0}]](#cite_{0})</sup>'.format(cite_id)
             offset += len(repl) - (cite_end - cite_start)
 
             text = text[:cite_start]\
-                    + '[[{0}]](#cite_{0})'.format(cite_id)\
+                    + repl\
                     + text[cite_end:]
 
         return text[:-ref_offset] + '\n'.join(references)
 
     @staticmethod
     def reduce_heading_tag_size(html, n=1):
-        return re.sub('<h(\d)([^>]*)>', 
+        return re.sub('<h(\d)([^>]*)>',
                 lambda m: '<h{0}{1}>'.format(int(m.group(1))+n, m.group(2)),
                 html)
 
@@ -129,7 +129,7 @@ class MarkdownCitationReader(MarkdownReader):
 
         if not 'citation' in metadata.keys():
             metadata['citation'] = citationScript
-        
+
         return content, metadata
 
 def add_reader(readers):

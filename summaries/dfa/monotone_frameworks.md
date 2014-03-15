@@ -9,10 +9,10 @@ The classical methods of data flow analyses share a common pattern which lead
 to the idea of developing a common framework which can be used to define
 multiple types of analyses.
 
-1. Live Variables [@Nielson] 
+1. Live Variables [@Nielson]
 $$
 \begin{aligned}
-  liveOut(i) & = 
+  liveOut(i) & =
     \begin{cases}
       \emptyset & \text{if } i \text{ is the last statement}\\\\
       \displaystyle \bigcup_{(i,i')\in CFG^R} liveIn(i') & \text{otherwise}
@@ -23,7 +23,7 @@ $$
 2. Reaching Definitions [@Nielson]
 $$
 \begin{aligned}
-  rdIn(i) & = 
+  rdIn(i) & =
     \begin{cases}
       \emptyset & \text{if } i \text{ is the first statement}\\\\
       \displaystyle \bigcup_{(i,i')\in CFG} rdOut(i') & \text{otherwise}
@@ -34,7 +34,7 @@ $$
 3. Available Expressions [@Nielson]
 $$
 \begin{aligned}
-  aeIn(i) & = 
+  aeIn(i) & =
     \begin{cases}
       \emptyset & \text{if } i \text{ is the first statement}\\\\
       \displaystyle \bigcap_{(i,i')\in CFG} aeOut(i') & \text{otherwise}
@@ -45,7 +45,7 @@ $$
 4. Very Busy Expressions [@Nielson]
 $$
 \begin{aligned}
-  vbIn(i) & = 
+  vbIn(i) & =
     \begin{cases}
       \emptyset & \text{if } i \text{ is the last statement}\\\\
       \displaystyle \bigcap_{(i,i')\in CFG^R} vbOut(i') & \text{otherwise}
@@ -71,19 +71,19 @@ $$
 Where:
 
 + $\iota$ is the initial/final state (usually $\emptyset$)
-+ $E$ is the set of terminal statements (entry/exit points) 
++ $E$ is the set of terminal statements (entry/exit points)
 + $\bigsqcup$ is either $\bigcup$ or $\bigcap$
 + $F$ is either the control flow graph or the reversed control flow graph
 + $f_l$ is the transfer function
 
 In case of *forward analyses* (Reaching Definitions and Available Expressions),
 $E$ contains the entry points of a program (an example would be the first
-statement in a function), $analysis_\circ$ computes exit conditions, 
+statement in a function), $analysis_\circ$ computes exit conditions,
 $analysis_\bullet$ computes entry conditions and the normal control flow graph
 is used.
 
 For *backward analyses* (Live Variables and Very Busy Expressions), TERM is the
-set of exit points (return statements, for example), $analysis_\circ$ computes 
+set of exit points (return statements, for example), $analysis_\circ$ computes
 entry conditions, $analysis_\bullet$ computes exit conditions and the reversed
 flow graph is used.
 
@@ -130,7 +130,7 @@ The classical analyses can be rewritten as follows:
 |$\sqsubseteq$|$\supseteq$              |$\subseteq$                             |$\supseteq$              |$\subseteq$             |
 |$\sqcup$     |$\cap$                   |$\cup$                                  |$\cap$                   |$\cup$                  |
 |$\bot$       |$AExp_\star$             |$\emptyset$                             |$AExpr_\star$            |$\emptyset$             |
-|$\iota$      |$\emptyset$              |language dependent                      |$\emptyset$              |$\emptyset$             |
+|$\iota$      |$\emptyset$              |language dependant                      |$\emptyset$              |$\emptyset$             |
 |$E$          |entry points             |entry points                            |exit points              |exit points             |
 |$F$          |$CFG$                    |$CFG$                                   |$CFG^R$                  |$CFG^R$                 |
 
@@ -142,11 +142,11 @@ The classical analyses can be rewritten as follows:
 Maximal Fixed Point (MFP) solution
 ----------------------------------
 
-The worklist algorithm can be used to compute the least solution to a 
+The worklist algorithm can be used to compute the least solution to a
 set of data flow equations. The algorithm uses a queue to keep track of the
-objects which need to be updated. When a new value for $analysis(i)$ is 
-computed, all the statements which follow that statement in the flow graph must 
-be updated as well. The algorithm terminates when the system stabilises and 
+objects which need to be updated. When a new value for $analysis(i)$ is
+computed, all the statements which follow that statement in the flow graph must
+be updated as well. The algorithm terminates when the system stabilises and
 there are no more sets to be updated [@Rayside].
 
     worklist <- empty
@@ -164,16 +164,16 @@ there are no more sets to be updated [@Rayside].
         analysis[l'] = analysis[l'] U f(analysis[l])
         worklist <- worklist ++ adjacent(l')
 
- 
+
 Meet Over All Paths (MOP) solution
 ----------------------------------
 
-The MOP solution for a node is obtained by combining the results from all paths 
-which lead to it. Due to the fact that the number of paths may be infinite 
-(cyclic graphs), computing the MOP solution is a difficult task. It has been 
-proven that there is no algorithm which can compute this solution for an 
+The MOP solution for a node is obtained by combining the results from all paths
+which lead to it. Due to the fact that the number of paths may be infinite
+(cyclic graphs), computing the MOP solution is a difficult task. It has been
+proven that there is no algorithm which can compute this solution for an
 arbitrary instance due to the fact that it is possible to build a framework
-whose solution would be the modified Post Correspondence Problem, which has been 
+whose solution would be the modified Post Correspondence Problem, which has been
 proven to be an unsolvable decision problem [@Post]. However, there are
 algorithms which can solve specific frameworks or classes of frameworks.
 For the classical forms of analysis, the MOP solution is identical to the MFP
