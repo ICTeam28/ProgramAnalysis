@@ -37,7 +37,7 @@
         var demo = $("#demo");
 
         var resize = function () {
-          var height = parseInt($(window).height()) - parseInt($(".navbar").outerHeight());
+          var height = parseInt($(window).height()) - parseInt($(".navbar").outerHeight()) - 2;
           demo.parent()
             .height(height)
             .css("padding", 0);
