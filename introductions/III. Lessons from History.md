@@ -6,8 +6,6 @@ never occured if Haskell would have been used).
 
 Fortunately, programmers have learnt from past mistakes: The Jet Propulsion
 Laboratory's Coding Style Guide [<sup>[ref]</sup>](http://lars-lab.jpl.nasa.gov/JPL_Coding_Standard_C.pdf)
-mandates the use of a static analyser.
-
-Hopefully, future rockets will blow up
-for serious reasons, like sensors mounted upside down
+mandates the use of a static analyser. Hopefully, future rocket failures will
+be caused by less silly errors, like sensors mounted upside down
 [<sup>[ref]</sup>](http://www.russianspaceweb.com/proton_glonass49.html).
