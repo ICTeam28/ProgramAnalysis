@@ -1,6 +1,6 @@
 Title: Available Expressions
 Date: 2014-03-12 23:25
-Category: Data Flow Analysis
+Category: II. Data Flow Analysis
 Tags: pelican, publishing
 Author: Ilija Radosavovic
 Summary: Available Expressions
@@ -26,11 +26,11 @@ An expression is killed by the block if any of its variables are redefined in th
 
 Consider the following program:
 
-    [x:=a+b]^1; 
-    [y=b+z]^2;  
-    [z=a*y]^3;  
-    while [y>a+b]^4 do( 
-          [a:=a+1]^5; 
+    [x:=a+b]^1;
+    [y=b+z]^2;
+    [z=a*y]^3;
+    while [y>a+b]^4 do(
+          [a:=a+1]^5;
           [x:=a+b]^6)
 
 The following table demonstrates results of Kill and Gen functions:

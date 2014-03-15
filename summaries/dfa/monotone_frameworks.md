@@ -1,6 +1,7 @@
 Title: Monotone Frameworks
 Date: 26.01.2014
-Category: Data Flow Analysis
+Category: II. Data Flow Analysis
+Tags: pelican, publishing
 Tags: pelican, publishing
 Author: Nandor Licker
 Summary: Monotone Frameworks

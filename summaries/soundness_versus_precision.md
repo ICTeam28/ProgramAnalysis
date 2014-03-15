@@ -1,6 +1,6 @@
 Title: Soundness versus precision
 Date: 02.02.2014
-Category: Static and Dynamic Analysis
+Category: I. Static and Dynamic Analysis
 Tags: pelican, publishing
 Author: Ilija Radosavovic
 Summary: Comparison between static and dynamic analysis

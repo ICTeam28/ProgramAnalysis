@@ -1,31 +1,32 @@
 Title: Live Variable Analysis
 Date: 29.01.2014
-Category: Data Flow Analysis
+Category: II. Data Flow Analysis
+Tags: pelican, publishing
 Tags: pelican, publishing
 Author: Nandor Licker
 Summary: Live Variable Analysis and its applications in program optimisation
 
-Live Variable Analysis is used to determine which variables defined at a certain 
-point in a program are going to be used later on. This type of analysis can be 
-used to eliminate assigments to variables whose values are not read or are 
+Live Variable Analysis is used to determine which variables defined at a certain
+point in a program are going to be used later on. This type of analysis can be
+used to eliminate assigments to variables whose values are not read or are
 overwritten.
 
-In the case of live variable Analysis, we have to define 2 functions, _kill_ and 
-_gen_. _kill(i)_ returns the set of variables which are overwritten by a 
-statement and _gen(i)_ returns the set of variables which are used in a 
-statement. The functions are required to compute two sets for each statement, 
-_liveIn_ and _liveOut_. A variable is in _liveOut(i)_ if it is defined at a 
-point in the program and it is going to be used later on. _liveIn(i)_ contains 
-all the variables which are used up to that point. If statement _i_ makes an 
-assignment to a variable which is not in _liveOut(i)_, the statement can be 
-removed as its result is not going to be used [@Nielson]. 
+In the case of live variable Analysis, we have to define 2 functions, _kill_ and
+_gen_. _kill(i)_ returns the set of variables which are overwritten by a
+statement and _gen(i)_ returns the set of variables which are used in a
+statement. The functions are required to compute two sets for each statement,
+_liveIn_ and _liveOut_. A variable is in _liveOut(i)_ if it is defined at a
+point in the program and it is going to be used later on. _liveIn(i)_ contains
+all the variables which are used up to that point. If statement _i_ makes an
+assignment to a variable which is not in _liveOut(i)_, the statement can be
+removed as its result is not going to be used [@Nielson].
 
 The two sets, which can be computed using chaotic iteration, are defined as
 follows:
 
 $$
 \begin{aligned}
-  liveOut(i) & = 
+  liveOut(i) & =
     \begin{cases}
       \emptyset & \text{if } i \text{ is the last statement}\\\\
       \underset{j \in prev(i)}{\bigcup} liveIn(j) & \text{otherwise}
@@ -67,17 +68,17 @@ By solving the system of equations using chaotic iteration, we get:
 Assignment of variables to registers/memory locations
 =====================================================
 
-If two variables are live at the same point in a program, they need to be 
+If two variables are live at the same point in a program, they need to be
 allocated to different registers or they need to be placed in different
-locations in memory. Allocation can be optimised by building an 
-*interference graph* from the results of the analysis where nodes represent 
-variables and the edges are placed between  the variables which cannot be 
-allocated to the same location. To determine the optimal allocation, the 
-*minimal coloring of the graph* has to be  determined. Unfortunaly, this problem 
-has been proven to be NP-Complete[@Karp]. Assuming P does not equal NP, there is 
-no feasible solution to compute an optimal assignment in reasonable time. 
-Fortunately, there are some heuristic algorithms which can provide a good 
-distribution [@Brelaz]. In the simulation, we have implemented the 
+locations in memory. Allocation can be optimised by building an
+*interference graph* from the results of the analysis where nodes represent
+variables and the edges are placed between  the variables which cannot be
+allocated to the same location. To determine the optimal allocation, the
+*minimal coloring of the graph* has to be  determined. Unfortunaly, this problem
+has been proven to be NP-Complete[@Karp]. Assuming P does not equal NP, there is
+no feasible solution to compute an optimal assignment in reasonable time.
+Fortunately, there are some heuristic algorithms which can provide a good
+distribution [@Brelaz]. In the simulation, we have implemented the
 *Welsh-Powell* algorithm [@Wellsh].
 
 ![Interference Graph](../images/igraph.png)

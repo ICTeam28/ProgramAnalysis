@@ -1,6 +1,7 @@
 Title: Code Hoisting
 Date: 2014-03-15 03:37
-Category: Data Flow Analysis
+Category: II. Data Flow Analysis
+Tags: pelican, publishing
 Tags: pelican, publishing
 Author: Ilija Radosavovic
 Summary: Code Hoisting

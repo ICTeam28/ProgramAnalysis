@@ -1,6 +1,7 @@
 Title: Very Busy Expressions
-Date: 2014-03-14 20:06 
-Category: Data Flow Analysis
+Date: 2014-03-14 20:06
+Category: II. Data Flow Analysis
+Tags: pelican, publishing
 Tags: pelican, publishing
 Author: Ilija Radosavovic
 Summary: Very Busy Expressions
@@ -15,7 +16,7 @@ which expressions must be *very busy* at the exit from the point. [@Nielson]
 Very Busy Expressions analysis are used for *code hoisting*. (create link to hoisting page)
 For example, if at a block of the program we have an expression which is definitely going to be
 evaluated later in the program, no matter which path is taken, we can evaluate
-that expression at the end of the block and store its value for later use, 
+that expression at the end of the block and store its value for later use,
 and thus reduce the size of the generated code.
 
 Data flow equations:
@@ -36,10 +37,10 @@ An expression is killed by the block if any of the variables occurring in it are
 
 Consider the following program:
 
-    if[a>b]^1 
-      then ([x:=b-a]^2 
-            [y:=a-b]^3 
-      else ([y:=b-a]^4 
+    if[a>b]^1
+      then ([x:=b-a]^2
+            [y:=a-b]^3
+      else ([y:=b-a]^4
             [x:=a-b]^5)
 
 Computing Kill and Gen functions we get:
@@ -47,7 +48,7 @@ Computing Kill and Gen functions we get:
 |<center>$l$</center>|<center>Kill($l$)</center> | <center>Gen($l$)<center/>  |
 |:--:|:----------:|:-------------:|
 | 1 | $\\{\\}$   | $\\{\\}$      |
-| 2 | $\\{\\}$   | $\\{b-a\\}$ | 
+| 2 | $\\{\\}$   | $\\{b-a\\}$ |
 | 3 | $\\{\\}$   | $\\{a-b\\}$ |
 | 4 | $\\{\\}$   | $\\{b-a\\}$ |
 | 5 | $\\{\\}$   | $\\{a-b\\}$ |
@@ -60,7 +61,7 @@ $$
     VBentry(2) & = VBexit(2) \bigcup \\{b-a\\} \\\\
     VBentry(3) & = \\{a-b\\} \\\\
     VBentry(4) & = VBexit(4) \bigcup \\{b-a\\} \\\\
-    VBentry(5) & = \\{a-b\\} \\\\ 
+    VBentry(5) & = \\{a-b\\} \\\\
   \end{aligned}
 $$
 
