@@ -5,8 +5,6 @@ Tags: pelican, publishing
 Author: Ilija Radosavovic
 Summary: Patriot Missile System
 
-<!--picture formatting broken-->
-
 Patriot Missile system was a surface-to-air system used by the United States army,
 originally designed to protect against Soviet cruise missiles and medium to high attitude
 aircrafts. During the Gulf War in the early 1990's it was used in the Operation Desert Storm
@@ -14,7 +12,7 @@ as a part of the Patriot missile air defence system. Patriot battalions were pla
 strategic positions in order to defend military personnel and citizens against Scud missiles
 launched by Iraqi forces.[@Lum]
 
-<!--![PratriotSystem](../images/Patriot_missile_launch_b.jpg){: style="float:right"}-->
+![PratriotSystem](../images/Patriot_missile_launch_b.jpg)
 
 Patriots weapon control computer operates in several stages:    
 1. Based on information such as velocity, longitude and latitude system searches for objects with Scud missile characteristics on its radar.    
@@ -23,16 +21,16 @@ Patriots weapon control computer operates in several stages:
 
 The following figure shows correctly calculated range area:    
 
-<!--![PratriotCorrect](../images/patriot_correct.gif){: style="float:right"}-->
+![PratriotCorrect](../images/patriot_correct.gif)
 
 In February of 1991, the Israeli troops had discovered that if systems runs for too long, it becomes inaccurate.
 After the Patriot System has been in operation for more than 8 consecutive hours, system's radar range gate shifts by significant 20%:    
 
-<!--![Pratriot8h](../images/patriot_8h.gif){: style="float:right"}-->
+![Pratriot8h](../images/patriot_8h.gif)
 
 After 20 hours of continuous use, the inaccurate time calculation becomes sufficiently large to cause the radar to look for the target in the wrong place:    
 
-<!--![PratriotInorrect](../images/patriot_incorrect.gif){: style="float:right"}-->
+![PratriotInorrect](../images/patriot_incorrect.gif)
 
 On February 25th 1991, at Dhahran, the system had been running for over 100 hours and had failed to intercept an incoming SCUD missile.
 The SCUD missile hit an army barracks, which resulted in deaths of 28 people. 

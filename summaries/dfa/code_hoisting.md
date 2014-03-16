@@ -14,13 +14,13 @@ which expressions are going to be evaluated later in the program no matter which
 Thus, in order to reduce the size of the code generated for the program, we can evaluate these expressions
 at the end of the block and store their values for later use in the program.
 
-Consider the following diagram: (formatting broken)
+Consider the following diagram: 
 
-![Pre](../images/HoistingPre.png){: style="float:right"}
+![Pre](../images/HoistingPre.png)
 
 By precomputing $\\{a-b\\}$ and $\\{b-a\\}$ and moving them to the earlier block, we get:
 
-![Pre](../images/HoistingPost.png){: style="float:right"}
+![Pre](../images/HoistingPost.png)
 
 However, depending on the nature of the program *hoisting* can have different effects on execution time,
 and does not guarantee improvements in terms of speed. Thus, the resulting program may be the same speed as
