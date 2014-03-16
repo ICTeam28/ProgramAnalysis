@@ -35,7 +35,7 @@ Consider the following program:
 
 The following table demonstrates results of Kill and Gen functions:
 
-|<center>$l$</center>| <center>Kill(l)</center> | <center>Gen(l)</center> |
+|<center>$l$</center>| <center>Kill($l$)</center> | <center>Gen($l$)</center> |
 |:-:|:-----------------:|:---------------:|
 | 1 | $\\{\\}$          | $\\{a+b\\}$     |
 | 2 | $\\{\\}$          | $\\{b+z\\}$     |
