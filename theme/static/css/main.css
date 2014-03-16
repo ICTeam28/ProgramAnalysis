@@ -65,10 +65,10 @@ article {
   padding-right: 50px;
   padding-bottom: 50px;
   border: 2px solid #EEE;
-  border-radius:         5px;
   -webkit-border-radius: 5px;
   -moz-border-radius:    5px;
   -ms-border-radius:     5px;
+  border-radius:         5px;
   font-size: 18px!important;
 }
 
@@ -85,6 +85,12 @@ article div.article-author {
   margin-top: 0;
   margin-bottom: 30px;
   font-size: 14px;
+}
+
+article img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 
