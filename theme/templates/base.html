@@ -35,6 +35,10 @@
     (function () {
       $(function () {
         var demo = $("#demo");
+        demo.on('load', function ()
+        {
+          demo.contents().find("#btn-back").remove();
+        });
 
         var resize = function () {
           var height = parseInt($(window).height()) - parseInt($(".navbar").outerHeight()) - 2;
