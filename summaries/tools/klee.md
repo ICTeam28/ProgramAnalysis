@@ -120,10 +120,10 @@ KLEE immediately reported the following errors:
     KLEE: ERROR: test.c:30: memory error: out of bound pointer
     KLEE: ERROR: test.c:43: divide by zero
 
-The code was rewritten in order to fix buffer overflows & null pointer
-divisions. It should be noted that itoa would still crash if it receives an
-empty string (buf = NULL, max = 0), as it would write '\0' to address buf - 1.
-This case wasn't detected by KLEE.
+The code was rewritten in order to fix buffer overflows & division by zero.
+It should be noted that itoa would still crash if it receives an empty string
+(buf = NULL, max = 0), as it would write '\0' to address buf - 1. This case
+was not detected by KLEE.
 
     int atoi(const char *str)
     {
