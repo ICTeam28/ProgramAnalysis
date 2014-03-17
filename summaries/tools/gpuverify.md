@@ -41,7 +41,7 @@ and we illustrate what happens when two threads increment the same variable:
 | write A = a                 | increment a'               | 6 | 6 | 6  |
 |                             | write A = a                | 6 | 6 | 6  |
 
-In the end, the value of A will be 6 due to the unfortunate sheduling of
+In the end, the value of A will be 6 due to the unfortunate scheduling of
 operations and lack of synchronisation.
 
 The following piece of OpenCL code suffers from the issue presented earlier:
