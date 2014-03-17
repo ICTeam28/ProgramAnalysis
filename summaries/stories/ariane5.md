@@ -1,4 +1,4 @@
-Title: Ariane-5 Rocket
+Title: Ariane 5
 Date: 2014-03-16 07:26
 Category: III. Lessons from History
 Tags: pelican, publishing
@@ -6,8 +6,8 @@ Author: Ilija Radosavovic
 Summary: Ariane 5
 
 Ariane 5 is, as part of Ariane rocket family, an expendable launch system used
-to deliver payloads into geostationary transfer orbit or Low Earth orbit. 
-Ariane 5 succeeded Ariane 4, but was not derived from it directly. 
+to deliver payloads into geostationary transfer orbit or Low Earth orbit.
+Ariane 5 succeeded Ariane 4, but was not derived from it directly.
 Development process took ten years and costed $7 bilion.[@Wiki]
      
      
@@ -31,7 +31,6 @@ integer.[@Douglas] The floating point number that was converted had a value grat
 than the 32768, the maximal value that could be represented using 16 bits, thus
 the conversion failed. Furthermore, since the backup system was running the same
 software, it could not prevent the failure. 
-
 
 
 
