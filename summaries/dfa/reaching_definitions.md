@@ -72,20 +72,20 @@ The following table demonstrates results of gen and kill functions applied to th
 
 
 |<center>$l$</center> | <center>Gen($l$)</center> | <center>Kill($l$)</center> |
-|:-:|:------:|:-------:|
-| 1 | $(x,1)$  |       |
-| 2 | $(y,2)$  |        |
-| 3 | $(x,3)$  | $(x,1)$  |
-| 4 |         |         |
-| 5 | $(y,5)$  |  $(y,2)$  |
-| 6 | $(x,6)$  |  $(x,3)$  |
+|:-:|:--------:|:-------:|
+| 1 | $(x,1)$  |         |
+| 2 | $(y,2)$  |         |
+| 3 | $(x,3)$  | $(x,1)$ |
+| 4 |          |         |
+| 5 | $(y,5)$  | $(y,2)$ |
+| 6 | $(x,6)$  | $(x,3)$ |
 
 
  Finally, we use chaotic iteration to compute the solution:    
 
 |<center>$l$</center> |  <center>RDentry($l$)</center>   |   <center>RDexit($l$)</center>   |
-|:-:|:-------------------------:|:-------------------------:|
-| 1 |                           | $\\{(x,1)\\}$                   |
+|:-:|:-------------------------------:|:-------------------------------:|
+| 1 |                                 | $\\{(x,1)\\}$                   |
 | 2 | $\\{(x,1)\\}$                   | $\\{(x,1),(y,2)\\}$             |
 | 3 | $\\{(x,1),(y,2)\\}$             | $\\{(x,3),(y,2)\\}$             |
 | 4 | $\\{(x,3),(y,2),(y,5),(x,6)\\}$ | $\\{(x,3),(y,2),(y,5),(x,6)\\}$ |
@@ -95,7 +95,7 @@ The following table demonstrates results of gen and kill functions applied to th
 
 References
 ========================================
-[@Nielson "Nielson, Flemming, Hanne R. Nielson, and Chris Hankin. Principles of program analysis. Springer, 1999. Page 40-50"]: http://www2.imm.dtu.dk/~hrni/PPA/ppa.html
+[@Nielson "Nielson, Flemming, Hanne R. Nielson, and Chris Hankin. Principles of program analysis. Springer, 1999. Page 41-44"]: http://www2.imm.dtu.dk/~hrni/PPA/ppa.html
 [@Wiklicky "Herbert Wiklicky, 2013, C470: Program Analysis, Imperial College London"]: http://www.doc.ic.ac.uk/~herbert/teaching/DataFlow.pdf
 [@Ullman "Jeffrey Ullman, Shih-wie Liao, Darlene Hadding, Pokey Rule, John Whaley, Joseph Wen, Keith Siilats, 2013, CS243: Program Analysis and Optimisation, Stanford University"]: http://www.stanford.edu/class/cs243/lectures/l2-DFA1.pdf
 
