@@ -22,18 +22,17 @@ Race conditions
 Multiplying two matrices together is a common task in computer science, so
 we have tried to implement the operation on the GPU. The first implementation
 we are going to present contains an obvious mistake: the product of two elements
-from A and B is added to an element in matrix C, but there is no
-synchronisation. We could have *k* threads trying to increment the same
-variable, providing incorrect results.
+from A and B is added to an element in matrix C  without synchronisation.
+We could have *k* threads trying to increment the same variable at the same
+time, generating incorrect results.
 
-
-This is a classic issue in concurrent programming: when two threads try to
-increment a shared variable, they might both read in the same value, increment
-it and write back the wrong value. Instead of computing a + 2, they will store
-a + 1 in memory.
+This is a classic issue in concurrent programming: when two or more threads try
+to increment a shared variable, they might both read in the same value, i
+ncrement it and write back a wrong value: instead of computing a + 2, they
+would store a + 1 in memory.
 
 In the following example, we assume that the initial value of variable A is 5
-and we illustrate what happens when two threads increment the same value:
+and we illustrate what happens when two threads increment the same variable:
 
 | <center>Thread #0</ccenter> | <center>Thread #1</center> | A | a | a' |
 |:---------------------------:|:--------------------------:|:-:|:-:|:--:|
@@ -45,8 +44,7 @@ and we illustrate what happens when two threads increment the same value:
 In the end, the value of A will be 6 due to the unfortunate sheduling of
 operations and lack of synchronisation.
 
-The following piece of code is an example of the synchronisation issue
-presented earlier:
+The following piece of OpenCL code suffers from the issue presented earlier:
 
     /**
      * Multiplies two matrices together.
@@ -71,6 +69,7 @@ presented earlier:
       int j = get_local_id(1);
       int k = get_local_id(2);
 
+      // Bad, bad code!
       matC[i * p + j] += matA[i * m + k] * matB[k * p + j];
     }
 
@@ -79,7 +78,7 @@ We ran GPUVerify on the kernel:
     gpuverify --local_size=[8,8,8] --global_size=[512,512,512] multiply.cl
 
 
-And it immediately detected that multiply threads might attempt to increment
+And it immediately detected that multiple threads might attempt to increment
 the same variable:
 
     add.cl: error: possible write-write race on ((char*)matC)[0]:
@@ -99,20 +98,20 @@ Atomic operations
 -----------------
 
 The fastest solution to this problem is to use atomic operations. Atomic
-operations are a bit slower than unsynchronised ones, but they are still faster
-than mutexes or semaphores. On most platforms, they are implemented using an
-instruction similar to CMPXCHG [@Intel] - CoMPare and eXCHanGe (or atomic_xchg
-in OpenCL[@AtomicXCHG]). Compare and exchange usually works with three
-parameters: a memory location, an old value and a new value. It reads in the
-value from the memory location and compares it with the old value. If they are
-equal, the new value is written to memory. To implement atomic addition, one
-has to read in the value from memory, increment it and then use CMPXCHG to update
-the variable. If the comparison fails, it means that another thread managed
-to increment the variable first, so the current thread has to try again by
-incrementing the updated value. If the comparison succeds, it means that no
-other threads accessed the memory location and we can safely store the new value.
+operations are a bit slower than the unsynchronised ones, but they are still
+faster than mutexes or semaphores. On most platforms, they are implemented using
+an instruction similar to CMPXCHG [@Intel] - CoMPare and eXCHanGe (or atomic_xchg
+in OpenCL[@AtomicXCHG]). Compare and exchange usually works with three parameters:
+a memory location, an old value and a new value. It reads in the value from the
+memory location and compares it with the old value. If they are equal, the new
+value is written to memory. To implement atomic addition, one has to read in the
+value from memory, increment it and then use CMPXCHG to update the variable. If
+the comparison fails, it means that another thread managed to increment the
+variable first, so the current thread has to try again by incrementing the
+updated value. If the comparison succeds, it means that no other threads
+accessed the memory location and we can safely store the new value.
 
-The following is an example on how the atomic addition could be implemented on
+The following is an example on how atomic addition could be implemented on
 an Intel CPU, using the lock prefix to guarantee atomicity:
 
       ; void atomic_add(int64_t *ptr, int64_t val)
@@ -126,23 +125,23 @@ an Intel CPU, using the lock prefix to guarantee atomicity:
 
           mov           rbx, [rbp + 16]
           mov           rcx, [rbp + 24]
-          mov           rax, [rbx]        ; read value from memory
+          mov           rax, [rbx]       ; read value from memory
 
       .loop:
-          lea           rdx, [rax + rcx]  ; compute incremented value
-          lock cmpxchg  [rbx], rdx        ; try doing the swap
-          jnz           .loop             ; if comparison fails, repeat
+          lea           rdx, [rax + rcx] ; compute incremented value
+          lock cmpxchg  [rbx], rdx       ; try doing the swap
+          jnz           .loop            ; if comparison fails, repeat
 
           pop           rdx
           pop           rcx
           pop           rbx
 
-          ret                             ; initial value is returned in rax
+          ret                            ; initial value is returned in rax
 
 Working example
 ---------------
 
-We have replaced the addition with an atomic addition: [@AtomicADD]
+We have replaced the normal addition with atomic addition:
 
     /**
      * Multiplies two matrices together.
