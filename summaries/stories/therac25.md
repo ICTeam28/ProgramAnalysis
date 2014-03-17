@@ -8,7 +8,7 @@ Summary: Therac 25
 The Therac-25 was a computer-controlled linear accelerator used for radiation
 therapy produced by Atomic Energy of Canada Limited (AECL).
 
-![Therac25](../images/therac25.jpg "http://1.bp.blogspot.com/_EVf-pfwip2k/TDLaHtDmRgI/AAAAAAAAAGM/me4FE4TiceM/s1600/thumb-21367-radiation_therapy.JPG")
+![Therac25](images/therac25.jpg "http://1.bp.blogspot.com/_EVf-pfwip2k/TDLaHtDmRgI/AAAAAAAAAGM/me4FE4TiceM/s1600/thumb-21367-radiation_therapy.JPG")
 
 <!-- What went wrong? -->
 
@@ -17,7 +17,7 @@ bug which caused the machine to deliver fatal overdoses of radiation.[@Muffy]
 
 todo
 
-![Diagram](../images/therac25-diagram.png "http://radonc.wikidot.com/localfiles/radiation-accident-therac25/Therac25.png")
+![Diagram](images/therac25-diagram.png "http://radonc.wikidot.com/localfiles/radiation-accident-therac25/Therac25.png")
 
 <!-- Consequences -->
 
