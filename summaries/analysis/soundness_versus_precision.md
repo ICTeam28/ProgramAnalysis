@@ -8,7 +8,7 @@ Summary: Comparison between static and dynamic analysis
 
 Static and Dynamic analysis developed side by side in different communities and
 have been regarded as distinct disciplines. Furthermore, the domains in which
-one of them shines represent the nightmare for the other. [@Ref]
+one of them shines represent the nightmare for the other. [@Ernst]
 
 Static Analysis inspects program code, and strives to conclude all possible
 outcomes of program execution. The most common static analyses are compiler
@@ -53,4 +53,7 @@ Traditionally, static and dynamic analysis have been viewed as distinct
 approaches with different techniques. However, static and dynamic analysis can
 interact by enhancing each other, and blending the strengths of both approaches.
 
-[@Ref "Static and dynamic analysis: synergy and duality"]: http://homes.cs.washington.edu/~mernst/pubs/staticdynamic-woda2003.pdf
+
+References
+==========
+[@Ernst "Michael D. Ernst. Static and dynamic analysis: synergy and duality.  WODA 2003: Workshop on Dynamic Analysis, (Portland, Oregon), May 9, 2003"]: http://homes.cs.washington.edu/~mernst/pubs/staticdynamic-woda2003.pdf
