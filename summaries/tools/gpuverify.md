@@ -112,7 +112,7 @@ updated value. If the comparison succeds, it means that no other threads
 accessed the memory location and we can safely store the new value.
 
 The following is an example on how atomic addition could be implemented on
-an Intel CPU, using the lock prefix to guarantee atomicity:
+an Intel CPU, using the lock prefix to guarantee atomicity: [@AtomicADD]
 
       ; void atomic_add(int64_t *ptr, int64_t val)
       atomic_add:
