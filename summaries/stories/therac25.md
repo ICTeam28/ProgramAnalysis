@@ -18,7 +18,7 @@ and safety mechanics were retained in the hardware.
 The Therac-25 was designed to be much more compact and efficient which meant that most
 of the hardware safety features and interlocks were instead implemented with software.
 
-![Therac25](../images/therac25.jpg "http://1.bp.blogspot.com/_EVf-pfwip2k/TDLaHtDmRgI/AAAAAAAAAGM/me4FE4TiceM/s1600/thumb-21367-radiation_therapy.JPG")
+![Therac25](images/therac25.jpg "http://1.bp.blogspot.com/_EVf-pfwip2k/TDLaHtDmRgI/AAAAAAAAAGM/me4FE4TiceM/s1600/thumb-21367-radiation_therapy.JPG")
 
 <!-- What went wrong? -->
 
@@ -33,7 +33,7 @@ Due to a program error, the software interlock could fail due to a race conditio
 byte counter frequently overflowed and if an operator entered input at exactly the moment
 when the counter overflowed, the software interlock would fail to intervene.[@Wiki]
 
-![Therac25Diagram](../images/therac25-diagram.png "http://radonc.wikidot.com/localfiles/radiation-accident-therac25/Therac25.png")
+![Therac25Diagram](images/therac25-diagram.png "http://radonc.wikidot.com/localfiles/radiation-accident-therac25/Therac25.png")
 
 <!-- Lessons -->
 
@@ -42,7 +42,6 @@ safe in critical programs where lives are at stake. Leveson notes that "A naive 
 
 References
 ==========
-
 [@Muffy "The Story of the Therac-25 in LOTOS"]: http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.298.4751&rep=rep1&type=pdf
 [@Wiki "Wikipedia - Therac-25"]: http://en.wikipedia.org/wiki/Therac-25
 [@Leveson "Medical Devices: The Therac-25"]: http://sunnyday.mit.edu/papers/therac.pdf

@@ -11,7 +11,7 @@ The developers of the project claim that Astree is sound (it can detect all the
 possible runtime errors) and automatic (requires no additional annotations to
 the source code). However, the rate of false positives is quite high (10-20% of
 the statements). It is also one of the few static analysers which can
-efficiently scale up to the sizes of real-world applications which span hundreds
+efficiently scale up to the size of real-world applications which span hundreds
 of thousands of lines of code. [@Astree]
 
 The tool mostly checks for undefined behaviour in C programs. Undefined

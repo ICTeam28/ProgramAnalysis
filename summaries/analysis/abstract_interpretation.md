@@ -1,5 +1,5 @@
 Title: Abstract Interpretation
-Date: 01.02.2014
+Date: 03.02.2014
 Category: I. Static and Dynamic Analysis
 Tags: pelican, publishing
 Author: Nandor Licker

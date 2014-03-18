@@ -78,16 +78,15 @@ $$
 Using Chaotic Iteration, we compute the solution:
 
 |<center>$l$</center>| <center>VBentry($l$)</center> | <center>VBexit($l$)</center>  |
-|:--:|:------------------:|:-----------------:|
-| 1 | $\\{a-b,b-a\\}$ | $\\{a-b,b-a\\}$|
-| 2 | $\\{a-b,b-a\\}$ | $\\{a-b\\}$      |
-| 3 | $\\{a-b\\}$       | $\\{\\}$           |
-| 4 | $\\{a-b,b-a\\}$ | $\\{a-b\\}$      |
-| 5 | $\\{a-b\\}$       | $\\{\\}$           |
+|:-:|:---------------:|:---------------:|
+| 1 | $\\{a-b,b-a\\}$ | $\\{a-b,b-a\\}$ |
+| 2 | $\\{a-b,b-a\\}$ | $\\{a-b\\}$     |
+| 3 | $\\{a-b\\}$     | $\\{\\}$        |
+| 4 | $\\{a-b,b-a\\}$ | $\\{a-b\\}$     |
+| 5 | $\\{a-b\\}$     | $\\{\\}$        |
 
 
 
 References
 ==========
-
-[@Nielson "Nielson, Flemming, Hanne R. Nielson, and Chris Hankin. Principles of program analysis. Springer, 1999."]: http://www2.imm.dtu.dk/~hrni/PPA/ppa.html
+[@Nielson "Nielson, Flemming, Hanne R. Nielson, and Chris Hankin. Principles of program analysis. Springer, 1999. Page 44-47"]: http://www2.imm.dtu.dk/~hrni/PPA/ppa.html
