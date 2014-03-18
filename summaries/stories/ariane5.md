@@ -30,8 +30,11 @@ velocity of the rocket with respect to the platform, was converted to a 16 bit s
 integer.[@Douglas] The floating point number that was converted had a value grater
 than the 32 768, the maximal value that could be represented using 16 bits, thus
 the conversion failed. Furthermore, since the backup system was running the same
-software, it could not prevent the failure.
+software, it could not prevent the failure.    
 
+The Ada code, which caused the operand error, is shown in the following picture:    
+     
+![ariane5_adacode](images/ariane5_adacode.png)
 
 
 References
