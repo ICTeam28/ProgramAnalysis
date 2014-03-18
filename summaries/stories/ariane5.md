@@ -70,7 +70,6 @@ a few lines of code:
      P_M_DERIVE(T_ALG.E_BV) := UC_16S_EN_16NS(TBD.T_ENTIER_16S(L_M_BV_32));
     end if;
 
-    -- Fixed code, vertical and horizontal components are treated the same way
     L_M_BH_32 := TBD.T_ENTIER_16S((1.0 / C_M_LSB_BH) *
                                        G_M_INFO_DERIVE(T_ALG.E_BH));
     if L_M_BH_32 > 32767 then
