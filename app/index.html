@@ -22,6 +22,40 @@
     <ul id="preset" style="display:none">
       <li data-id="edit" data-name="Last Edited">
       </li>
+      <li data-id="apple" data-name="Apple bug">
+func isEven(x) {
+  return x % 2 == 0;
+}
+
+func isSquare(x) {
+  y = 1;
+  while (y * y < x) {
+    y = y + 1;
+  }
+  if (y * y == x) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+func isSquareEven(x) {
+  status = 1;
+  if (!isEven(x)) {
+    status = 0;
+    goto fail;
+  }
+
+  goto fail;
+  if (!isSquare(x)) {
+    status = 0;
+    goto fail;
+  }
+
+fail:
+  return status;
+}
+      </li>
       <li data-id="sum" data-name="Sum">
 func sum(x, y, z) {
   return x + y + z;
