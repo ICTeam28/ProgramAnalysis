@@ -21,7 +21,7 @@ became queued up, causing the primary server to fail within 30 minutes. Once the
 primary server failed, all applications were transferred to the back-up server,
 which ended up failing because of the same exact race condition that plagued the
 primary server. The server failures caused a slowdown of the refresh rate of the
-operators' consoles to a minute per screen compared to the usual 1-3 seconds.
+operators' consoles to a minute per screen compared to the usual 1-3 seconds.[@Wiki]
 
 There were at least eleven fatalities which had a connection to the blackout, which
 would have been easily preventable had there been proper checks of the software before
@@ -31,4 +31,4 @@ condition and allowed GE Energy to fix the problem.
 References
 ==========
 [@SecurityFocus "Software Bug Contributed to Blackout"]: http://www.securityfocus.com/news/8016
-[@Blog "Blackout: What's wrong with the American grid"]: http://boingboing.net/2012/08/03/blackout-whats-wrong-with-t.html
+[@Wiki "Northeast blackout of 2003"]: http://en.wikipedia.org/wiki/Northeast_blackout_of_2003
