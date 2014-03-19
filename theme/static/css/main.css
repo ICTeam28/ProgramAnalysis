@@ -1,31 +1,36 @@
 body, html {
   padding: 0;
   margin: 0;
+  height: 100%;
 }
 
 body {
   height: 100%;
   width: 100%;
-  font-family: 'Fenix', serif!important;
-  font-size: 16px!important;
   padding-top: 0;
 }
 
 /* Home */
 /********/
 /* Hero */
-header {
-  height: 230px;
+#hero {
   padding: 20px;
   text-align: center;
   background-color: #222;
   color: #ffffff;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+  position: relative;
 }
 /* Categories */
 section {
   background-color: #FEFEFE!important;
   border: solid 1px #222;
+  width: 90%;               /* fallback for browsers without support for calc() */
+  width: calc(100% - 80px);
 }
 section.category-picture {
   background: no-repeat;
@@ -50,6 +55,8 @@ section.category-intro {
   padding: 10px 50px;
   padding-top: 50px;
   padding-bottom: 50px;
+  font-family: 'Fenix', serif!important;
+  font-size: 16px!important;
 }
 
 .cite-highlight {
@@ -72,6 +79,7 @@ article {
   -ms-border-radius:     5px;
   border-radius:         5px;
   font-size: 18px!important;
+  font-family: 'Fenix', serif!important;
 }
 
 article div.article-title h1 {

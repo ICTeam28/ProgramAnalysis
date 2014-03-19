@@ -62,7 +62,7 @@ The following piece of OpenCL code suffers from the issue presented earlier:
                                , int p
                                , __global __read_only   long *matA
                                , __global __read_only   long *matB
-                               , __global __write_only  long *matC
+                               , __global               long *matC
                                )
     {
       int i = get_local_id(0);
@@ -159,7 +159,7 @@ We have replaced the normal addition with atomic addition:
                                 , int p
                                 , __global __read_only   int *matA
                                 , __global __read_only   int *matB
-                                , __global __write_only  int *matC
+                                , __global               int *matC
                                 )
     {
       int i = get_local_id(0);

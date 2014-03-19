@@ -13,7 +13,7 @@ from plugins import citations, latex
 PLUGINS = [citations,latex]
 
 SITENAME = 'Program Analysis: Analysis'
-SITEURL = 'http://www.doc.ic.ac.uk/project/2013/163/g12163xx/web/'
+SITEURL = 'http://www.doc.ic.ac.uk/project/2013/163/g12163xx/web'
 DEFAULT_LANG = u'en'
 DEFAULT_PAGINATION = False
 ARTICLE_DIR = './summaries/'
@@ -28,6 +28,8 @@ APP_DIR = './app/'
 DEPENDENCY_DIR_JS = './script'
 DEPENDENCY_DIR_CSS = './style'
 DEPENDENCY_DIR_IMAGES = './images'
+
+shutil.rmtree(OUTPUT_DIR)
 
 shutil.copytree(APP_DIR, OUTPUT_DIR + APP_DIR)
 shutil.copytree(DEPENDENCY_DIR_JS, OUTPUT_DIR + DEPENDENCY_DIR_JS)
