@@ -23,7 +23,7 @@ By precomputing $\\{a-b\\}$ and $\\{b-a\\}$ and moving them to the earlier block
 ![Pre](images/HoistingPost.png)
 
 However, depending on the nature of the program *hoisting* can have different effects on execution time,
-and does not guarantee improvements in terms of speed. Thus, the resulting program may be the same speed as
+and does not guarantee improvements in terms of speed. Thus, the resulting program may be of the same speed as
 before or even slower.
 
 
