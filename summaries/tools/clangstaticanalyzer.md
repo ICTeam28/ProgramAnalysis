@@ -9,10 +9,8 @@ Clang is a front-end to the LLVM compiler architecture, which is a modularised
 set of libraries used for compiling software. Clang includes a static analyzer
 which is designed to detect runtime bugs in C, C++ and Objective-C code. [@Ted]
 
-Features
-----------
-
-todo
+The analyzer works by performing symbolic execution of a given program where all input values are represented with symbolic values. As a result, every possible
+path through the program is explored.
 
 Usage
 ----------
