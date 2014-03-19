@@ -13,7 +13,7 @@ from plugins import citations, latex
 PLUGINS = [citations,latex]
 
 SITENAME = 'Program Analysis: Analysis'
-SITEURL = 'http://www.doc.ic.ac.uk/project/2013/163/g12163xx/web/'
+SITEURL = 'http://www.doc.ic.ac.uk/project/2013/163/g12163xx/web'
 DEFAULT_LANG = u'en'
 DEFAULT_PAGINATION = False
 ARTICLE_DIR = './summaries/'

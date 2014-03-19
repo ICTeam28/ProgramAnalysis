@@ -1,8 +1,8 @@
 Title: Introduction to Dynamic Compilation
 Date: 2014-03-17
-Author: Nic Prettejohn
+Category: I. Static and Dynamic Analysis
 Tags: pelican, publishing
-Category: I1. Static and Dynamic Analysis
+Author: Nic Prettejohn
 Summary: Dynamic Compilation - Just In Time Compilation
 
 There are two main approaches to executing code: Compilation and interpretation.
@@ -19,9 +19,9 @@ recompile the original source code.
 
 Interpretation
 ==============
-"Interpreted Languages" are programming languages where blocks of the source 
-code are compiled and then executed immediately. Such languages are normally 
-compiled to an intermediatry "byte-code" - platform independent instructions 
+"Interpreted Languages" are programming languages where blocks of the source
+code are compiled and then executed immediately. Such languages are normally
+compiled to an intermediatry "byte-code" - platform independent instructions
 for the interpreter.
 
 
@@ -60,11 +60,11 @@ loops.
 
 These traces correspond to a particular execution of the program, and as a
 consequence cannot contain any control flow splits. Control flow decisions
-must be encoded as "Guard" expressions in the trace so the JIT can fall-back 
+must be encoded as "Guard" expressions in the trace so the JIT can fall-back
 to the interpreter in cases where the guards for the expression aren't met.
 
 ```
-if x == 4:          |  guard(x1 == 4) 
+if x == 4:          |  guard(x1 == 4)
     y=y+x           |  y2 =y1 +x1
 ```
 [@JITHints]
@@ -93,5 +93,5 @@ References
 ==========
 
 [@JITBriefHistory "A Brief History of JIT"]: http://dl.acm.org/citation.cfm?id=857077
-[@JITHints]: 
-[@LuaJIT]: http://luajit.org/performance_x86.html
+[@JITHints "A"]: http://luajit.org/performance_x86.html
+[@LuaJIT "B"]: http://luajit.org/performance_x86.html
