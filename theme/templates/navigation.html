@@ -7,6 +7,9 @@
       {% for page in pages %}
         <li><a href="{{ page.url }}">{{ page.title }}</a></li>
       {% endfor %}
+      {% for category, articles in categories %}
+      <li><a href="#{{ category|replace(' ', '-') }}">{{ category }}</a></li>
+      {% endfor %}
       </ul>
     </div>
   </div>

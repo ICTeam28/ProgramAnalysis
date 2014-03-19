@@ -124,7 +124,6 @@ class MarkdownCitationReader(MarkdownReader):
         content = MarkdownCitationReader.reduce_heading_tag_size(content)
         content = MarkdownCitationReader.bootstrap_tables(content)
 
-
         metadata = self._parse_metadata(self._md.Meta)
 
         if not 'citation' in metadata.keys():

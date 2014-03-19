@@ -2,16 +2,21 @@
 
 {% block content %}
 <header id="hero">
-  <h1>Program Analysis</h1>
+  <div id="hero-container">
+    <h1>Program Analysis</h1>
+  </div>
 </header>
 {% for cat, articles in categories %}
-  <section id="{{ cat|lower }}" class="category-picture parallax" style="background-image:
+  {# <section id="{{ cat|lower }}" class="category-picture parallax" style="background-image:
       url('{{SITEURL}}/theme/images/covers/{{ cat|lower|urlencode}}.jpg');">
-  </section>
-  <section class="category-intro">
+  </section> #}
+  <section id="{{ cat|replace(' ','-')}}" class="category-intro">
     <h2>{{ cat }}</h2>
     <div class="container">
     <div class="row">
+      <div class="col-xs-12 col-sm-4 col-sm-offset-4">
+        <img src="{{SITEURL}}/theme/images/covers/{{ cat|lower|urlencode}}.jpg"/>
+      </div>
       <div class="col-xs-12 col-sm-6">
         {# This is a horrible way to do this #}
         <p>{{ INTROS.get(cat|trim|lower) }}</p>

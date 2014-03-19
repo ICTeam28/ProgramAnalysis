@@ -29,6 +29,8 @@ DEPENDENCY_DIR_JS = './script'
 DEPENDENCY_DIR_CSS = './style'
 DEPENDENCY_DIR_IMAGES = './images'
 
+shutil.rmtree(OUTPUT_DIR)
+
 shutil.copytree(APP_DIR, OUTPUT_DIR + APP_DIR)
 shutil.copytree(DEPENDENCY_DIR_JS, OUTPUT_DIR + DEPENDENCY_DIR_JS)
 shutil.copytree(DEPENDENCY_DIR_CSS, OUTPUT_DIR + DEPENDENCY_DIR_CSS)
