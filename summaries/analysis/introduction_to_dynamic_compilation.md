@@ -14,7 +14,7 @@ A set of languages are referred to as *Compiled languages* if they rely on
 compilation before execution. The source code, written in a higher level
 language such as C, is compiled once to architecture specific machine code.
 The program can then be run an arbitrary number of times without having to
-recompile the original source code.
+recompile the original source code.[@JITBriefHistory]
 
 
 Interpretation
@@ -22,7 +22,7 @@ Interpretation
 "Interpreted Languages" are programming languages where blocks of the source
 code are compiled and then executed immediately. Such languages are normally
 compiled to an intermediatry "byte-code" - platform independent instructions
-for the interpreter.
+for the interpreter.[@JITBriefHistory]
 
 
 Advantages of each approach
@@ -36,7 +36,7 @@ process which grows exponentially with code complexity.
 Programs written in interpreted languages tend to be more portable. The source
 code can be executed on any platform that supports the interpreter. As the
 languages are compiled at run-time, they also have access to platform specific
-information and can optimise for the execution environment.
+information and can optimise for the execution environment.[@JITBriefHistory]
 
 
 Dynamic Compilation (Just-In-Time Compilation)
@@ -45,7 +45,7 @@ Dynamic Compilation or Just-In-Time (JIT) Compilation aims to combine both
 approaches to utilise the benefits of both. As compilation is an expensive
 process, Just-In-Time compilers seek to compile loops where the time gained
 from increased efficiency outweighs the time spent compiling the byte-code to
-machine code.
+machine code.[@JITBriefHistory]
 
 
 Tracing JIT
@@ -76,7 +76,7 @@ Compiling frequently executed loops to native machine code results in dramatic
 improvements in runtime performance.
 
 To take LuaJIT as an example, it showed 134.71x improvement over the standard
-Lua Interpreter (Implemented in C).
+Lua Interpreter (Implemented in C).[@LuaJIT]
 
 | <center>Benchmark</center> | <center>N</center>| <center>Ratio</center>|
 |:--------------:|:--------:|:------:|
@@ -92,6 +92,6 @@ Lua Interpreter (Implemented in C).
 References
 ==========
 
-[@JITBriefHistory "A Brief History of JIT"]: http://dl.acm.org/citation.cfm?id=857077
-[@JITHints "A"]: http://luajit.org/performance_x86.html
-[@LuaJIT "B"]: http://luajit.org/performance_x86.html
+[@JITBriefHistory "A Brief History of Just-In-Time"]: http://dl.acm.org/citation.cfm?id=857077
+[@JITHints "Runtime Feedback in a Meta-Tracing JIT for Efficient Dynamic Languages"]: https://bitbucket.org/pypy/extradoc/raw/extradoc/talk/icooolps2011/jit-hints.pdf
+[@LuaJIT "LuaJIT Performance Benchmarks"]: http://luajit.org/performance_x86.html
