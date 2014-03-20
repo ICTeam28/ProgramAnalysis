@@ -42,13 +42,12 @@ body {
 #hero-inner{
     display: table-cell;
     vertical-align: middle;
-    top: 50%;
 }
 /* Categories */
 section {
   //background-color: #FEFEFE!important;
   //border: solid 1px #222;
-  height: 100%;
+  height: calc(100% - 50px);
 }
 section > .category-wrapper {
   display: table;
@@ -57,9 +56,6 @@ section > .category-wrapper {
 section > .category-wrapper > .category-inner {
   display: table-cell;
   vertical-align: middle;
-}
-section .container {
-  display: block;
 }
 section.category-picture {
   background: no-repeat;
@@ -86,7 +82,6 @@ section.category-picture {
 }
 .category-intro a, .category-intro a:hover, .category-intro a:link, .category-intro a:focus, .category-intro a:visited {
     color: #444;
-    text-decoration: underline;
 }
 .orange {
   background-color: #F48D6C;    
