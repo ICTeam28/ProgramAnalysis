@@ -65,8 +65,8 @@ section.category-picture {
 .red {
   background-color: #F16663;
 }
-a, a:hover, a:link, a:focus, a:visited {
-    color: #FFF;
+.category-intro a, .category-intro a:hover, .category-intro a:link, .category-intro a:focus, .category-intro a:visited {
+    color: #111;
 }
 .orange {
   background-color: #F48D6C;    

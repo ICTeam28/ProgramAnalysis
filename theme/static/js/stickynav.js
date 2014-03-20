@@ -1,5 +1,5 @@
 (function () {
-  var isHomePage = window.location.pathname === '/';
+  var isHomePage = $("#hero").length !== 0;
   var $window = $(window);
   var busy = false;
   var $nav = $('nav.navbar');

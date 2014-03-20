@@ -1,5 +1,5 @@
 Title: Live Variable Analysis
-Date: 29.01.2014
+Date: 2014-03-26 20:06
 Category: II Data Flow Analysis
 Tags: pelican, publishing
 Author: Nandor Licker
