@@ -97,8 +97,9 @@ implemented in C.[@LuaJIT]
 | nsieve-bit     |  12      | 41.25	 |
 
 LuaJIT shows a 134x improvement over the traditional Lua interpreter for
-computing MD5 hashes, a truly incredibly speed improvement achieved by
-compiling the many loops in the md5 hashing algorithm to native code.[@MD5RFC]
+computing MD5 hashes. The JIT can take advantage of the many loops and limited
+control-flow options in the md5 hashing algorithm[@MD5RFC], compiling the logic
+to native code - resulting in the incredible speed improvement.
 
 References
 ==========
