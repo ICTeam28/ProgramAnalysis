@@ -17,11 +17,11 @@
     <h2>{{ cat }}</h2>
     <div class="container">
     <div class="row">
-      <div class="col-xs-12 col-sm-4">
+      <div class="col-xs-12 col-sm-5">
         {# This is a horrible way to do this #}
         <p>{{ INTROS.get(cat|trim|lower) }}</p>
       </div>
-      <div class="col-xs-12 col-sm-4">
+      <div class="col-xs-12 col-sm-3">
         <ol class="list">
 
         {% for article in articles %}
