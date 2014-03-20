@@ -92,12 +92,24 @@ section.category-picture {
 .category-intro pre {
   box-shadow: 0px 0px 15px #000;
 }
+.category-intro ul {
+  padding: 0;
+  list-style-type: none;
+}
+.category-intro li {
+  list-style: none;
+}
+.category-intro li {
+    margin-bottom: 5px;
+}
 .red {
   background-color: #F16663;
 }
 .category-intro a, .category-intro a:hover, .category-intro a:link, 
 .category-intro a:focus, .category-intro a:visited {
-    color: #444;
+    color: #FFF;
+    font-weight: bold;
+    border-bottom 1px #FFF solid;
 }
 .orange {
   background-color: #F48D6C;

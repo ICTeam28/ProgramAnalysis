@@ -25,10 +25,11 @@
         <p>{{ INTROS.get(cat|trim|lower) }}</p>
       </div>
       <div class="col-xs-12 col-sm-3">
+        <h3> Articles </h3>
         <ul class="list">
 
         {% for article in articles %}
-          <li><a href="{{ article.url }}">{{ article.title }}</a></li>
+          <li><a href="{{ article.url }}" title="Read more on {{ article.title }}">{{ article.title }}</a></li>
         {% endfor %}
 
         </ol>
