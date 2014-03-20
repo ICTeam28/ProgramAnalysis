@@ -36,15 +36,23 @@ body {
 #hero-container {
   position: relative;
   z-index: 10;
+  display: table;
+  height: 100%;
+}
+#hero-inner{
+    display: table-cell;
+    vertical-align: middle;
+    top: 50%;
 }
 /* Categories */
 section {
   //background-color: #FEFEFE!important;
-  border: solid 1px #222;
+  //border: solid 1px #222;
   height: 100%;
 }
 section > .category-wrapper {
   display: table;
+  height: 100%;
 }
 section > .category-wrapper > .category-inner {
   display: table-cell;
