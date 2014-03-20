@@ -1,6 +1,6 @@
 Title: V-22 Osprey Crash
 Date: 2014-03-19 13:53
-Category: III. Lessons from History
+Category: III Lessons from History
 Tags: pelican, publishing
 Author: David Avedissian
 Summary: V-22 Osprey Crash
@@ -20,7 +20,7 @@ The Marine Corps then grounded its entire fleet of eight V-22 Ospreys.
 
 ![Osprey](images/osprey.jpg)
 
-Rather than resetting the computer, the software changed the pitch of the rotors.[@NYTimes] 
+Rather than resetting the computer, the software changed the pitch of the rotors.[@NYTimes]
 This was most likely caused by the wrong subroutine being called, which could've
 been solved by proper unit testing and static analysis of the code to ensure that
 all code paths could be reached and pre/post conditions are met.

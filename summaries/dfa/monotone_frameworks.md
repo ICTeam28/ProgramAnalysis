@@ -1,6 +1,6 @@
 Title: Monotone Frameworks
 Date: 26.01.2014
-Category: II. Data Flow Analysis
+Category: II Data Flow Analysis
 Tags: pelican, publishing
 Author: Nandor Licker
 Summary: Monotone Frameworks
@@ -82,7 +82,7 @@ statement in a function), $analysis_\circ$ computes exit conditions,
 $analysis_\bullet$ computes entry conditions and the normal control flow graph
 is used.
 
-For *backward analyses* ([Live Variables](live-variable-analysis.html) and 
+For *backward analyses* ([Live Variables](live-variable-analysis.html) and
 [Very Busy Expressions](very-busy-expressions.html)), TERM is the
 set of exit points (return statements, for example), $analysis_\circ$ computes
 entry conditions, $analysis_\bullet$ computes exit conditions and the reversed

@@ -1,6 +1,6 @@
 Title: Introduction to Dynamic Compilation
 Date: 2014-03-17
-Category: I. Static and Dynamic Analysis
+Category: I Static and Dynamic Analysis
 Tags: pelican, publishing
 Author: Nic Prettejohn
 Summary: Dynamic Compilation - Just In Time Compilation

@@ -1,13 +1,13 @@
 Title: Available Expressions
 Date: 2014-03-12 23:25
-Category: II. Data Flow Analysis
+Category: II Data Flow Analysis
 Tags: pelican, publishing
 Author: Ilija Radosavovic
 Summary: Available Expressions
 
 Expression $a+b$ is said to be $available$ at a point of a program
-if each     
-path from the beginning of the program evaluates $a+b$ and does not modify    
+if each
+path from the beginning of the program evaluates $a+b$ and does not modify
 neither $a$ nor $b$.
 
 *Available Expressions analysis* is useful for global common-subexpression elimination. [@Ullman]

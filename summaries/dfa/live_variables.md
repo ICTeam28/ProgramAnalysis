@@ -1,6 +1,6 @@
 Title: Live Variable Analysis
 Date: 29.01.2014
-Category: II. Data Flow Analysis
+Category: II Data Flow Analysis
 Tags: pelican, publishing
 Author: Nandor Licker
 Summary: Live Variable Analysis and its applications in program optimisation

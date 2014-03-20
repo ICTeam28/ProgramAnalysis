@@ -1,6 +1,6 @@
 Title: Abstract Interpretation
 Date: 03.02.2014
-Category: I. Static and Dynamic Analysis
+Category: I Static and Dynamic Analysis
 Tags: pelican, publishing
 Author: Nandor Licker
 Summary: Abstract interpretation - the french method

@@ -1,6 +1,6 @@
 Title: Very Busy Expressions
 Date: 2014-03-14 20:06
-Category: II. Data Flow Analysis
+Category: II Data Flow Analysis
 Tags: pelican, publishing
 Author: Ilija Radosavovic
 Summary: Very Busy Expressions
@@ -12,7 +12,7 @@ label, the expression is going to be used before any of the variables occurring 
 For each program point, we use the *Very Busy Expressions* analysis in order to determine
 which expressions must be *very busy* at the exit from the point. [@Nielson]
 
-*Very Busy Expressions analysis* is used for 
+*Very Busy Expressions analysis* is used for
 [code hoisting](code-hoisting.html).
 For example, if at a block of the program we have an expression which is definitely going to be
 evaluated later in the program, no matter which path is taken, we can evaluate

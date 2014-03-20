@@ -23,18 +23,18 @@
 
   function resize() {
     requestTick(function() {
-    var scrollTop = $window.scrollTop();
-    var navOffset = $hero.offset().top + $hero.height();
+      var scrollTop = $window.scrollTop();
+      var navOffset = $hero.offset().top + $hero.height();
 
-    if (scrollTop > navOffset){
-      nav.classList.add('navbar-fixed-top');
-      nav.style.top = '0px';
-    }else {
-      nav.classList.remove('navbar-fixed-top');
-      nav.style.top = navOffset + 'px';
-    }
+      if (scrollTop > navOffset){
+        nav.classList.add('navbar-fixed-top');
+        nav.style.top = '0px';
+      }else {
+        nav.classList.remove('navbar-fixed-top');
+        nav.style.top = navOffset + 'px';
+      }
 
-    busy = false;
+      busy = false;
     });
   }
 

@@ -1,6 +1,6 @@
 Title: Northeast Blackout of 2003
 Date: 2014-03-18 17:36
-Category: III. Lessons from History
+Category: III Lessons from History
 Tags: pelican, publishing
 Author: David Avedissian
 Summary: Northeast Blackout of 2003

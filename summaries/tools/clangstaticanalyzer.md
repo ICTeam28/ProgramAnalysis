@@ -1,6 +1,6 @@
 Title: Clang Static Analyzer
 Date: 11.03.2014
-Category: IV. Tools for Program Analysis
+Category: IV Tools for Program Analysis
 Tags: pelican, publishing
 Author: David Avedissian
 Summary: Overview of the Clang Static Analyser

@@ -1,6 +1,6 @@
 Title: Astree
 Date: 11.03.2014
-Category: IV. Tools for Program Analysis
+Category: IV Tools for Program Analysis
 Tags: pelican, publishing
 Author: Nandor Licker
 Summary: Astree is a static analyser based on abstract interpretation
