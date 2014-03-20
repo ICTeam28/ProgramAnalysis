@@ -138,7 +138,7 @@
 
       if (idx === 0) {
         source = localStorage.getItem('source');
-        source = source ? source : $("[data-id=apple]").text();
+        source = source ? source : 'func main() {\n\treturn 0;\n}';
       }
 
       env.source[id] = source;
