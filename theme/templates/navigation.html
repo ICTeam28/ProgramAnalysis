@@ -10,15 +10,15 @@
     </div>
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <div class="navbar-collapse collapse">
-        <ul class="nav navbar-nav">
+        <ul id="thenav" class="nav navbar-nav">
           <li><a href="{{ SITEURL }}">Home</a></li>
           <li><a href="{{ SITEURL }}/app/">Try it for yourself!</a></li>
           {% for page in pages %}
           <li><a href="{{ page.url }}">{{ page.title }}</a></li>
           {% endfor %}
-        {% for category, articles in categories %}
-        <li><a href="{{ SITEURL }}/#{{ category|replace(' ', '-') }}">{{ category }}</a></li>
-        {% endfor %}
+          {% for category, articles in categories %}
+          <li><a href="{{ SITEURL }}/#{{ category|replace(' ', '-') }}">{{ category }}</a></li>
+          {% endfor %}
         </ul>
       </div>
     </div>

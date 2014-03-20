@@ -27,6 +27,11 @@ body {
   position: relative;
 }
 
+#thenav {
+  margin-left: auto!important;
+  margin-right: auto!important;
+  text-align: center;
+}
 #hero-background {
   position: absolute;
   top: 0; left: 0;
