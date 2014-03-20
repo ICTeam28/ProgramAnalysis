@@ -41,6 +41,17 @@ body {
 section {
   //background-color: #FEFEFE!important;
   border: solid 1px #222;
+  height: 100%;
+}
+section > .category-wrapper {
+  display: table;
+}
+section > .category-wrapper > .category-inner {
+  display: table-cell;
+  vertical-align: middle;
+}
+section .container {
+  display: block;
 }
 section.category-picture {
   background: no-repeat;
@@ -66,13 +77,17 @@ section.category-picture {
   background-color: #F16663;
 }
 .category-intro a, .category-intro a:hover, .category-intro a:link, .category-intro a:focus, .category-intro a:visited {
-    color: #111;
+    color: #444;
+    text-decoration: underline;
 }
 .orange {
   background-color: #F48D6C;    
 }
 .yellow {
   background-color: #F2E07B;
+}
+.turquoise {
+  background-color: #037E8C;
 }
 .green {
   background-color: #8ABE9B;
