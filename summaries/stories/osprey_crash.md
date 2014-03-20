@@ -1,5 +1,5 @@
 Title: V-22 Osprey Crash
-Date: 2014-03-19 13:53
+Date: 2014-02-26 13:53
 Category: III Lessons from History
 Tags: pelican, publishing
 Author: David Avedissian
