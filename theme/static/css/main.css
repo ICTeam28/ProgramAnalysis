@@ -16,33 +16,71 @@ body {
 #hero {
   padding: 20px;
   text-align: center;
-  background-color: #222;
+  background-color: #4A6D8B;
   color: #ffffff;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
-  height: 100%;
+  //height: 100%;
+  height: calc(100% - 10px);
   width: 100%;
   left: 0;
   top: 0;
   position: relative;
 }
+
+#hero-background {
+  position: absolute;
+  top: 0; left: 0;
+  z-index: 0;
+}
+
+#hero-container {
+  position: relative;
+  z-index: 10;
+}
 /* Categories */
 section {
-  background-color: #FEFEFE!important;
+  //background-color: #FEFEFE!important;
   border: solid 1px #222;
-  width: 90%;               /* fallback for browsers without support for calc() */
-  width: calc(100% - 80px);
 }
 section.category-picture {
   background: no-repeat;
   background-size: cover;
-  width: 100%;
-  height: 400px;
   -moz-transform: translate3d(0px, 0px, 0px);
   -ms-transform: translate3d(0px, 0px, 0px);
   -webkit-transform: translate3d(0px, 0px, 0px);
   transform: translate3d(0px, 0px, 0px);
   background-position: 50% 50%;
 }
+
+.cover-image img {
+  height: auto;
+  width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+  box-shadow: 0px 0px 15px #000;
+}
+pre {
+  box-shadow: 0px 0px 15px #000;
+}
+.red {
+  background-color: #F16663;
+}
+.red a, .red a:hover, .red a:visited {
+    color: #FFF;
+}
+.orange {
+  background-color: #F48D6C;    
+}
+.yellow {
+  background-color: #F2E07B;
+}
+.green {
+  background-color: #8ABE9B;
+}
+.blue {
+  background-color: #4A6D8B;
+}
+
 section.category-intro {
   display: block;
   -moz-transform: translate3d(0px, 0px, 0px);
@@ -50,13 +88,13 @@ section.category-intro {
   -o-transform: translate3d(0px, 0px, 0px);
   -webkit-transform: translate3d(0px, 0px, 0px);
   transform: translate3d(0px, 0px, 0px);
-  background: #FFF;
+  //background: #FFF;
   min-height: 300px;
   padding: 10px 50px;
   padding-top: 50px;
   padding-bottom: 50px;
   font-family: 'Fenix', serif!important;
-  font-size: 16px!important;
+  font-size: 18px!important;
 }
 
 .cite-highlight {

@@ -1,27 +1,27 @@
 {% extends "base.html" %}
 
+{% set category_colour = cycler('red', 'orange', 'yellow', 'green', 'blue') %}
+
 {% block content %}
 <header id="hero">
   <div id="hero-container">
     <h1>Program Analysis</h1>
   </div>
+  <canvas id="hero-background"></canvas>
 </header>
 {% for cat, articles in categories %}
   {# <section id="{{ cat|lower }}" class="category-picture parallax" style="background-image:
       url('{{SITEURL}}/theme/images/covers/{{ cat|lower|urlencode}}.jpg');">
   </section> #}
-  <section id="{{ cat|replace(' ','-')}}" class="category-intro">
+  <section id="{{ cat|replace(' ','-')}}" class="category-intro {{ category_colour.next() }}">
     <h2>{{ cat }}</h2>
     <div class="container">
     <div class="row">
-      <div class="col-xs-12 col-sm-4 col-sm-offset-4">
-        <img src="{{SITEURL}}/theme/images/covers/{{ cat|lower|urlencode}}.jpg"/>
-      </div>
-      <div class="col-xs-12 col-sm-6">
+      <div class="col-xs-12 col-sm-4">
         {# This is a horrible way to do this #}
         <p>{{ INTROS.get(cat|trim|lower) }}</p>
       </div>
-      <div class="col-xs-12 col-sm-6">
+      <div class="col-xs-12 col-sm-4">
         <ol class="list">
 
         {% for article in articles %}
@@ -29,6 +29,9 @@
         {% endfor %}
 
         </ol>
+      </div>
+      <div class="col-xs-12 col-sm-4 cover-image">
+        <img src="{{SITEURL}}/theme/images/covers/{{ cat|lower|urlencode}}.jpg"/>
       </div>
   </section>
 {% endfor %}
