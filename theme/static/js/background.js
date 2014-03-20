@@ -14,59 +14,63 @@
     var off = (canvas.width - columnCount * 300) / 2;
 
     var renderColumn = function (i, j) {
-      var offX = off + i * 300 + 50.5;
-      var offY0 = j - Math.ceil(j / 130) * 130;
+      var k0 = Math.floor(j / 130);
       var rowCount = Math.floor(canvas.height + 300) / 130, k;
-      ctx.save();
 
-      for (k = -3; k < rowCount + 3; ++k) {
-        var offY = offY0 + k * 130;
-        var absK = Math.floor(j / 130) + k;
+      ctx.save();
+      ctx.translate(off + i * 300 + 50.5, 0.0);
+
+      for (k = k0 - 9; k <= k0 + rowCount + 9; ++k) {
+        var offY = k * 130 - j;
         var text;
 
-        ctx.strokeRect(offX, offY, 200, 70);
+        ctx.strokeRect(0.0, offY, 200, 70);
 
         ctx.beginPath();
-        ctx.moveTo(offX + 100, offY + 70);
-        ctx.lineTo(offX + 100, offY + 125);
+        ctx.moveTo(100, offY + 70);
+        ctx.lineTo(100, offY + 125);
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.lineTo(offX +  95, offY + 125);
-        ctx.lineTo(offX + 100, offY + 130);
-        ctx.lineTo(offX + 105, offY + 125);
-        ctx.lineTo(offX + 100, offY + 125);
+        ctx.lineTo( 95, offY + 125);
+        ctx.lineTo(100, offY + 130);
+        ctx.lineTo(105, offY + 125);
+        ctx.lineTo(100, offY + 125);
         ctx.fill();
 
-        var reg = "r" + absK;
+        var reg = "r" + (k % 50);
 
-        if ((absK % 2) === 0) {
+        if ((k % 9) === 0 || (k % 9) === 4) {
           ctx.beginPath();
-          ctx.moveTo(offX + 200, offY + 35);
+          ctx.moveTo(200, offY + 35);
           ctx.bezierCurveTo(
-            offX + 260, offY + 35,
-            offX + 260, offY + 425,
-            offX + 200, offY + 425
+            260, offY + 35,
+            260, offY + 805,
+            200, offY + 805
           );
           ctx.stroke();
 
           ctx.beginPath();
-          ctx.moveTo(offX + 200, offY + 425);
-          ctx.lineTo(offX + 206, offY + 429);
-          ctx.lineTo(offX + 204, offY + 419);
+          ctx.moveTo(200, offY + 805);
+          ctx.lineTo(206, offY + 809);
+          ctx.lineTo(204, offY + 799);
           ctx.closePath();
           ctx.fill();
 
-          text = "cjmp " + reg;
+          var c = (k % 9) === 0 ? "c" : "n";
+          text = c + "jmp L" + ((k + 6) % 20) + "," + reg + ">0";
+        } else if ((k % 9 === 1) || (k % 9) === 6) {
+          text = "lbl L" + (k % 20);
+        } else if ((k % 9) == 7) {
         } else {
-          text = "str " + reg;
+          text = "str " + reg + ", " + reg + "+5";
         }
 
         ctx.fillStyle = "#111111";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.font = "24px Courier New";
-        ctx.fillText(text, offX + 100, offY + 35);
+        ctx.fillText(text, 100, offY + 35);
         ctx.fillStyle = "#000000";
       }
 
@@ -75,7 +79,7 @@
 
     var date = (new Date()).getTime(), i;
     for (i = 0; i < columnCount; ++i) {
-      renderColumn(i, date / 50 + i * 342);
+      renderColumn(i, date / 10 + i * 342);
     }
 
     requestAnimationFrame(render);
