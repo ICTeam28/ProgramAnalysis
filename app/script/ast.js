@@ -342,7 +342,11 @@
       p.appendChild(line);
 
       // Expression
-      return drawAST(node.expr, g);
+      child = drawAST(node.expr, g);
+      return {
+        'width': w + 10 + child.width,
+        'height': Math.max(30, child.height)
+      };
     case 'if':
       // Condition
       drawLabel('IF', node.loc, p);
