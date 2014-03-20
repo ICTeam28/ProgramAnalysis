@@ -11,7 +11,7 @@
   <canvas id="hero-background"></canvas>
 </header>
 {% for cat, articles in categories %}
-  <section id="{{ cat|replace(' ','-')}}" class="category-intro {{ category_colour.next() }}">
+  <section name="{{ cat | replace(' ', '-') }}" id="{{ cat|replace(' ','-')}}" class="category-intro {{ category_colour.next() }}">
     <div class="category-wrapper">
       <div class="category-inner">
     <h2>{{ cat }}</h2>
