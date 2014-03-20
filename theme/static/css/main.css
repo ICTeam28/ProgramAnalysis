@@ -16,7 +16,7 @@ body {
 #hero {
   padding: 20px;
   text-align: center;
-  background-color: #4A6D8B;
+  background-color: #363A35;
   color: #ffffff;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
   //height: 100%;
@@ -59,13 +59,13 @@ section.category-picture {
   margin-right: auto;
   box-shadow: 0px 0px 15px #000;
 }
-pre {
+.category-intro pre {
   box-shadow: 0px 0px 15px #000;
 }
 .red {
   background-color: #F16663;
 }
-.red a, .red a:hover, .red a:visited {
+a, a:hover, a:link, a:focus, a:visited {
     color: #FFF;
 }
 .orange {
@@ -80,6 +80,19 @@ pre {
 .blue {
   background-color: #4A6D8B;
 }
+.cyan {
+  background-color: #1CB2BD
+}
+.darkyellow {
+  background-color: #EDB81D;
+}
+.peach {
+  background-color: #ED694F;
+}
+.white {
+  background-color: #F0F0EA;
+}
+
 
 section.category-intro {
   display: block;
