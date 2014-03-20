@@ -1,5 +1,5 @@
 Title: Therac 25 Radiation Disaster
-Date: 2014-03-17 15:08
+Date: 2014-03-01 15:08
 Category: III Lessons from History
 Tags: pelican, publishing
 Author: David Avedissian
