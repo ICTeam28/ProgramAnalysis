@@ -5,14 +5,11 @@
 
 {% block content %}
 <header id="hero">
-  <div id="hero-container">
-    <div id="hero-inner">
-      <h1>Program Analysis</h1>
-    </div>
+  <div id="hero-inner">
+    Program Analysis
   </div>
   <canvas id="hero-background"></canvas>
 </header>
-<div class="container">
 {% for cat, articles in categories %}
   {# <section id="{{ cat|lower }}" class="category-picture parallax" style="background-image:
       url('{{SITEURL}}/theme/images/covers/{{ cat|lower|urlencode}}.jpg');">
@@ -21,6 +18,7 @@
     <div class="category-wrapper">
       <div class="category-inner">
     <h2>{{ cat }}</h2>
+    <div class="container">
     <div class="row">
       <div class="col-xs-12 col-sm-5">
         {# This is a horrible way to do this #}
@@ -39,9 +37,9 @@
         <img src="{{SITEURL}}/theme/images/covers/{{ cat|lower|urlencode}}.jpg"/>
       </div>
     </div>
+    </div>
   </section>
 {% endfor %}
-</div>
   <section class="category-intro">
     <iframe id="demo" class="demo" frameBorder="0" src="app/"></iframe>
   </section>
