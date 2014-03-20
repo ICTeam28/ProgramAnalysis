@@ -40,7 +40,7 @@ Let's consider the following C functions:
     13.    return b * (a - 2);
     14.  }
 
-By analysing the source code, we can infer the parity, sign and possibly the
+By analysing the source code we can infer the parity, sign and possibly the
 interval of some variables.
 
 

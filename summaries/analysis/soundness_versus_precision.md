@@ -8,7 +8,7 @@ Summary: Comparison between static and dynamic analysis
 
 Static and Dynamic analysis developed side by side in different communities and
 have been regarded as distinct disciplines. Furthermore, the domains in which
-one of them shines represent the nightmare for the other. [@Ernst]
+one of them shines are a nightmare for the other. [@Ernst]
 
 
 Static Analysis
@@ -35,26 +35,26 @@ execution.
 
 Advantages and disadvantages
 ============================
-Although, some static analyses are performed quickly, generally, obtaining
-precise results demands many complicated and time consuming computations.
-Furthermore, certain problems, such as pointers analysis, are almost unsolvable.
-Conversely, the same problem is solved at runtime, using a single machine cycle
+Although some static analyses are performed quickly, obtaining
+precise results typically demands many complicated and time consuming computations.
+Furthermore, certain problems - such as pointers analysis - are almost unsolvable.
+Conversely, the same problem is solved trivially at runtime: using a single machine cycle
 to compare the pointers.
 
 The results of dynamic analysis cannot be generalised to future executions.
-Furthermore, there is no guarantee that the set of test cases, over which the
-program was run, covers all possible executions of the program. One of the main
-challenges of dynamic analysis is constructing a test suit, which covers all
+Furthermore, there is no guarantee that the set of test cases that the program
+was run over covers all possible executions of the program. One of the main
+challenges of dynamic analysis is constructing a test suite which covers all
 representative cases, and thus reveals properties of the program. Despite the
 fact that unsound dynamic analysis often faces criticism, it is used on many
 occasions because it delivers a sufficient quantity of valuable information.
 
-Performing both analysis
+Performing both analyses
 ===========================================
 Since both of the analyses collect different information, performing one
-analysis, then the other is more powerful than performing either one on its own.
-Static and dynamic analysis can supplement each other by providing, otherwise
-unavailable, information. For instance, static analysis can reduce the
+analysis then the other is more powerful than performing either one on its own.
+Static and dynamic analysis can supplement each other by providing otherwise
+unavailable information. For instance, static analysis can reduce the
 collection of data by guaranteeing that a smaller amount of information is
 sufficient, which makes dynamic analysis quicker and more efficient.
 
