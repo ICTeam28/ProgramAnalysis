@@ -25,5 +25,7 @@ This was most likely caused by the wrong subroutine being called, which could've
 been solved by proper unit testing and static analysis of the code to ensure that
 all code paths could be reached and pre/post conditions are met.
 
+References
+==========
 [@Sandra "Sandra Jontz: Hydraulics problem, software glitch led to fatal Osprey crash"]: http://www.fas.org/man/dod-101/sys/ac/docs/man-ac-v22-010407.htm
 [@NYTimes "James Dao: After North Carolina Crash, Marines Ground Osprey Program"]: http://www.nytimes.com/2000/12/13/us/after-north-carolina-crash-marines-ground-osprey-program.html?pagewanted=all
