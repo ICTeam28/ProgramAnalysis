@@ -49,7 +49,7 @@ body {
 section {
   //background-color: #FEFEFE!important;
   //border: solid 1px #222;
-  height: calc(100% - 50px);
+  min-height: calc(100% - 50px);
 }
 section > .category-wrapper {
   display: table;
@@ -71,6 +71,12 @@ section.category-picture {
   background-position: 50% 50%;
 }
 
+.button-footer {
+  text-align: center;
+  padding: 30px;
+  padding-bottom: 100px;
+}
+
 .cover-image img {
   height: auto;
   width: 300px;
@@ -84,7 +90,8 @@ section.category-picture {
 .red {
   background-color: #F16663;
 }
-.category-intro a, .category-intro a:hover, .category-intro a:link, .category-intro a:focus, .category-intro a:visited {
+.category-intro a, .category-intro a:hover, .category-intro a:link, 
+.category-intro a:focus, .category-intro a:visited {
     color: #444;
 }
 .orange {
@@ -124,10 +131,10 @@ section.category-intro {
   -webkit-transform: translate3d(0px, 0px, 0px);
   transform: translate3d(0px, 0px, 0px);
   //background: #FFF;
-  min-height: 300px;
   padding: 10px 50px;
   padding-top: 50px;
   padding-bottom: 50px;
+  height: 100%;
   font-family: 'Fenix', serif!important;
   font-size: 18px!important;
 }
