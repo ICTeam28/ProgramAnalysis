@@ -78,7 +78,7 @@ section.category-picture {
 
 .button-footer {
   text-align: center;
-  padding: 30px;
+  padding: 50px;
   padding-bottom: 100px;
 }
 
@@ -159,6 +159,17 @@ section.category-intro {
 .cite-highlight {
   background-color: #FF0;
 }
+
+/*** Teams ***/
+#team ul {
+  font-size: 1.4em;
+  margin-top: 60px;
+  list-style-type: none;
+}
+#team li {
+  display: inline;
+  padding: 10px;
+}    
 
 /*** Articles ***/
 article {
