@@ -9,7 +9,7 @@ The Northeast Blackout of 2003 was a widespread power outage that occured on
 Thursday, August 14 2003. It affected parts of Northeastern United States and
 Ontario, Canada.
 
-![Blackout](images/northeast-blackout.jpg)
+<!--![Blackout](images/northeast-blackout.jpg)-->
 
 The root cause of the blackout was a race condition which existed in GE Energy's
 energy managment system XA/21, which was based on Unix.[@SecurityFocus] Once the
