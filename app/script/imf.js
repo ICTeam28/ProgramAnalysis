@@ -293,6 +293,10 @@
       break;
     }
 
+    if (op.kill && !window.chrome) {
+      fill = 'fill: #ff0000';
+    }
+
     range = new env.AceRange(op.loc.first_line - 1, op.loc.first_column,
                              op.loc.last_line - 1, op.loc.last_column);
 
