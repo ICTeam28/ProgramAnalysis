@@ -2,11 +2,10 @@ Title: Live Variable Analysis
 Date: 29.01.2014
 Category: II. Data Flow Analysis
 Tags: pelican, publishing
-Tags: pelican, publishing
 Author: Nandor Licker
 Summary: Live Variable Analysis and its applications in program optimisation
 
-Live Variable Analysis is used to determine which variables defined at a certain
+*Live Variable Analysis* is used to determine which variables defined at a certain
 point in a program are going to be used later on. This type of analysis can be
 used to eliminate assigments to variables whose values are not read or are
 overwritten.
@@ -45,30 +44,30 @@ For example, for the following function written in mini:
       return square - cube;   // 4
     }
 
-The kill and gen function would be defined as follows:
+The $kill$ and $gen$ function would be defined as follows:
 
-|   | kill    | gen          |
-| - | ------- | ------------ |
-| 0 | y       |              |
-| 1 | x       | t            |
-| 2 | square  | x            |
-| 3 | cube    | x, t         |
-| 4 |         | square, cube |
+|   | <center>$kill$</center> | <center>$gen$</center> |
+|:-:|:-------:|:-------------:|
+| 0 | $y$     |               |
+| 1 | $x$     | $t$           |
+| 2 | $square$| $x$           |
+| 3 | $cube$  | $x, t$        |
+| 4 |         | $square, cube$|
 
 By solving the system of equations using chaotic iteration, we get:
 
-|   | liveIn          | liveOut      |
-| - | --------------- | ------------ |
-| 0 |                 |              |
-| 1 | t               | x, t         |
-| 2 | x, t            | square, x, t |
-| 3 | square, x, t    | square, cube |
-| 4 | square, cube    |              |
+|   | <center>$liveIn$</center> | <center>$liveOut$</center> |
+|:-:|:---------------:|:-------------:|
+| 0 |                 |               |
+| 1 | $t$             | $x, t$        |
+| 2 | $x, t$          | $square, x, t$|
+| 3 | $square, x, t$  | $square, cube$|
+| 4 | $square, cube$  |               |
 
 Assignment of variables to registers/memory locations
 =====================================================
 
-If two variables are live at the same point in a program, they need to be
+If two variables are *live* at the same point in a program, they need to be
 allocated to different registers or they need to be placed in different
 locations in memory. Allocation can be optimised by building an
 *interference graph* from the results of the analysis where nodes represent

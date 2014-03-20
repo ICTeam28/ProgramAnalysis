@@ -29,7 +29,7 @@ A board of inquiry investigated the causes of the explosion and issued a report.
 error in the inertial reference system. Namely a 64 bit number, relating to the
 horizontal velocity of the rocket with respect to the platform, was converted to
 a 16 bit signed integer.[@Douglas] The floating point number that was converted
-had a value grater than the 32 768, the maximal value that could be represented
+had a value grater than 32 768, the maximal value that could be represented
 using 16 bits, thus the conversion failed. Furthermore, since the backup system
 was running the same software, it could not prevent the failure.
 

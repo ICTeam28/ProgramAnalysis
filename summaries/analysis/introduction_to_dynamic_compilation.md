@@ -29,7 +29,7 @@ Advantages of each approach
 ===========================
 Compiled langauges' main benefits lies in performance. Through compiling the
 entire program in one go, the compiler can devote as much time as necessary to
-analyse the program and make optimisations. Howeevr, small changes in the
+analyse the program and make optimisations. However, small changes in the
 program source code can require recompilation of the entire program - a
 process which grows exponentially with code complexity.
 
@@ -78,7 +78,7 @@ improvements in runtime performance.
 To take LuaJIT as an example, it showed 134.71x improvement over the standard
 Lua Interpreter (Implemented in C).
 
-| Benchmark      | N        | Ratio	 |
+| <center>Benchmark</center> | <center>N</center>| <center>Ratio</center>|
 |:--------------:|:--------:|:------:|
 | md5	         | 20000    | 134.71 |
 | array3d	     | 300      | 91.96  |

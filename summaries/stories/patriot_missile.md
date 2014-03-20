@@ -23,7 +23,7 @@ The following figure shows correctly calculated range area:
 
 ![PatriotCorrect](images/patriot_correct.gif)
 
-In February of 1991, the Israeli troops had discovered that if systems runs for too long, it becomes inaccurate.
+In February of 1991, the Israeli troops had discovered that if system runs for too long, it becomes inaccurate.
 After the Patriot System has been in operation for more than 8 consecutive hours, system's radar range gate shifts by significant 20%:
 
 ![Patriot8h](images/patriot_8h.gif)
@@ -40,9 +40,7 @@ The prediction was calculated based on the targets velocity and the time of the 
 The algorithm used to predict the next interception range, required velocity and time to be stored as real numbers.
 Since the system only has 24 bit fixed point registers and the time was measured as the number of tenth seconds,
 the value 1/10, which has a non-terminating binary expansion, was chopped at 24 bits after the radix point.
-The small chopping error, when multiplied by the large number giving the time in tenths of a second, lead to a significant error. [@Douglas]
-
-
+The small chopping error, when multiplied by the large number giving the time in tenths of a second, led to a significant error. [@Douglas]
 
 
 References
