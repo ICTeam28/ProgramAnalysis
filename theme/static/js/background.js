@@ -79,7 +79,7 @@
 
     var date = (new Date()).getTime(), i;
     for (i = 0; i < columnCount; ++i) {
-      renderColumn(i, date / 10 + i * 342);
+      renderColumn(i, date / 50 + i * 342);
     }
 
     requestAnimationFrame(render);
