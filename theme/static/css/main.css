@@ -33,16 +33,18 @@ body {
   z-index: 0;
 }
 
-#hero-container {
-  position: relative;
+#hero-inner {
+  position: absolute;
+  margin-left: auto;
+  margin-right: auto;
+  top: 50%;
+  margin-top: -50px;
+  left: 0; right: 0;
+  text-align: center;
   z-index: 10;
-  display: table;
-  height: 100%;
+  font-size: 72px;
 }
-#hero-inner{
-    display: table-cell;
-    vertical-align: middle;
-}
+
 /* Categories */
 section {
   //background-color: #FEFEFE!important;
@@ -84,7 +86,7 @@ section.category-picture {
     color: #444;
 }
 .orange {
-  background-color: #F48D6C;    
+  background-color: #F48D6C;
 }
 .yellow {
   background-color: #F2E07B;
