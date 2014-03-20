@@ -690,9 +690,9 @@
 
         $('<div id ="f' + name + '"></div>')
           .append('<div class="header">' +
-                    '<input type="button" class="prev" value="<"/>' +
+                    '<input type="button" class="prev" value="Previous stage"/>' +
                     '<span>' + first + '</span>' +
-                    '<input type="button" class="next" value=">"/>' +
+                    '<input type="button" class="next" value="Next stage"/>' +
                   '</div>')
           .append(content)
           .appendTo(tabs);

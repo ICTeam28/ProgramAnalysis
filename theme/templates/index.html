@@ -11,9 +11,6 @@
   <canvas id="hero-background"></canvas>
 </header>
 {% for cat, articles in categories %}
-  {# <section id="{{ cat|lower }}" class="category-picture parallax" style="background-image:
-      url('{{SITEURL}}/theme/images/covers/{{ cat|lower|urlencode}}.jpg');">
-  </section> #}
   <section id="{{ cat|replace(' ','-')}}" class="category-intro {{ category_colour.next() }}">
     <div class="category-wrapper">
       <div class="category-inner">

@@ -174,13 +174,15 @@ body
 #imf-tabs .header > .prev
 {
   position: absolute;
-  left: 0px;
+  left: 3px; top: 3px;
+  font-size: 14px;
 }
 
 #imf-tabs .header > .next
 {
   position: absolute;
-  right: 0px;
+  right: 3px; top: 3px;
+  font-size: 14px;
 }
 
 #imf-tabs .header > span
