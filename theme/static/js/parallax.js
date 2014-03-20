@@ -4,13 +4,13 @@
     , pictures = document.querySelectorAll('.parallax');
 
   // requestAnimationFrame shim for multi-browser support.
-  window.requestAnimationFrame = window.requestAnimationFrame || 
+  window.requestAnimationFrame = window.requestAnimationFrame ||
                                  window.mozRequestAnimationFrame ||
-                                 window.webkitRequestAnimationFrame || 
+                                 window.webkitRequestAnimationFrame ||
                                  window.msRequestAnimationFrame ||
                                  function (f){setTimeout(f, 17)};
-  
-  var requestTick = function (f){
+
+  var requestTick = function (f) {
     if (!busy){
       requestAnimationFrame(f);
     }
