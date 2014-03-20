@@ -5,7 +5,7 @@ Tags: pelican, publishing
 Author: Ilija Radosavovic
 Summary: Code Hoisting
 
-*Code Hoisting* reduces he size of the program by moving duplicated expression computations to the same place,
+*Code Hoisting* reduces the size of the program by moving duplicated expression computations to the same place,
 where they can be combined into a single instruction. [@Mycroft]
 
 *Code Hoisting* relies on [Very Busy Expressions Analysis](very-busy-expressions.html) which, for a program point, determines
@@ -21,9 +21,9 @@ By precomputing $\\{a-b\\}$ and $\\{b-a\\}$ and moving them to the earlier block
 
 ![Pre](images/HoistingPost.png)
 
-However, depending on the nature of the program *hoisting* can have different effects on execution time,
-and does not guarantee improvements in terms of speed. Thus, the resulting program may be of the same speed as
-before or even slower.
+However, depending on the nature of the program, *hoisting* can have different 
+effects on execution time: It does not guarantee improvements in terms of speed. 
+The resulting program may be the same speed as before or even slower.
 
 
 
