@@ -293,6 +293,10 @@
       break;
     }
 
+    if (op.kill && !window.chrome) {
+      fill = 'fill: #ff0000';
+    }
+
     range = new env.AceRange(op.loc.first_line - 1, op.loc.first_column,
                              op.loc.last_line - 1, op.loc.last_column);
 
@@ -690,9 +694,9 @@
 
         $('<div id ="f' + name + '"></div>')
           .append('<div class="header">' +
-                    '<input type="button" class="prev" value="<"/>' +
+                    '<input type="button" class="prev" value="Previous stage"/>' +
                     '<span>' + first + '</span>' +
-                    '<input type="button" class="next" value=">"/>' +
+                    '<input type="button" class="next" value="Next stage"/>' +
                   '</div>')
           .append(content)
           .appendTo(tabs);
