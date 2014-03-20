@@ -4,6 +4,9 @@
 
   if (window.chrome)  {
     var canvas = $("#hero-background").get(0);
+    if (!canvas) {
+      return;
+    }
     var ctx = canvas.getContext('2d');
 
     (function render() {

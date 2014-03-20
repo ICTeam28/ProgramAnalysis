@@ -80,7 +80,7 @@ Fortunately, there are some heuristic algorithms which can provide a good
 distribution [@Brelaz]. In the simulation, we have implemented the
 *Welsh-Powell* algorithm [@Wellsh].
 
-![Interference Graph](../images/igraph.png)
+![Interference Graph](images/igraph.png)
 
 In the example program, *t* and *cube* are never used concurrently, so they can
 be allocated to the same register.
