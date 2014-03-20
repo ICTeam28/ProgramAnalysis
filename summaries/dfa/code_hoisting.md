@@ -9,7 +9,7 @@ Summary: Code Hoisting
 *Code Hoisting* reduces he size of the program by moving duplicated expression computations to the same place,
 where they can be combined into a single instruction. [@Mycroft]
 
-*Code Hoisting* relies on *Very Busy Expressions Analysis* (add link) which for a program point determines
+*Code Hoisting* relies on [Very Busy Expressions Analysis](very-busy-expressions.html) which for a program point determines
 which expressions are going to be evaluated later in the program no matter which path is taken.
 Thus, in order to reduce the size of the code generated for the program, we can evaluate these expressions
 at the end of the block and store their values for later use in the program.

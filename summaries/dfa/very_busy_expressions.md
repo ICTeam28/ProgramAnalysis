@@ -13,7 +13,8 @@ label, the expression is going to be used before any of the variables occurring 
 For each program point, we use the Very Busy Expressions analysis in order to determine
 which expressions must be *very busy* at the exit from the point. [@Nielson]
 
-Very Busy Expressions analysis are used for *code hoisting*. (create link to hoisting page)
+Very Busy Expressions analysis are used for 
+[code hoisting](code-hoisting.html).
 For example, if at a block of the program we have an expression which is definitely going to be
 evaluated later in the program, no matter which path is taken, we can evaluate
 that expression at the end of the block and store its value for later use,
